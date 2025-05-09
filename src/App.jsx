@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 import React, { useEffect, useRef } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -87,6 +87,7 @@ const AppContent = () => {
         onNodeDrop={handleNodeDrop}
         onNodeRemove={handleRemoveNode}
       />
+      <Analytics />
     </div>
   );
 };
@@ -97,7 +98,6 @@ const App = () => {
     <ReactFlowProvider>
       <DecisionProvider>
         <AppContent />
-        <Analytics />
       </DecisionProvider>
     </ReactFlowProvider>
   );
