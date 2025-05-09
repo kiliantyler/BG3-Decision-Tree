@@ -1,4 +1,5 @@
 // src/App.jsx
+import { Analytics } from '@vercel/analytics/next';
 import React, { useEffect, useRef } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -96,6 +97,7 @@ const App = () => {
     <ReactFlowProvider>
       <DecisionProvider>
         <AppContent />
+        <Analytics />
       </DecisionProvider>
     </ReactFlowProvider>
   );
