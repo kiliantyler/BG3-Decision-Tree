@@ -13,7 +13,7 @@ export const mindflayerPod = {
   description: "You find yourself trapped in a mindflayer pod. What do you do?",
   options: ["Try to break free", "Wait and observe", "Call for help"],
   prerequisites: [], // Starting point, no prerequisites
-  unlocks: ["nautiloid_laezel", "nautiloid_us_or_them"],
+  unlocks: ["nautiloid_laezel"],
   mutuallyExclusive: [],
   optional: false, // This is the starting point, so not optional
   required: true,

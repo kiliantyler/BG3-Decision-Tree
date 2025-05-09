@@ -13,7 +13,8 @@ import { wildernessDecisions } from './wilderness/index.js';
 // Export individual location decision sets
 export {
   druidGroveDecisions,
-  goblinCampDecisions, nautiloidDecisions,
+  goblinCampDecisions,
+  nautiloidDecisions,
   wildernessDecisions
 };
 
