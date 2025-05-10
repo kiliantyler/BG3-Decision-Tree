@@ -86,10 +86,7 @@ button {
   border-color: var(--border);
 }
 
-/* Exclude our custom buttons from general button styling */
-button:not(.theme-toggle):not(.fit-view-button):not(.reset-button):hover {
-  border-color: var(--purple);
-}
+/* Button styles moved to their respective component files */
 
 button.change-decision {
   background-color: var(--currentLine);
@@ -176,30 +173,7 @@ button.change-decision:hover {
   border-top-color: var(--comment);
 }
 
-/* Dark theme overrides for all buttons */
-[data-theme='dark'] .theme-toggle,
-[data-theme='dark'] .fit-view-button {
-  background-color: var(--currentLine);
-  border-color: var(--border);
-}
-
-[data-theme='dark'] .reset-button {
-  background-color: var(--currentLine);
-  border-color: var(--border);
-}
-
-[data-theme='dark'] .theme-toggle:hover,
-[data-theme='dark'] .fit-view-button:hover {
-  background-color: var(--selection);
-  border-color: var(--purple);
-}
-
-[data-theme='dark'] .reset-button:hover {
-  background-color: var(--selection);
-  border-color: var(--red);
-}
-
-/* Fit view button hover state is handled in customStyles.css */
+/* Dark theme overrides for buttons moved to their respective component files */
 
 [data-theme='dark'] .react-flow__background {
   background-color: var(--background);
@@ -208,8 +182,6 @@ button.change-decision:hover {
 [data-theme='dark'] .react-flow__background-pattern {
   color: var(--comment) !important;
 }
-
-/* Theme toggle hover state is handled in customStyles.css */
 
 /* Decision node styling */
 .decision-node.required:not(.completed) {

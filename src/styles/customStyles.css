@@ -27,91 +27,10 @@ body,
   position: relative; /* Needed for absolute positioning of buttons */
 }
 
-/* Button controls in the flow chart */
-.theme-toggle {
-  position: absolute;
-  top: 10px;
-  left: 10px; /* Position to the left */
-  background-color: var(--nodeBackground);
-  border: 1px solid var(--border);
-  border-radius: 8px; /* Rounded square */
-  width: 40px; /* Fixed width */
-  height: 40px; /* Fixed height */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  transition: all 0.2s ease; /* Add transition for hover effect */
-}
-
-.theme-toggle:hover {
-  background-color: var(--selection);
-  transform: scale(1.05); /* Slight scale effect on hover */
-}
-
-/* Fit view button */
-.fit-view-button {
-  position: absolute;
-  top: 10px;
-  left: 60px; /* Position to the right of theme toggle button */
-  background-color: var(--nodeBackground);
-  border: 1px solid var(--border);
-  border-radius: 8px; /* Rounded square */
-  width: 40px; /* Fixed width */
-  height: 40px; /* Fixed height */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  transition: all 0.2s ease; /* Add transition for hover effect */
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  transition: all 0.2s ease; /* Add transition for hover effect */
-}
-
-/* Explicitly set SVG color for fit view button */
-.fit-view-button svg {
-  fill: #0dcaf0 !important; /* Cyan color that works in both light and dark modes */
-}
-
-.fit-view-button:hover {
-  background-color: var(--selection);
-  transform: scale(1.05); /* Slight scale effect on hover */
-}
-
-/* Reset button - positioned at bottom left */
-.reset-button {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background-color: var(--nodeBackground);
-  border: 1px solid var(--red); /* Red border */
-  border-radius: 8px; /* Rounded square */
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-/* Explicitly set SVG color for reset button */
-.reset-button svg {
-  fill: #dc3545 !important; /* Red color that works in both light and dark modes */
-}
-
-.reset-button:hover {
-  background-color: var(--selection);
-  transform: scale(1.05); /* Consistent scale effect with other buttons */
-}
+/* Button controls in the flow chart - styles moved to component files */
+/* Theme toggle styles moved to ThemeToggle.jsx */
+/* Fit view button styles moved to FitViewButton.jsx */
+/* Reset button styles moved to ResetButton.jsx */
 
 /* Hide the attribution panel at the bottom */
 .react-flow__attribution {

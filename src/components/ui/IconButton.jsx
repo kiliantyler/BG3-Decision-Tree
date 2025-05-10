@@ -1,5 +1,5 @@
 // components/ui/IconButton.jsx
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * A reusable icon button component
@@ -14,13 +14,38 @@ import React from 'react';
  * @returns {React.ReactElement} - The icon button component
  */
 const IconButton = ({ children, onClick, title, ariaLabel, className = '', style = {} }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const baseStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    zIndex: 10,
+    transition: 'all 0.2s ease',
+    ...style,
+  };
+
+  const hoverStyle = isHovered
+    ? {
+        backgroundColor: 'var(--selection)',
+        transform: 'scale(1.05)',
+      }
+    : {};
+
   return (
     <button
       className={className}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       aria-label={ariaLabel || title}
       title={title}
-      style={style}
+      style={{
+        ...baseStyle,
+        ...hoverStyle,
+      }}
     >
       {children}
     </button>

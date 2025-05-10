@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Using the red color that works in both light and dark modes
 const ResetIcon = ({ color = '#dc3545', size = 24 }) => {
   return (
     <div
@@ -19,6 +20,7 @@ const ResetIcon = ({ color = '#dc3545', size = 24 }) => {
         style={{
           display: 'block',
           overflow: 'visible',
+          fill: '#dc3545', // Explicitly set fill color
         }}
       >
         {/* Simple counterclockwise circular arrow */}

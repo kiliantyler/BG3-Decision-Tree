@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Using the cyan color that works in both light and dark modes
 const SearchIcon = ({ color = '#0dcaf0', size = 24 }) => {
   // Use inline SVG with explicit styling
   return (
@@ -20,6 +21,7 @@ const SearchIcon = ({ color = '#0dcaf0', size = 24 }) => {
         style={{
           display: 'block',
           overflow: 'visible',
+          fill: '#0dcaf0', // Explicitly set fill color
         }}
       >
         {/* Improved magnifying glass */}
