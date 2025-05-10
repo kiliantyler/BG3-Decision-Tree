@@ -1,17 +1,19 @@
 // src/hooks/useDecisionManager.jsx - Updated to ensure all decisions are available to the sidebar
 import { useCallback, useEffect, useState } from 'react';
 import { MarkerType } from 'reactflow';
-
 // Import all decisions from the data manager
 import {
   allDecisions,
   decisionsByCategory,
   getAvailableDecisions,
-  getUnlockedDecisions
+  getUnlockedDecisions,
 } from '../data/enhancedDataManager';
 
 // Debug flag
 const DEBUG = true; // Enable debugging
+
+// Local storage key
+const STORAGE_KEY = 'bg3-decision-tree-state';
 
 /**
  * Custom hook for managing decisions, nodes, and edges in the flowchart
@@ -37,40 +39,119 @@ const useDecisionManager = () => {
   // Track newly added nodes to enable focusing on them
   const [newlyAddedNodes, setNewlyAddedNodes] = useState([]);
 
-  // Initialize component
+  // Load state from localStorage on initialization
   useEffect(() => {
+    try {
+      const savedState = localStorage.getItem(STORAGE_KEY);
+
+      if (savedState) {
+        const {
+          completedDecisions: savedCompletedDecisions,
+          nodes: savedNodes,
+          edges: savedEdges,
+        } = JSON.parse(savedState);
+
+        if (DEBUG) {
+          console.log('🔧 useDecisionManager: Loading state from localStorage', {
+            completedDecisions: savedCompletedDecisions?.length || 0,
+            nodes: savedNodes?.length || 0,
+            edges: savedEdges?.length || 0,
+          });
+        }
+
+        // Restore state from localStorage
+        if (savedCompletedDecisions) setCompletedDecisions(savedCompletedDecisions);
+        if (savedNodes) {
+          // Ensure node data has the necessary functions
+          const restoredNodes = savedNodes.map(node => ({
+            ...node,
+            data: {
+              ...node.data,
+              onComplete: handleDecisionComplete,
+              onRemove: handleRemoveNode,
+            },
+          }));
+          setNodes(restoredNodes);
+        }
+        if (savedEdges) setEdges(savedEdges);
+      } else {
+        if (DEBUG) {
+          console.log('🔧 useDecisionManager: No saved state found in localStorage');
+        }
+      }
+    } catch (error) {
+      console.error('Error loading state from localStorage:', error);
+    }
+
     if (DEBUG) {
-      console.log("🔧 useDecisionManager: Initializing with raw data", {
+      console.log('🔧 useDecisionManager: Initializing with raw data', {
         allDecisionsCount: allDecisions?.length || 0,
         categoriesCount: Object.keys(decisionsByCategory || {}).length,
-        categoryNames: Object.keys(decisionsByCategory || {})
+        categoryNames: Object.keys(decisionsByCategory || {}),
       });
-      
+
       // Verify data structure
       const allCategorizedDecisions = Object.values(decisionsByCategory || {}).flat();
-      console.log("🔧 useDecisionManager: Data verification", {
+      console.log('🔧 useDecisionManager: Data verification', {
         allDecisionsHasCorrectLength: allDecisions?.length === allCategorizedDecisions.length,
         allDecisionsLength: allDecisions?.length || 0,
-        categorizedDecisionsLength: allCategorizedDecisions.length
+        categorizedDecisionsLength: allCategorizedDecisions.length,
       });
     }
-    
+
     // Initialize states
     setCategorizedDecisions(decisionsByCategory || {});
-    setAvailableDecisions(getAvailableDecisions([]));
+    setAvailableDecisions(getAvailableDecisions(completedDecisions));
   }, []);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      // Only save if we have some state to save
+      if (completedDecisions.length > 0 || nodes.length > 0 || edges.length > 0) {
+        // Create a simplified version of nodes without circular references
+        const nodesToSave = nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            // Remove function references that can't be serialized
+            onComplete: undefined,
+            onRemove: undefined,
+          },
+        }));
+
+        const stateToSave = {
+          completedDecisions,
+          nodes: nodesToSave,
+          edges,
+        };
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+
+        if (DEBUG) {
+          console.log('🔧 useDecisionManager: Saved state to localStorage', {
+            completedDecisions: completedDecisions.length,
+            nodes: nodes.length,
+            edges: edges.length,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error saving state to localStorage:', error);
+    }
+  }, [completedDecisions, nodes, edges]);
 
   // Find all nodes that depend on a given node (recursively)
   const findDependentNodes = useCallback(
-    (nodeId) => {
+    nodeId => {
       const directDependents = edges
-        .filter((edge) => edge.source === nodeId)
-        .map((edge) => edge.target);
+        .filter(edge => edge.source === nodeId)
+        .map(edge => edge.target);
 
       let allDependents = [...directDependents];
 
       // Recursively find dependents of dependents
-      directDependents.forEach((depId) => {
+      directDependents.forEach(depId => {
         const subDependents = findDependentNodesInternal(depId);
         allDependents = [...allDependents, ...subDependents];
       });
@@ -81,20 +162,16 @@ const useDecisionManager = () => {
   );
 
   // Internal version to avoid recursion issues
-  const findDependentNodesInternal = (nodeId) => {
-    const directDependents = edges
-      .filter((edge) => edge.source === nodeId)
-      .map((edge) => edge.target);
+  const findDependentNodesInternal = nodeId => {
+    const directDependents = edges.filter(edge => edge.source === nodeId).map(edge => edge.target);
 
     let allDependents = [...directDependents];
 
     // Recursively find dependents of dependents, but limit depth to avoid infinite loops
-    directDependents.forEach((depId) => {
+    directDependents.forEach(depId => {
       // Avoid circular references by checking if we've already seen this node
       if (!allDependents.includes(depId)) {
-        const childDeps = edges
-          .filter((edge) => edge.source === depId)
-          .map((edge) => edge.target);
+        const childDeps = edges.filter(edge => edge.source === depId).map(edge => edge.target);
         allDependents = [...allDependents, ...childDeps];
       }
     });
@@ -106,7 +183,7 @@ const useDecisionManager = () => {
 
   // Handle removing a node from the canvas
   const handleRemoveNode = useCallback(
-    (nodeId) => {
+    nodeId => {
       // First check if this node has dependent nodes
       const dependentNodes = findDependentNodes(nodeId);
 
@@ -122,30 +199,23 @@ const useDecisionManager = () => {
 
         // Remove this node and all its dependents
         const allNodesToRemove = [nodeId, ...dependentNodes];
-        setNodes((nds) =>
-          nds.filter((node) => !allNodesToRemove.includes(node.id))
-        );
-        setEdges((eds) =>
+        setNodes(nds => nds.filter(node => !allNodesToRemove.includes(node.id)));
+        setEdges(eds =>
           eds.filter(
-            (edge) =>
-              !allNodesToRemove.includes(edge.source) &&
-              !allNodesToRemove.includes(edge.target)
+            edge =>
+              !allNodesToRemove.includes(edge.source) && !allNodesToRemove.includes(edge.target)
           )
         );
 
         // Also remove from completedDecisions
-        setCompletedDecisions((prev) =>
-          prev.filter((id) => !allNodesToRemove.includes(id))
-        );
+        setCompletedDecisions(prev => prev.filter(id => !allNodesToRemove.includes(id)));
       } else {
         // Just remove this node
-        setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-        setEdges((eds) =>
-          eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
-        );
+        setNodes(nds => nds.filter(node => node.id !== nodeId));
+        setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
 
         // Also remove from completedDecisions if present
-        setCompletedDecisions((prev) => prev.filter((id) => id !== nodeId));
+        setCompletedDecisions(prev => prev.filter(id => id !== nodeId));
       }
     },
     [findDependentNodes, setNodes, setEdges, setCompletedDecisions]
@@ -155,12 +225,12 @@ const useDecisionManager = () => {
   const addUnlockedNodesToCanvas = useCallback(
     (sourceDecisionId, unlockedDecisions) => {
       // Find the source node
-      const sourceNode = nodes.find((node) => node.id === sourceDecisionId);
+      const sourceNode = nodes.find(node => node.id === sourceDecisionId);
       if (!sourceNode) return null;
 
       // Filter to only required decisions (not optional ones)
       const requiredDecisions = unlockedDecisions.filter(
-        (decision) => decision.required === true && !decision.optional
+        decision => decision.required === true && !decision.optional
       );
 
       // Skip if no required decisions
@@ -206,16 +276,12 @@ const useDecisionManager = () => {
       // Calculate positions for new nodes
       requiredDecisions.forEach((decision, index) => {
         // Skip if node already exists on canvas
-        if (nodes.some((node) => node.id === decision.id)) {
+        if (nodes.some(node => node.id === decision.id)) {
           return;
         }
 
         // Calculate position
-        const position = calculateNodePosition(
-          sourceNode,
-          index,
-          requiredDecisions.length
-        );
+        const position = calculateNodePosition(sourceNode, index, requiredDecisions.length);
 
         // Create new node
         const newNode = {
@@ -250,13 +316,13 @@ const useDecisionManager = () => {
 
       // Update nodes and edges state if we have new nodes
       if (newNodes.length > 0) {
-        setNodes((nds) => {
+        setNodes(nds => {
           const updatedNodes = [...nds, ...newNodes];
           // Set newly added nodes to enable focusing in FlowChart
           setNewlyAddedNodes(newNodes);
           return updatedNodes;
         });
-        setEdges((eds) => [...eds, ...newEdges]);
+        setEdges(eds => [...eds, ...newEdges]);
         return {
           newNodeIds,
           sourceNodeId: sourceDecisionId,
@@ -273,7 +339,7 @@ const useDecisionManager = () => {
   const addNodeFromSidebar = useCallback(
     (decisionData, position) => {
       // Check if node already exists
-      if (nodes.some((node) => node.id === decisionData.id)) {
+      if (nodes.some(node => node.id === decisionData.id)) {
         return null;
       }
 
@@ -290,7 +356,7 @@ const useDecisionManager = () => {
       };
 
       // Add the new node to the chart
-      setNodes((nds) => {
+      setNodes(nds => {
         const updatedNodes = [...nds, newNode];
         // Set newly added nodes to enable focusing in FlowChart
         setNewlyAddedNodes([newNode]);
@@ -302,8 +368,8 @@ const useDecisionManager = () => {
         const newEdges = [];
 
         // For each prerequisite, check if it's on the canvas
-        decisionData.prerequisites.forEach((prereqId) => {
-          const sourceNode = nodes.find((node) => node.id === prereqId);
+        decisionData.prerequisites.forEach(prereqId => {
+          const sourceNode = nodes.find(node => node.id === prereqId);
           if (sourceNode) {
             // Create a connection from the prerequisite to this node
             const newEdge = {
@@ -323,7 +389,7 @@ const useDecisionManager = () => {
 
         // Add all new edges
         if (newEdges.length > 0) {
-          setEdges((eds) => [...eds, ...newEdges]);
+          setEdges(eds => [...eds, ...newEdges]);
         }
       }
 
@@ -336,9 +402,7 @@ const useDecisionManager = () => {
   const handleDecisionComplete = useCallback(
     (decisionId, option, isChanging = false) => {
       console.log(
-        `Decision ${decisionId} ${
-          isChanging ? 'changed to' : 'completed with'
-        } option: ${option}`
+        `Decision ${decisionId} ${isChanging ? 'changed to' : 'completed with'} option: ${option}`
       );
 
       // If changing a decision, we need to remove any nodes that depend on this one
@@ -358,33 +422,25 @@ const useDecisionManager = () => {
             return; // User cancelled
           }
 
-          setNodes((nds) =>
-            nds.filter((node) => !nodesToRemove.includes(node.id))
-          );
-          setEdges((eds) =>
+          setNodes(nds => nds.filter(node => !nodesToRemove.includes(node.id)));
+          setEdges(eds =>
             eds.filter(
-              (edge) =>
-                !nodesToRemove.includes(edge.source) &&
-                !nodesToRemove.includes(edge.target)
+              edge => !nodesToRemove.includes(edge.source) && !nodesToRemove.includes(edge.target)
             )
           );
 
           // Also remove from completedDecisions
-          setCompletedDecisions((prev) =>
-            prev.filter(
-              (id) => id !== decisionId && !nodesToRemove.includes(id)
-            )
+          setCompletedDecisions(prev =>
+            prev.filter(id => id !== decisionId && !nodesToRemove.includes(id))
           );
         } else {
           // If no dependent nodes, just remove this decision from completed
-          setCompletedDecisions((prev) =>
-            prev.filter((id) => id !== decisionId)
-          );
+          setCompletedDecisions(prev => prev.filter(id => id !== decisionId));
         }
       }
 
       // Mark the decision as completed
-      setCompletedDecisions((prev) => {
+      setCompletedDecisions(prev => {
         // For a changed decision, we already removed it above
         if (isChanging) {
           return [...prev, decisionId];
@@ -402,13 +458,13 @@ const useDecisionManager = () => {
 
       // Store the selected option in the node data for persistence
       // while preserving the current position of the node
-      setNodes((nds) => {
-        return nds.map((node) => {
+      setNodes(nds => {
+        return nds.map(node => {
           if (node.id === decisionId) {
             // Preserve the node's current position and update only the data
             return {
               ...node,
-              data: { ...node.data, selectedOption: option }
+              data: { ...node.data, selectedOption: option },
             };
           }
           return node;
@@ -442,10 +498,7 @@ const useDecisionManager = () => {
     // If there are unlocked decisions, add required ones to the canvas
     if (allUnlockedDecisions.length > 0) {
       // Add to canvas and return if we made changes
-      const result = addUnlockedNodesToCanvas(
-        lastCompletedDecision,
-        allUnlockedDecisions
-      );
+      const result = addUnlockedNodesToCanvas(lastCompletedDecision, allUnlockedDecisions);
 
       // Reset last completed decision after processing
       if (result) {
@@ -468,6 +521,28 @@ const useDecisionManager = () => {
     }
   }, [newlyAddedNodes]);
 
+  // Reset the state to initial values
+  const resetState = useCallback(() => {
+    if (DEBUG) {
+      console.log('🔧 useDecisionManager: Resetting state');
+    }
+
+    // Clear state
+    setCompletedDecisions([]);
+    setNodes([]);
+    setEdges([]);
+    setLastCompletedDecision(null);
+    setNewlyAddedNodes([]);
+
+    // Reset available decisions
+    setAvailableDecisions(getAvailableDecisions([]));
+
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
+
+    return true;
+  }, []);
+
   return {
     // State
     nodes,
@@ -485,6 +560,7 @@ const useDecisionManager = () => {
     addUnlockedNodesToCanvas,
     addNodeFromSidebar,
     findDependentNodes,
+    resetState,
   };
 };
 

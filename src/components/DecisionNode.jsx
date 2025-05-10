@@ -20,7 +20,7 @@ const DecisionNode = ({ data, isConnectable, id }) => {
   const isRequired = data.required === true && !data.optional;
 
   // Handle option selection and completion
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = option => {
     // If changing a decision, first confirm
     if (selectedOption && !isChangingDecision) {
       setIsChangingDecision(true);
@@ -64,9 +64,6 @@ const DecisionNode = ({ data, isConnectable, id }) => {
       if (node) {
         // Get current viewport to preserve zoom level
         const { zoom } = reactFlowInstance.getViewport();
-
-        // Hard-coded sidebar width - this is the offset we need to apply
-        const sidebarWidth = 300;
 
         // Get the container element to calculate proper dimensions
         const container = document.querySelector('.reactflow-wrapper');
@@ -292,8 +289,7 @@ const DecisionNode = ({ data, isConnectable, id }) => {
               border: '1px solid #ffeeba',
             }}
           >
-            <strong>Warning:</strong> Changing this decision may remove
-            connected nodes.
+            <strong>Warning:</strong> Changing this decision may remove connected nodes.
             <div
               style={{
                 marginTop: '8px',
@@ -334,53 +330,47 @@ const DecisionNode = ({ data, isConnectable, id }) => {
         )}
 
         {/* Options section - show when not selected or when changing */}
-        {data.options &&
-          data.options.length > 0 &&
-          (!selectedOption || isChangingDecision) && (
-            <div
-              className="node-options"
-              style={{
-                fontSize: '0.9rem',
-                background: 'rgba(255, 255, 255, 0.4)',
-                borderRadius: '6px',
-                padding: '8px 10px',
-                marginTop: '10px',
-              }}
-            >
-              <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                {isChangingDecision
-                  ? 'Select new option:'
-                  : 'Choose an option:'}
-              </div>
-              {data.options.map((option, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleOptionSelect(option)}
-                  style={{
-                    cursor: 'pointer',
-                    padding: '5px 8px',
-                    margin: '3px 0',
-                    borderRadius: '4px',
-                    transition: 'all 0.2s ease',
-                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                    border: '1px solid transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-                    e.target.style.border = isOptional
-                      ? '1px solid #bebebe'
-                      : '1px solid #ff9900';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
-                    e.target.style.border = '1px solid transparent';
-                  }}
-                >
-                  {option}
-                </div>
-              ))}
+        {data.options && data.options.length > 0 && (!selectedOption || isChangingDecision) && (
+          <div
+            className="node-options"
+            style={{
+              fontSize: '0.9rem',
+              background: 'rgba(255, 255, 255, 0.4)',
+              borderRadius: '6px',
+              padding: '8px 10px',
+              marginTop: '10px',
+            }}
+          >
+            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+              {isChangingDecision ? 'Select new option:' : 'Choose an option:'}
             </div>
-          )}
+            {data.options.map((option, index) => (
+              <div
+                key={index}
+                onClick={() => handleOptionSelect(option)}
+                style={{
+                  cursor: 'pointer',
+                  padding: '5px 8px',
+                  margin: '3px 0',
+                  borderRadius: '4px',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  border: '1px solid transparent',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                  e.target.style.border = isOptional ? '1px solid #bebebe' : '1px solid #ff9900';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                  e.target.style.border = '1px solid transparent';
+                }}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Selected option display */}
         {selectedOption && !isChangingDecision && (
@@ -439,8 +429,7 @@ const DecisionNode = ({ data, isConnectable, id }) => {
               </div>
             )}
             <div style={{ marginTop: '5px' }}>
-              <strong>Type:</strong>{' '}
-              {isOptional ? 'Optional Side Quest' : 'Required Main Quest'}
+              <strong>Type:</strong> {isOptional ? 'Optional Side Quest' : 'Required Main Quest'}
             </div>
           </div>
         )}

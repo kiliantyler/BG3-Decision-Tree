@@ -30,6 +30,7 @@ const AppContent = () => {
     addNodeFromSidebar,
     handleRemoveNode,
     newlyAddedNodes,
+    resetState,
   } = useDecision();
 
   // Reference to track if initial node has been added
@@ -152,6 +153,15 @@ const AppContent = () => {
     );
   }
 
+  // Handle reset button click
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+      resetState();
+      // Force reload the page to ensure a clean state
+      window.location.reload();
+    }
+  };
+
   // Render the main application
   return (
     <div className="app-container">
@@ -168,6 +178,7 @@ const AppContent = () => {
         onNodeRemove={handleRemoveNode}
         newlyAddedNodes={newlyAddedNodes || []}
         setNodes={setNodes} // Pass the setNodes function to update node positions
+        onReset={handleReset} // Pass the reset function to FlowChart
       />
 
       {/* Debug panel - activated with CTRL+SHIFT+D */}

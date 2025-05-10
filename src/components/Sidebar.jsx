@@ -9,7 +9,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // State for filter toggle
-  const [showOnlyAvailable, setShowOnlyAvailable] = useState(availableOnly);
+  const [showUnavailable, setShowUnavailable] = useState(false); // Default to false (off)
 
   // State for filtering by type (optional/required)
   const [showOptional, setShowOptional] = useState(true);
@@ -21,7 +21,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
       // Log the key state values to help debug issues
       console.log('Sidebar component state:', {
         availableOnly,
-        showOnlyAvailable,
+        showUnavailable,
         showOptional,
         showRequired,
         decisionCategories: Object.keys(decisions),
@@ -29,7 +29,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         completedDecisions: completed?.length || 0,
       });
     }
-  }, [availableOnly, showOnlyAvailable, showOptional, showRequired, decisions, completed]);
+  }, [availableOnly, showUnavailable, showOptional, showRequired, decisions, completed]);
 
   // Function to handle the start of drag
   const onDragStart = (event, nodeType, decision) => {
@@ -129,8 +129,8 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         const matchesType =
           (showOptional && item.optional) || (showRequired && item.required && !item.optional);
 
-        // Availability filter - only apply if showOnlyAvailable is true
-        const matchesAvailability = !showOnlyAvailable || isDecisionAvailable(item.id);
+        // Availability filter - show unavailable items if showUnavailable is true or item is available
+        const matchesAvailability = showUnavailable || isDecisionAvailable(item.id);
 
         // Count if matches all filters
         if (matchesSearch && matchesType && matchesAvailability) {
@@ -167,8 +167,8 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         const matchesType =
           (showOptional && item.optional) || (showRequired && item.required && !item.optional);
 
-        // Availability filter - only apply if showOnlyAvailable is true
-        const matchesAvailability = !showOnlyAvailable || isDecisionAvailable(item.id);
+        // Availability filter - show unavailable items if showUnavailable is true or item is available
+        const matchesAvailability = showUnavailable || isDecisionAvailable(item.id);
 
         // Add to filtered items if it matches all filters
         if (matchesSearch && matchesType && matchesAvailability) {
@@ -188,7 +188,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         displayCount,
         categoriesShown: Object.keys(categoriesToShow).length,
         filtering: {
-          showOnlyAvailable,
+          showUnavailable,
           showOptional,
           showRequired,
           searchTerm: searchTerm ? `"${searchTerm}"` : 'none',
@@ -371,51 +371,6 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
           />
 
           <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              marginBottom: '10px',
-            }}
-          >
-            <label style={{ display: 'flex', alignItems: 'center' }}>
-              <input
-                type="checkbox"
-                checked={showOnlyAvailable}
-                onChange={() => {
-                  const newValue = !showOnlyAvailable;
-                  setShowOnlyAvailable(newValue);
-                  if (DEBUG) console.log(`Changed showOnlyAvailable to ${newValue}`);
-                }}
-                style={{ marginRight: '8px' }}
-              />
-              Show only available decisions
-            </label>
-
-            <div style={{ display: 'flex', gap: '10px', marginLeft: '16px' }}>
-              <label style={{ display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="checkbox"
-                  checked={showRequired}
-                  onChange={() => setShowRequired(!showRequired)}
-                  style={{ marginRight: '8px' }}
-                />
-                Required
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="checkbox"
-                  checked={showOptional}
-                  onChange={() => setShowOptional(!showOptional)}
-                  style={{ marginRight: '8px' }}
-                />
-                Optional
-              </label>
-            </div>
-          </div>
-
-          <div
             className="legend"
             style={{
               display: 'flex',
@@ -427,79 +382,115 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
               marginBottom: '12px',
             }}
           >
-            {/* Display decision counts */}
+            {/* Required Quest with toggle */}
             <div
               style={{
-                fontSize: '0.7rem',
-                marginBottom: '6px',
-                color: '#666',
-                textAlign: 'right',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '4px',
+                cursor: 'pointer',
               }}
+              onClick={() => setShowRequired(!showRequired)}
             >
-              Showing {displayCount} of {total} decisions ({available} available,{' '}
-              {total - available} locked)
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    backgroundColor: '#ffb84d',
+                    border: '1px solid #ff9900',
+                    borderRadius: '3px',
+                    display: 'inline-block',
+                    marginRight: '6px',
+                  }}
+                ></span>
+                <span>Required Quest</span>
+              </div>
+              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
+                <input
+                  className="tgl tgl-light"
+                  id="cb-required"
+                  type="checkbox"
+                  checked={showRequired}
+                  onChange={() => setShowRequired(!showRequired)}
+                />
+                <label className="tgl-btn" htmlFor="cb-required"></label>
+              </div>
             </div>
 
-            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Legend:</div>
+            {/* Optional Side Quest with toggle */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 marginBottom: '4px',
+                cursor: 'pointer',
               }}
+              onClick={() => setShowOptional(!showOptional)}
             >
-              <span
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  backgroundColor: '#ffb84d',
-                  border: '1px solid #ff9900',
-                  borderRadius: '3px',
-                  display: 'inline-block',
-                  marginRight: '6px',
-                }}
-              ></span>
-              <span>Required Quest</span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    backgroundColor: '#e0e0e0',
+                    border: '1px solid #bebebe',
+                    borderRadius: '3px',
+                    display: 'inline-block',
+                    marginRight: '6px',
+                  }}
+                ></span>
+                <span>Optional Side Quest</span>
+              </div>
+              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
+                <input
+                  className="tgl tgl-light"
+                  id="cb-optional"
+                  type="checkbox"
+                  checked={showOptional}
+                  onChange={() => setShowOptional(!showOptional)}
+                />
+                <label className="tgl-btn" htmlFor="cb-optional"></label>
+              </div>
             </div>
+
+            {/* Unavailable Decision with toggle */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                marginBottom: '4px',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
               }}
+              onClick={() => setShowUnavailable(!showUnavailable)}
             >
-              <span
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  backgroundColor: '#e0e0e0',
-                  border: '1px solid #bebebe',
-                  borderRadius: '3px',
-                  display: 'inline-block',
-                  marginRight: '6px',
-                }}
-              ></span>
-              <span>Optional Side Quest</span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <span
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  backgroundColor: '#f8f8f8',
-                  border: '1px dashed #999',
-                  borderRadius: '3px',
-                  display: 'inline-block',
-                  marginRight: '6px',
-                  opacity: 0.6,
-                }}
-              ></span>
-              <span>Unavailable Decision</span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    backgroundColor: '#f8f8f8',
+                    border: '1px dashed #999',
+                    borderRadius: '3px',
+                    display: 'inline-block',
+                    marginRight: '6px',
+                    opacity: 0.6,
+                  }}
+                ></span>
+                <span>Unavailable Decision</span>
+              </div>
+              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
+                <input
+                  className="tgl tgl-light"
+                  id="cb-available"
+                  type="checkbox"
+                  checked={showUnavailable}
+                  onChange={() => setShowUnavailable(!showUnavailable)}
+                />
+                <label className="tgl-btn" htmlFor="cb-available"></label>
+              </div>
             </div>
           </div>
         </div>
@@ -523,7 +514,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Debug Info:</div>
           <div>
             Filter Settings:
-            {showOnlyAvailable ? ' Show Available Only,' : ' Show All,'}
+            {showUnavailable ? ' Show Unavailable,' : ' Hide Unavailable,'}
             {showRequired ? ' Required,' : ''}
             {showOptional ? ' Optional' : ''}
           </div>

@@ -24,6 +24,81 @@ body,
   flex: 1;
   height: 100%;
   overflow: hidden;
+  position: relative; /* Needed for absolute positioning of buttons */
+}
+
+/* Button controls in the flow chart */
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px; /* Position to the left */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Rounded square */
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: all 0.2s ease; /* Add transition for hover effect */
+}
+
+.theme-toggle:hover {
+  background-color: #f8f8f8;
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+/* Fit view button */
+.fit-view-button {
+  position: absolute;
+  top: 10px;
+  left: 60px; /* Position to the right of theme toggle button */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Rounded square */
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: all 0.2s ease; /* Add transition for hover effect */
+}
+
+.fit-view-button:hover {
+  background-color: #f8f8f8;
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+/* Reset button - positioned at bottom left */
+.reset-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded square */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.reset-button:hover {
+  background-color: #c82333;
+  transform: scale(1.05); /* Consistent scale effect with other buttons */
 }
 
 /* Hide the attribution panel at the bottom */
@@ -109,10 +184,61 @@ body,
   padding: 15px;
   border-right: 1px solid #ddd;
   background-color: #f8f8f8;
-  overflow-y: auto;
+  overflow-y: hidden; /* Prevent scrollbar from appearing */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 5;
   flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+/* Make the decision categories scrollable instead */
+.decision-categories {
+  max-height: calc(100vh - 250px); /* Adjust based on header height */
+  overflow-y: auto; /* Use auto scroll */
+  position: relative; /* For absolute positioning of scroll indicator */
+  padding-bottom: 20px; /* Space for scroll indicator */
+}
+
+/* Hide scrollbars completely for all browsers */
+.decision-categories::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in WebKit browsers */
+}
+
+/* Firefox scrollbar hiding */
+.decision-categories {
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+}
+
+/* Ensure decision items use full width */
+.decision-category {
+  width: 100%; /* Full width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Add a scroll indicator arrow */
+.scroll-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 150px; /* Center in sidebar */
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: none; /* Don't interfere with scrolling */
+  z-index: 100; /* Ensure it's above other content */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+/* Show arrow when scrollable class is added */
+.scroll-indicator.visible {
+  opacity: 1; /* Visible when class is added */
 }
 
 .sidebar-header {
@@ -147,6 +273,8 @@ body,
   cursor: grab;
   user-select: none;
   transition: all 0.2s ease;
+  width: 100%; /* Full width to match headers */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .decision-item:hover {
@@ -288,4 +416,75 @@ button.change-decision:hover {
   color: #555;
   border-top: 1px dashed #ccc;
   padding-top: 8px;
+}
+
+/* Slider Checkbox Styling */
+.checkbox-wrapper-6 {
+  position: relative;
+  z-index: 10; /* Ensure it's above other elements */
+}
+
+.checkbox-wrapper-6 .tgl {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  margin: 0;
+  z-index: 1; /* Make it clickable */
+}
+
+.checkbox-wrapper-6 .tgl + .tgl-btn {
+  outline: 0;
+  display: block;
+  width: 4em;
+  height: 2em;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.checkbox-wrapper-6 .tgl + .tgl-btn:after,
+.checkbox-wrapper-6 .tgl + .tgl-btn:before {
+  position: relative;
+  display: block;
+  content: '';
+  width: 50%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.checkbox-wrapper-6 .tgl + .tgl-btn:after {
+  left: 0;
+}
+
+.checkbox-wrapper-6 .tgl + .tgl-btn:before {
+  display: none;
+}
+
+.checkbox-wrapper-6 .tgl:checked + .tgl-btn:after {
+  left: 50%;
+}
+
+.checkbox-wrapper-6 .tgl-light + .tgl-btn {
+  background: #f0f0f0;
+  border-radius: 2em;
+  padding: 2px;
+  transition: all 0.4s ease;
+}
+
+.checkbox-wrapper-6 .tgl-light + .tgl-btn:after {
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.checkbox-wrapper-6 .tgl-light:checked + .tgl-btn {
+  background: #9fd6ae;
 }
