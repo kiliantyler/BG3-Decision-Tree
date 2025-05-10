@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-05-10
+
 ### Added
 
 - Initial project setup
@@ -34,5 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sidebar for available decisions
 - Debug panel for development
 
-[Unreleased]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kiliantyler/BG3-Decision-Tree/releases/tag/v0.1.0
