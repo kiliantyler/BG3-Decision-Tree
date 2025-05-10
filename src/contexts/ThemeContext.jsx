@@ -70,6 +70,7 @@ export const ThemeProvider = ({ children }) => {
 
   // Apply theme to document root and save to localStorage when changed
   useEffect(() => {
+    // Set data-theme attribute for CSS selectors
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
 
@@ -78,6 +79,15 @@ export const ThemeProvider = ({ children }) => {
     Object.entries(currentTheme).forEach(([key, value]) => {
       document.documentElement.style.setProperty(`--${key}`, value);
     });
+
+    // Add a small delay to ensure all styles are applied properly
+    setTimeout(() => {
+      // Force a repaint to ensure all styles are applied
+      document.body.style.display = 'none';
+      // This triggers a reflow
+      void document.body.offsetHeight;
+      document.body.style.display = '';
+    }, 10);
   }, [theme]);
 
   // Toggle between light and dark themes

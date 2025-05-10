@@ -57,7 +57,7 @@ const FlowChart = ({
     if (newlyAddedNodes.length > 0 && reactFlowInstance) {
       console.log(
         'Focusing on newly added nodes:',
-        newlyAddedNodes.map((n) => n.id)
+        newlyAddedNodes.map(n => n.id)
       );
       layoutManager.focusOnNewNodes(newlyAddedNodes);
     }
@@ -69,25 +69,25 @@ const FlowChart = ({
 
   // Forward node changes to parent if needed
   const handleNodesChange = useCallback(
-    (changes) => {
+    changes => {
       onNodesChangeInternal(changes);
-      
+
       // Update parent nodes state with current positions
       if (setParentNodes && reactFlowInstance) {
         // Get the current nodes with updated positions
         const currentNodes = reactFlowInstance.getNodes();
-        
+
         // Only update parent state after position changes (not during other operations)
-        const positionChanges = changes.filter(change => 
-          change.type === 'position' && change.dragging === false
+        const positionChanges = changes.filter(
+          change => change.type === 'position' && change.dragging === false
         );
-        
+
         if (positionChanges.length > 0) {
           // Update the parent nodes state with the current positions
           setParentNodes(currentNodes);
         }
       }
-      
+
       // Call the original onNodesChange if provided
       if (onNodesChange) {
         onNodesChange(changes);
@@ -98,7 +98,7 @@ const FlowChart = ({
 
   // Forward edge changes to parent if needed
   const handleEdgesChange = useCallback(
-    (changes) => {
+    changes => {
       onEdgesChangeInternal(changes);
       if (onEdgesChange) {
         onEdgesChange(changes);
@@ -109,7 +109,7 @@ const FlowChart = ({
 
   // Handle connections between nodes
   const handleConnect = useCallback(
-    (params) => {
+    params => {
       // Create connection with arrow marker
       const connection = {
         ...params,
@@ -120,7 +120,7 @@ const FlowChart = ({
       };
 
       // Update internal edges
-      setEdges((eds) => addEdge(connection, eds));
+      setEdges(eds => addEdge(connection, eds));
 
       // Notify parent
       if (onConnect) {
@@ -132,7 +132,7 @@ const FlowChart = ({
 
   // Handle dropping new nodes onto the canvas
   const handleDrop = useCallback(
-    (event) => {
+    event => {
       event.preventDefault();
 
       if (!reactFlowInstance) return;
@@ -163,12 +163,7 @@ const FlowChart = ({
 
       // Notify parent about the new node
       if (onNodeDrop) {
-        console.log(
-          'Dropping node:',
-          decisionData.id,
-          'at position:',
-          position
-        );
+        console.log('Dropping node:', decisionData.id, 'at position:', position);
         return onNodeDrop(decisionData, position);
       }
     },
@@ -176,13 +171,13 @@ const FlowChart = ({
   );
 
   // Allow dropping on the pane
-  const handleDragOver = useCallback((event) => {
+  const handleDragOver = useCallback(event => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
   // Initialize ReactFlow instance
-  const handleInit = useCallback((instance) => {
+  const handleInit = useCallback(instance => {
     console.log('ReactFlow instance initialized');
     setReactFlowInstance(instance);
 
@@ -212,22 +207,22 @@ const FlowChart = ({
 
       // After fitting, adjust the viewport if needed
       setTimeout(() => {
-        const { x, y, zoom } = reactFlowInstance.getViewport();
-        
+        const { y, zoom } = reactFlowInstance.getViewport();
+
         // Get the dimensions of the container
         const containerWidth = container.clientWidth;
-        
+
         // Calculate the center point of the visible area
         const effectiveCenterX = containerWidth / 2;
-        
+
         // Get all nodes to calculate their center
         const nodes = reactFlowInstance.getNodes();
         if (nodes.length === 0) return;
-        
+
         // Calculate the center of all nodes
         const positions = nodes.map(node => node.position);
         const nodesCenterX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
-        
+
         // Adjust viewport to center nodes properly
         reactFlowInstance.setViewport(
           {
@@ -259,35 +254,12 @@ const FlowChart = ({
         attributionPosition="hidden"
       >
         <Controls position="bottom-right" />
-        <Background variant="dots" gap={12} size={1} color="#ddd" />
+        <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
 
       {/* Custom fit view button (positioned in top-right corner) */}
-      <button
-        className="fit-view-button"
-        onClick={handleFitView}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 10,
-          padding: '5px 10px',
-          background: '#fff',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '12px',
-        }}
-      >
-        <span
-          role="img"
-          aria-label="Fit to view"
-          style={{ marginRight: '5px' }}
-        >
+      <button className="fit-view-button" onClick={handleFitView}>
+        <span role="img" aria-label="Fit to view" style={{ marginRight: '5px' }}>
           🔍
         </span>
         View All Nodes
