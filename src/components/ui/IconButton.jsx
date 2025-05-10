@@ -1,5 +1,5 @@
 // components/ui/IconButton.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
 /**
@@ -31,6 +31,7 @@ const IconButton = ({
   const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const buttonRef = useRef(null);
 
   // Determine position styles
   const getPositionStyles = () => {
@@ -91,9 +92,21 @@ const IconButton = ({
     return {};
   };
 
+  // Handle click and blur focus
+  const handleClick = e => {
+    if (onClick) {
+      onClick(e);
+    }
+    // Blur the button after click to remove focus
+    if (buttonRef.current) {
+      buttonRef.current.blur();
+    }
+  };
+
   return (
     <button
-      onClick={onClick}
+      ref={buttonRef}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
