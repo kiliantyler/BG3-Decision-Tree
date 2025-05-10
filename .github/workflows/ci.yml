@@ -16,7 +16,7 @@ jobs:
         # You can add more Node.js versions if needed
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -53,7 +53,7 @@ jobs:
             build-cmd: bun run build
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js 22.x
         uses: actions/setup-node@v3
