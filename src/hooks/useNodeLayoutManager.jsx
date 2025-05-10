@@ -106,15 +106,8 @@ const useNodeLayoutManager = (reactFlowInstance) => {
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
 
-        // For proper centering, we need to account for the sidebar width
-        // The sidebar has a width of 300px as defined in the CSS
-        const sidebarWidth = 300;
-
-        // Calculate the flow area width (total container width minus sidebar)
-        const flowAreaWidth = containerWidth - sidebarWidth;
-
-        // Calculate the center of the flow area
-        const effectiveCenterX = sidebarWidth + flowAreaWidth / 2;
+        // Calculate the center point
+        const effectiveCenterX = containerWidth / 2;
 
         // Set viewport position to center the node in the flow area
         reactFlowInstance.setViewport(

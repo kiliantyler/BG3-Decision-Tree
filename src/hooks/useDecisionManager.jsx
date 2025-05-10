@@ -1,14 +1,17 @@
-// src/hooks/useDecisionManager.js - Fix undefined values with defaults
+// src/hooks/useDecisionManager.jsx - Updated to ensure all decisions are available to the sidebar
 import { useCallback, useEffect, useState } from 'react';
 import { MarkerType } from 'reactflow';
-import {
-  getAvailableDecisions,
-  getUnlockedDecisions,
-} from '../data/gameDecisionManager';
 
-// Constants for layout calculations
-const VERTICAL_SPACING = 300;
-const HORIZONTAL_SPACING = 250;
+// Import all decisions from the data manager
+import {
+  allDecisions,
+  decisionsByCategory,
+  getAvailableDecisions,
+  getUnlockedDecisions
+} from '../data/enhancedDataManager';
+
+// Debug flag
+const DEBUG = true; // Enable debugging
 
 /**
  * Custom hook for managing decisions, nodes, and edges in the flowchart
@@ -21,7 +24,8 @@ const useDecisionManager = () => {
   const [availableDecisions, setAvailableDecisions] = useState([]);
 
   // State for categorized decisions (for the sidebar)
-  const [categorizedDecisions, setCategorizedDecisions] = useState({});
+  // Initialize with ALL decisions organized by category, not just available ones
+  const [categorizedDecisions, setCategorizedDecisions] = useState(decisionsByCategory || {});
 
   // State for nodes and edges
   const [nodes, setNodes] = useState([]);
@@ -33,8 +37,30 @@ const useDecisionManager = () => {
   // Track newly added nodes to enable focusing on them
   const [newlyAddedNodes, setNewlyAddedNodes] = useState([]);
 
+  // Initialize component
+  useEffect(() => {
+    if (DEBUG) {
+      console.log("🔧 useDecisionManager: Initializing with raw data", {
+        allDecisionsCount: allDecisions?.length || 0,
+        categoriesCount: Object.keys(decisionsByCategory || {}).length,
+        categoryNames: Object.keys(decisionsByCategory || {})
+      });
+      
+      // Verify data structure
+      const allCategorizedDecisions = Object.values(decisionsByCategory || {}).flat();
+      console.log("🔧 useDecisionManager: Data verification", {
+        allDecisionsHasCorrectLength: allDecisions?.length === allCategorizedDecisions.length,
+        allDecisionsLength: allDecisions?.length || 0,
+        categorizedDecisionsLength: allCategorizedDecisions.length
+      });
+    }
+    
+    // Initialize states
+    setCategorizedDecisions(decisionsByCategory || {});
+    setAvailableDecisions(getAvailableDecisions([]));
+  }, []);
+
   // Find all nodes that depend on a given node (recursively)
-  // Define this first to avoid the "Cannot access before initialization" error
   const findDependentNodes = useCallback(
     (nodeId) => {
       const directDependents = edges
@@ -76,34 +102,7 @@ const useDecisionManager = () => {
     return allDependents;
   };
 
-  // Calculate position for a node based on parent and siblings
-  const calculateNodePosition = useCallback(
-    (parentNode, index, totalSiblings) => {
-      if (!parentNode) {
-        return { x: 50, y: 50 };
-      }
-
-      // Get parent position
-      const parentX = parentNode.position.x;
-      const parentY = parentNode.position.y;
-
-      // Calculate horizontal offset for multiple children
-      let horizontalOffset = 0;
-      if (totalSiblings > 1) {
-        // Calculate total width of all siblings
-        const totalWidth = (totalSiblings - 1) * HORIZONTAL_SPACING;
-        // Calculate starting offset to center the group
-        horizontalOffset = -totalWidth / 2 + index * HORIZONTAL_SPACING;
-      }
-
-      // Place node below parent, with horizontal offset if there are siblings
-      return {
-        x: parentX + horizontalOffset,
-        y: parentY + VERTICAL_SPACING,
-      };
-    },
-    []
-  );
+  // We'll use the layout manager's calculateNodePosition function instead
 
   // Handle removing a node from the canvas
   const handleRemoveNode = useCallback(
@@ -174,6 +173,36 @@ const useDecisionManager = () => {
       const newEdges = [];
       const newNodeIds = [];
 
+      // Import layout constants from useNodeLayoutManager
+      const VERTICAL_SPACING = 300;
+      const HORIZONTAL_SPACING = 250;
+
+      // Calculate position for a node based on parent and siblings
+      const calculateNodePosition = (parentNode, index, totalSiblings) => {
+        if (!parentNode) {
+          return { x: 50, y: 50 };
+        }
+
+        // Get parent position
+        const parentX = parentNode.position.x;
+        const parentY = parentNode.position.y;
+
+        // Calculate horizontal offset for multiple children
+        let horizontalOffset = 0;
+        if (totalSiblings > 1) {
+          // Calculate total width of all siblings
+          const totalWidth = (totalSiblings - 1) * HORIZONTAL_SPACING;
+          // Calculate starting offset to center the group
+          horizontalOffset = -totalWidth / 2 + index * HORIZONTAL_SPACING;
+        }
+
+        // Place node below parent, with horizontal offset if there are siblings
+        return {
+          x: parentX + horizontalOffset,
+          y: parentY + VERTICAL_SPACING,
+        };
+      };
+
       // Calculate positions for new nodes
       requiredDecisions.forEach((decision, index) => {
         // Skip if node already exists on canvas
@@ -237,7 +266,7 @@ const useDecisionManager = () => {
 
       return null;
     },
-    [nodes, calculateNodePosition]
+    [nodes]
   );
 
   // Add a new node when dragged from sidebar
@@ -371,14 +400,20 @@ const useDecisionManager = () => {
       // Store the last completed decision for unlocking new nodes
       setLastCompletedDecision(decisionId);
 
-      // Also store the selected option in the node data for persistence
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === decisionId
-            ? { ...node, data: { ...node.data, selectedOption: option } }
-            : node
-        )
-      );
+      // Store the selected option in the node data for persistence
+      // while preserving the current position of the node
+      setNodes((nds) => {
+        return nds.map((node) => {
+          if (node.id === decisionId) {
+            // Preserve the node's current position and update only the data
+            return {
+              ...node,
+              data: { ...node.data, selectedOption: option }
+            };
+          }
+          return node;
+        });
+      });
     },
     [findDependentNodes]
   );
@@ -391,15 +426,9 @@ const useDecisionManager = () => {
     // Set all available decisions for the sidebar
     setAvailableDecisions(available);
 
-    // Organize available decisions by category for the sidebar
-    const byCategory = {};
-    available.forEach((decision) => {
-      if (!byCategory[decision.category]) {
-        byCategory[decision.category] = [];
-      }
-      byCategory[decision.category].push(decision);
-    });
-    setCategorizedDecisions(byCategory);
+    // Keep using decisionsByCategory which contains ALL decisions
+    // This allows the sidebar to show all decisions when "Show only available decisions" is unchecked
+    setCategorizedDecisions(decisionsByCategory);
   }, [completedDecisions]);
 
   // Add unlocked nodes to canvas when a decision is completed

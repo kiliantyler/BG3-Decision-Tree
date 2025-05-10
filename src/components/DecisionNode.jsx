@@ -68,15 +68,25 @@ const DecisionNode = ({ data, isConnectable, id }) => {
         // Hard-coded sidebar width - this is the offset we need to apply
         const sidebarWidth = 300;
 
+        // Get the container element to calculate proper dimensions
+        const container = document.querySelector('.reactflow-wrapper');
+        if (!container) {
+          console.warn('Could not find ReactFlow container');
+          return;
+        }
+
+        // Get the dimensions of the container
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+
+        // Calculate the center point with a slight adjustment for the sidebar
+        const effectiveCenterX = containerWidth / 2;
+
         // Center view on this node with animation, keeping current zoom level
-        // Add half the sidebar width to offset the center point to the right
         reactFlowInstance.setViewport(
           {
-            x:
-              -node.position.x * zoom +
-              window.innerWidth / 2 +
-              sidebarWidth / 2,
-            y: -node.position.y * zoom + window.innerHeight / 2,
+            x: -node.position.x * zoom + effectiveCenterX,
+            y: -node.position.y * zoom + containerHeight / 2,
             zoom: zoom, // Preserve current zoom level
           },
           { duration: 800 }

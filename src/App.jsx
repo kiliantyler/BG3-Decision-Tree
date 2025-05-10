@@ -22,6 +22,7 @@ const AppContent = () => {
   const {
     nodes,
     edges,
+    setNodes,
     completedDecisions,
     categorizedDecisions,
     addNodeFromSidebar,
@@ -148,7 +149,7 @@ const AppContent = () => {
     <div className="app-container">
       <Sidebar
         decisions={categorizedDecisions || {}}
-        availableOnly={true}
+        availableOnly={false}
         completed={completedDecisions || []}
       />
 
@@ -158,6 +159,7 @@ const AppContent = () => {
         onNodeDrop={handleNodeDrop}
         onNodeRemove={handleRemoveNode}
         newlyAddedNodes={newlyAddedNodes || []}
+        setNodes={setNodes} // Pass the setNodes function to update node positions
       />
       
       {/* Debug panel - activated with CTRL+SHIFT+D */}

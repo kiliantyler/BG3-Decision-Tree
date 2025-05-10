@@ -31,6 +31,7 @@ const FlowChart = ({
   onConnect,
   onNodeDrop,
   newlyAddedNodes = [],
+  setNodes: setParentNodes, // Add this prop to update parent nodes state
 }) => {
   // ReactFlow states
   const [nodes, setNodes, onNodesChangeInternal] = useNodesState(initialNodes);
@@ -70,11 +71,29 @@ const FlowChart = ({
   const handleNodesChange = useCallback(
     (changes) => {
       onNodesChangeInternal(changes);
+      
+      // Update parent nodes state with current positions
+      if (setParentNodes && reactFlowInstance) {
+        // Get the current nodes with updated positions
+        const currentNodes = reactFlowInstance.getNodes();
+        
+        // Only update parent state after position changes (not during other operations)
+        const positionChanges = changes.filter(change => 
+          change.type === 'position' && change.dragging === false
+        );
+        
+        if (positionChanges.length > 0) {
+          // Update the parent nodes state with the current positions
+          setParentNodes(currentNodes);
+        }
+      }
+      
+      // Call the original onNodesChange if provided
       if (onNodesChange) {
         onNodesChange(changes);
       }
     },
-    [onNodesChangeInternal, onNodesChange]
+    [onNodesChangeInternal, onNodesChange, setParentNodes, reactFlowInstance]
   );
 
   // Forward edge changes to parent if needed
@@ -176,8 +195,12 @@ const FlowChart = ({
   // Function to fit all nodes in the view
   const handleFitView = useCallback(() => {
     if (reactFlowInstance) {
-      // Hard-coded sidebar width - this is the offset we need to apply
-      const sidebarWidth = 300; // Sidebar width in pixels
+      // Get the container element to calculate proper dimensions
+      const container = document.querySelector('.reactflow-wrapper');
+      if (!container) {
+        console.warn('Could not find ReactFlow container');
+        return;
+      }
 
       // First, fit all nodes
       reactFlowInstance.fitView({
@@ -187,14 +210,28 @@ const FlowChart = ({
         maxZoom: 1.5,
       });
 
-      // After fitting, adjust the X position to account for the sidebar
+      // After fitting, adjust the viewport if needed
       setTimeout(() => {
         const { x, y, zoom } = reactFlowInstance.getViewport();
-
-        // Offset the viewport to account for the sidebar
+        
+        // Get the dimensions of the container
+        const containerWidth = container.clientWidth;
+        
+        // Calculate the center point of the visible area
+        const effectiveCenterX = containerWidth / 2;
+        
+        // Get all nodes to calculate their center
+        const nodes = reactFlowInstance.getNodes();
+        if (nodes.length === 0) return;
+        
+        // Calculate the center of all nodes
+        const positions = nodes.map(node => node.position);
+        const nodesCenterX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
+        
+        // Adjust viewport to center nodes properly
         reactFlowInstance.setViewport(
           {
-            x: x + (sidebarWidth / 2) * zoom, // Move viewport to the right by half the sidebar width
+            x: -nodesCenterX * zoom + effectiveCenterX,
             y,
             zoom,
           },
