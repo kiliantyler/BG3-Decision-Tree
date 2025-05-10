@@ -157,7 +157,7 @@ const AppContent = () => {
     <div className="app-container">
       <Sidebar
         decisions={categorizedDecisions || {}}
-        availableOnly={false}
+        availableOnly={true}
         completed={completedDecisions || []}
       />
 
