@@ -1,4 +1,4 @@
-// src/components/Sidebar.jsx - Complete robust revision to fix unavailable nodes issue
+// components/sidebar/Sidebar.jsx
 import { useEffect, useState } from 'react';
 
 // Debug flag - set to true to see detailed logging

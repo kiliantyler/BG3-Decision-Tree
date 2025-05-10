@@ -1,24 +1,18 @@
-// src/App.jsx
+// components/layout/AppContent.jsx
 import { Analytics } from '@vercel/analytics/react';
 import React, { useEffect, useRef, useState } from 'react';
-import { ReactFlowProvider } from 'reactflow';
-import 'reactflow/dist/style.css';
-import './styles/customStyles.css';
-import './styles/theme.css';
 
 // Components
-import DebugPanel from './components/DebugPanel.jsx';
-import FlowChart from './components/FlowChart.jsx';
-import Sidebar from './components/Sidebar.jsx';
+import { DebugPanel } from '../debug';
+import { FlowChart } from '../flowchart';
+import { Sidebar } from '../sidebar';
 
 // Context
-import { DecisionProvider, useDecision } from './contexts/DecisionContext.jsx';
-import { ThemeProvider } from './contexts/ThemeContext.jsx';
+import { useDecision } from '../../contexts/DecisionContext';
 
 // Import from enhanced data manager
-import { getStartingNode } from './data/enhancedDataManager.js';
+import { getStartingNode } from '../../data/enhancedDataManager';
 
-// Inner App component that uses the decision context
 const AppContent = () => {
   // Use the decision context
   const {
@@ -210,17 +204,4 @@ const AppContent = () => {
   );
 };
 
-// Main App component that provides context
-const App = () => {
-  return (
-    <ReactFlowProvider>
-      <ThemeProvider>
-        <DecisionProvider>
-          <AppContent />
-        </DecisionProvider>
-      </ThemeProvider>
-    </ReactFlowProvider>
-  );
-};
-
-export default App;
+export default AppContent;

@@ -32,8 +32,8 @@ body,
   position: absolute;
   top: 10px;
   left: 10px; /* Position to the left */
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: var(--nodeBackground);
+  border: 1px solid var(--border);
   border-radius: 8px; /* Rounded square */
   width: 40px; /* Fixed width */
   height: 40px; /* Fixed height */
@@ -47,7 +47,7 @@ body,
 }
 
 .theme-toggle:hover {
-  background-color: #f8f8f8;
+  background-color: var(--selection);
   transform: scale(1.05); /* Slight scale effect on hover */
 }
 
@@ -56,8 +56,8 @@ body,
   position: absolute;
   top: 10px;
   left: 60px; /* Position to the right of theme toggle button */
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: var(--nodeBackground);
+  border: 1px solid var(--border);
   border-radius: 8px; /* Rounded square */
   width: 40px; /* Fixed width */
   height: 40px; /* Fixed height */
@@ -68,10 +68,19 @@ body,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
   transition: all 0.2s ease; /* Add transition for hover effect */
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: all 0.2s ease; /* Add transition for hover effect */
+}
+
+/* Explicitly set SVG color for fit view button */
+.fit-view-button svg {
+  fill: #0dcaf0 !important; /* Cyan color that works in both light and dark modes */
 }
 
 .fit-view-button:hover {
-  background-color: #f8f8f8;
+  background-color: var(--selection);
   transform: scale(1.05); /* Slight scale effect on hover */
 }
 
@@ -80,24 +89,27 @@ body,
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
+  background-color: var(--nodeBackground);
+  border: 1px solid var(--red); /* Red border */
   border-radius: 8px; /* Rounded square */
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
+/* Explicitly set SVG color for reset button */
+.reset-button svg {
+  fill: #dc3545 !important; /* Red color that works in both light and dark modes */
+}
+
 .reset-button:hover {
-  background-color: #c82333;
+  background-color: var(--selection);
   transform: scale(1.05); /* Consistent scale effect with other buttons */
 }
 

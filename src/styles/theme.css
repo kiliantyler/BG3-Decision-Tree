@@ -86,7 +86,8 @@ button {
   border-color: var(--border);
 }
 
-button:hover {
+/* Exclude our custom buttons from general button styling */
+button:not(.theme-toggle):not(.fit-view-button):not(.reset-button):hover {
   border-color: var(--purple);
 }
 
@@ -175,41 +176,30 @@ button.change-decision:hover {
   border-top-color: var(--comment);
 }
 
+/* Dark theme overrides for all buttons */
+[data-theme='dark'] .theme-toggle,
 [data-theme='dark'] .fit-view-button {
-  background-color: var(--currentLine) !important;
-  color: var(--foreground) !important;
-  border-color: var(--border) !important;
+  background-color: var(--currentLine);
+  border-color: var(--border);
 }
 
+[data-theme='dark'] .reset-button {
+  background-color: var(--currentLine);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .theme-toggle:hover,
 [data-theme='dark'] .fit-view-button:hover {
-  background-color: var(--selection) !important;
-  border-color: var(--purple) !important;
-}
-
-/* Fit view button styling */
-.fit-view-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  padding: 5px 10px;
-  background-color: var(--nodeBackground);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  transition: all var(--transition-speed);
-}
-
-.fit-view-button:hover {
   background-color: var(--selection);
   border-color: var(--purple);
 }
+
+[data-theme='dark'] .reset-button:hover {
+  background-color: var(--selection);
+  border-color: var(--red);
+}
+
+/* Fit view button hover state is handled in customStyles.css */
 
 [data-theme='dark'] .react-flow__background {
   background-color: var(--background);
@@ -219,29 +209,7 @@ button.change-decision:hover {
   color: var(--comment) !important;
 }
 
-/* Theme toggle button */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-  background-color: var(--nodeBackground);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--foreground);
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-speed);
-  position: absolute;
-  top: 10px;
-  right: 132px; /* Position to the left of the "View All Nodes" button */
-  z-index: 10;
-}
-
-.theme-toggle:hover {
-  background-color: var(--selection);
-  border-color: var(--purple);
-}
+/* Theme toggle hover state is handled in customStyles.css */
 
 /* Decision node styling */
 .decision-node.required:not(.completed) {

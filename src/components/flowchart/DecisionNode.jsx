@@ -1,4 +1,4 @@
-// components/DecisionNode.jsx - Enhanced with focus capability
+// components/flowchart/DecisionNode.jsx - Enhanced with focus capability
 import React, { useCallback, useEffect, useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 

@@ -1,3 +1,4 @@
+// components/flowchart/OutcomeNode.jsx
 import React, { useCallback } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 
@@ -20,10 +21,7 @@ const OutcomeNode = ({ data, id, isConnectable }) => {
         // Add half the sidebar width to offset the center point to the right
         reactFlowInstance.setViewport(
           {
-            x:
-              -node.position.x * zoom +
-              window.innerWidth / 2 +
-              sidebarWidth / 2,
+            x: -node.position.x * zoom + window.innerWidth / 2 + sidebarWidth / 2,
             y: -node.position.y * zoom + window.innerHeight / 2,
             zoom: zoom, // Preserve current zoom level
           },
@@ -78,10 +76,7 @@ const OutcomeNode = ({ data, id, isConnectable }) => {
         isConnectable={isConnectable}
       />
 
-      <div
-        className="node-header"
-        style={{ fontWeight: 'bold', marginBottom: '5px' }}
-      >
+      <div className="node-header" style={{ fontWeight: 'bold', marginBottom: '5px' }}>
         {data.label}
       </div>
 
