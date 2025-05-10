@@ -1,12 +1,10 @@
 // components/flowchart/DecisionNode.jsx - Enhanced with focus capability
-import React, { useCallback, useEffect, useState } from 'react';
-import { Handle, Position, useReactFlow } from 'reactflow';
+import React, { useEffect, useState } from 'react';
+import BaseNode from './BaseNode';
 
-const DecisionNode = ({ data, isConnectable, id }) => {
+const DecisionNode = ({ data, isConnectable }) => {
   const [selectedOption, setSelectedOption] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isChangingDecision, setIsChangingDecision] = useState(false);
-  const reactFlowInstance = useReactFlow();
 
   // Initialize selected option from data if available
   useEffect(() => {
@@ -15,9 +13,8 @@ const DecisionNode = ({ data, isConnectable, id }) => {
     }
   }, [data.selectedOption]);
 
-  // Determine if this is an optional or required node
+  // Determine if this is an optional node
   const isOptional = data.optional === true;
-  const isRequired = data.required === true && !data.optional;
 
   // Handle option selection and completion
   const handleOptionSelect = option => {
@@ -44,54 +41,6 @@ const DecisionNode = ({ data, isConnectable, id }) => {
     setIsChangingDecision(false);
   };
 
-  // Toggle expanded view
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  // Handle node removal
-  const handleRemoveNode = () => {
-    if (data.onRemove && typeof data.onRemove === 'function') {
-      data.onRemove(data.id);
-    }
-  };
-
-  // Focus on this node
-  const handleFocus = useCallback(() => {
-    if (reactFlowInstance) {
-      // Get the node's position
-      const node = reactFlowInstance.getNode(id);
-      if (node) {
-        // Get current viewport to preserve zoom level
-        const { zoom } = reactFlowInstance.getViewport();
-
-        // Get the container element to calculate proper dimensions
-        const container = document.querySelector('.reactflow-wrapper');
-        if (!container) {
-          console.warn('Could not find ReactFlow container');
-          return;
-        }
-
-        // Get the dimensions of the container
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-
-        // Calculate the center point with a slight adjustment for the sidebar
-        const effectiveCenterX = containerWidth / 2;
-
-        // Center view on this node with animation, keeping current zoom level
-        reactFlowInstance.setViewport(
-          {
-            x: -node.position.x * zoom + effectiveCenterX,
-            y: -node.position.y * zoom + containerHeight / 2,
-            zoom: zoom, // Preserve current zoom level
-          },
-          { duration: 800 }
-        );
-      }
-    }
-  }, [reactFlowInstance, id]);
-
   // Background color based on type and completion status
   const getBgColor = () => {
     if (selectedOption) return '#d4edda'; // Completed
@@ -106,175 +55,26 @@ const DecisionNode = ({ data, isConnectable, id }) => {
     return '#ff9900'; // Required
   };
 
-  return (
-    <div
-      className={`decision-node ${selectedOption ? 'completed' : ''} ${
-        isExpanded ? 'expanded' : ''
-      } ${isOptional ? 'optional' : 'required'}`}
-      style={{
-        padding: '15px',
-        borderRadius: '8px',
-        background: getBgColor(),
-        border: `2px solid ${getBorderColor()}`,
-        width: isExpanded ? '280px' : '220px',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        position: 'relative', // For remove button positioning
-      }}
-    >
-      {/* Remove button - only show for optional nodes or when nothing is selected yet */}
-      {(isOptional || !selectedOption) && (
-        <button
-          onClick={handleRemoveNode}
-          style={{
-            position: 'absolute',
-            top: '-10px',
-            right: '-10px',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            background: '#f44336',
-            color: 'white',
-            border: '2px solid #fff',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 10,
-            boxShadow: '0 2px 3px rgba(0,0,0,0.2)',
-          }}
-          title="Remove node"
-        >
-          ×
-        </button>
-      )}
+  // Handle node removal
+  const handleRemoveNode = () => {
+    if (data.onRemove && typeof data.onRemove === 'function') {
+      data.onRemove(data.id);
+    }
+  };
 
-      {/* Focus button */}
-      <button
-        onClick={handleFocus}
-        style={{
-          position: 'absolute',
-          top: '-10px',
-          left: '-10px',
-          width: '22px',
-          height: '22px',
-          borderRadius: '50%',
-          background: '#4285f4',
-          color: 'white',
-          border: '2px solid #fff',
-          fontSize: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          zIndex: 10,
-          boxShadow: '0 2px 3px rgba(0,0,0,0.2)',
-        }}
-        title="Focus on this node"
-      >
-        🔍
-      </button>
+  // Determine if the remove button should be shown
+  const showRemoveButton = isOptional || !selectedOption;
 
-      <Handle
-        type="target"
-        position={Position.Top}
-        style={{ background: '#555', width: '10px', height: '10px' }}
-        isConnectable={isConnectable}
-      />
+  // Create a data object with the selectedOption for the BaseNode
+  const nodeData = {
+    ...data,
+    selectedOption: selectedOption,
+  };
 
-      <div className="node-content">
-        {/* Header with expand/collapse button */}
-        <div
-          className="node-header"
-          style={{
-            fontWeight: 'bold',
-            marginBottom: '8px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ flex: 1 }}>{data.label}</div>
-
-          {/* Type badge */}
-          {isOptional && !selectedOption && (
-            <span
-              className="optional-badge"
-              style={{
-                background: '#bebebe',
-                color: 'white',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '0.7rem',
-                marginRight: '5px',
-              }}
-            >
-              Optional
-            </span>
-          )}
-
-          {isRequired && !selectedOption && (
-            <span
-              className="required-badge"
-              style={{
-                background: '#ff9900',
-                color: 'white',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '0.7rem',
-                marginRight: '5px',
-              }}
-            >
-              Required
-            </span>
-          )}
-
-          {/* Completion badge */}
-          {selectedOption && (
-            <span
-              className="completed-badge"
-              style={{
-                background: '#28a745',
-                color: 'white',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '0.7rem',
-                marginRight: '5px',
-              }}
-            >
-              Completed
-            </span>
-          )}
-
-          {/* Expand/collapse button */}
-          <button
-            onClick={toggleExpanded}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              padding: '0 5px',
-            }}
-          >
-            {isExpanded ? '−' : '+'}
-          </button>
-        </div>
-
-        {/* Description */}
-        <div
-          className="node-description"
-          style={{
-            fontSize: '0.85rem',
-            marginBottom: '10px',
-            lineHeight: '1.3',
-          }}
-        >
-          {data.description}
-        </div>
-
+  // Create a custom renderer for the node content
+  const renderCustomContent = () => {
+    return (
+      <>
         {/* Decision change warning */}
         {isChangingDecision && (
           <div
@@ -405,43 +205,33 @@ const DecisionNode = ({ data, isConnectable, id }) => {
             </button>
           </div>
         )}
+      </>
+    );
+  };
 
-        {/* Metadata (prerequisites, unlocks) - only shown when expanded */}
-        {isExpanded && (
-          <div
-            className="node-meta"
-            style={{
-              fontSize: '0.8rem',
-              marginTop: '12px',
-              color: '#555',
-              borderTop: '1px dashed #ccc',
-              paddingTop: '8px',
-            }}
-          >
-            {data.prerequisites && data.prerequisites.length > 0 && (
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Requires:</strong> {data.prerequisites.join(', ')}
-              </div>
-            )}
-            {data.unlocks && data.unlocks.length > 0 && (
-              <div>
-                <strong>Unlocks:</strong> {data.unlocks.join(', ')}
-              </div>
-            )}
-            <div style={{ marginTop: '5px' }}>
-              <strong>Type:</strong> {isOptional ? 'Optional Side Quest' : 'Required Main Quest'}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        style={{ background: '#555', width: '10px', height: '10px' }}
-        isConnectable={isConnectable}
-      />
-    </div>
+  return (
+    <BaseNode
+      data={nodeData}
+      isConnectable={isConnectable}
+      className={`decision-node ${selectedOption ? 'completed' : ''} ${
+        isOptional ? 'optional' : 'required'
+      }`}
+      style={{
+        padding: '15px',
+        borderRadius: '8px',
+        background: getBgColor(),
+        border: `2px solid ${getBorderColor()}`,
+        width: '220px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      }}
+      onRemove={handleRemoveNode}
+      showRemoveButton={showRemoveButton}
+      isExpandable={true}
+      showBadges={true}
+      nodeType="decision"
+    >
+      {renderCustomContent()}
+    </BaseNode>
   );
 };
 
