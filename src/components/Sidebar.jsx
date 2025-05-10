@@ -1,6 +1,5 @@
 // src/components/Sidebar.jsx - Complete robust revision to fix unavailable nodes issue
 import { useEffect, useState } from 'react';
-import ThemeToggle from './ThemeToggle';
 
 // Debug flag - set to true to see detailed logging
 const DEBUG = true;
@@ -441,11 +440,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
               {total - available} locked)
             </div>
 
-            <ThemeToggle />
-
-            <div style={{ fontWeight: 'bold', marginBottom: '4px', marginTop: '10px' }}>
-              Legend:
-            </div>
+            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Legend:</div>
             <div
               style={{
                 display: 'flex',

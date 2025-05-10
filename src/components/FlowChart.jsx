@@ -9,6 +9,7 @@ import ReactFlow, {
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import ThemeToggle from './ThemeToggle';
 
 // Custom node components
 import DecisionNode from './DecisionNode.jsx';
@@ -256,6 +257,9 @@ const FlowChart = ({
         <Controls position="bottom-right" />
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
+
+      {/* Theme toggle button */}
+      <ThemeToggle />
 
       {/* Custom fit view button (positioned in top-right corner) */}
       <button className="fit-view-button" onClick={handleFitView}>

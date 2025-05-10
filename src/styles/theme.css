@@ -181,6 +181,11 @@ button.change-decision:hover {
   border-color: var(--border) !important;
 }
 
+[data-theme='dark'] .fit-view-button:hover {
+  background-color: var(--selection) !important;
+  border-color: var(--purple) !important;
+}
+
 /* Fit view button styling */
 .fit-view-button {
   position: absolute;
@@ -219,24 +224,23 @@ button.change-decision:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  margin: 10px 0;
-  width: 100%;
-  background-color: var(--currentLine);
+  padding: 5px 10px;
+  background-color: var(--nodeBackground);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--foreground);
   cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-speed);
+  position: absolute;
+  top: 10px;
+  right: 132px; /* Position to the left of the "View All Nodes" button */
+  z-index: 10;
 }
 
 .theme-toggle:hover {
   background-color: var(--selection);
   border-color: var(--purple);
-}
-
-.theme-toggle svg {
-  margin-right: 8px;
 }
 
 /* Decision node styling */
