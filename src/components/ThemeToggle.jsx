@@ -1,5 +1,5 @@
 // src/components/ThemeToggle.jsx
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../hooks/useTheme';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
