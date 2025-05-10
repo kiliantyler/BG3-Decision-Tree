@@ -1,13 +1,13 @@
 /**
  * Act 1 Decisions
- * 
+ *
  * This file aggregates all decisions from Act 1 across
  * different locations.
  */
 
 import { druidGroveDecisions } from './druidGrove/index.js';
 import { goblinCampDecisions } from './goblinCamp/index.js';
-import { nautiloidDecisions } from './nautiloid/index.js';
+import { nautiloidDecisions } from './nautiloidShip/index.js';
 import { wildernessDecisions } from './wilderness/index.js';
 
 // Export individual location decision sets
