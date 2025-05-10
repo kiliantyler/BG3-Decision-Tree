@@ -5,3 +5,5 @@
 3. Create more node types for different game elements
 4. Add the ability to export flowcharts
 5. Build a more comprehensive database of BG3 decisions
+6. Randomizer
+7. Dark Urge options/decisions

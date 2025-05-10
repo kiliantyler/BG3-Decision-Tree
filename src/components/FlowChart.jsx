@@ -29,17 +29,13 @@ const FlowChart = ({
   onNodesChange,
   onEdgesChange,
   onConnect,
-  onNodeRemove,
-  onNodeAdd,
   onNodeDrop,
+  newlyAddedNodes = [],
 }) => {
   // ReactFlow states
   const [nodes, setNodes, onNodesChangeInternal] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChangeInternal] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-
-  // Previous nodes count to detect new nodes
-  const [prevNodesLength, setPrevNodesLength] = useState(initialNodes.length);
 
   // Use the layout manager hook
   const layoutManager = useNodeLayoutManager(reactFlowInstance);
@@ -53,17 +49,18 @@ const FlowChart = ({
   useEffect(() => {
     console.log('Updating nodes in FlowChart to:', initialNodes.length);
     setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
 
-    // If nodes have increased, fit view to show all nodes
-    if (initialNodes.length > prevNodesLength && reactFlowInstance) {
-      console.log('Nodes increased, fitting view');
-      setTimeout(() => {
-        reactFlowInstance.fitView({ padding: 0.3 });
-      }, 200);
+  // Focus on newly added nodes from props
+  useEffect(() => {
+    if (newlyAddedNodes.length > 0 && reactFlowInstance) {
+      console.log(
+        'Focusing on newly added nodes:',
+        newlyAddedNodes.map((n) => n.id)
+      );
+      layoutManager.focusOnNewNodes(newlyAddedNodes);
     }
-
-    setPrevNodesLength(initialNodes.length);
-  }, [initialNodes, setNodes, reactFlowInstance, prevNodesLength]);
+  }, [newlyAddedNodes, reactFlowInstance, layoutManager]);
 
   useEffect(() => {
     setEdges(initialEdges);
@@ -153,7 +150,7 @@ const FlowChart = ({
           'at position:',
           position
         );
-        onNodeDrop(decisionData, position);
+        return onNodeDrop(decisionData, position);
       }
     },
     [reactFlowInstance, onNodeDrop]
@@ -176,6 +173,37 @@ const FlowChart = ({
     }, 200);
   }, []);
 
+  // Function to fit all nodes in the view
+  const handleFitView = useCallback(() => {
+    if (reactFlowInstance) {
+      // Hard-coded sidebar width - this is the offset we need to apply
+      const sidebarWidth = 300; // Sidebar width in pixels
+
+      // First, fit all nodes
+      reactFlowInstance.fitView({
+        padding: 0.3,
+        includeHiddenNodes: false,
+        minZoom: 0.2,
+        maxZoom: 1.5,
+      });
+
+      // After fitting, adjust the X position to account for the sidebar
+      setTimeout(() => {
+        const { x, y, zoom } = reactFlowInstance.getViewport();
+
+        // Offset the viewport to account for the sidebar
+        reactFlowInstance.setViewport(
+          {
+            x: x + (sidebarWidth / 2) * zoom, // Move viewport to the right by half the sidebar width
+            y,
+            zoom,
+          },
+          { duration: 200 }
+        );
+      }, 50);
+    }
+  }, [reactFlowInstance]);
+
   return (
     <div className="reactflow-wrapper">
       <ReactFlow
@@ -188,7 +216,7 @@ const FlowChart = ({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         nodeTypes={nodeTypes}
-        fitView
+        fitView={false} // Changed to false since we're manually handling zoom
         minZoom={0.1}
         maxZoom={2}
         attributionPosition="hidden"
@@ -196,6 +224,37 @@ const FlowChart = ({
         <Controls position="bottom-right" />
         <Background variant="dots" gap={12} size={1} color="#ddd" />
       </ReactFlow>
+
+      {/* Custom fit view button (positioned in top-right corner) */}
+      <button
+        className="fit-view-button"
+        onClick={handleFitView}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 10,
+          padding: '5px 10px',
+          background: '#fff',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+        }}
+      >
+        <span
+          role="img"
+          aria-label="Fit to view"
+          style={{ marginRight: '5px' }}
+        >
+          🔍
+        </span>
+        View All Nodes
+      </button>
     </div>
   );
 };

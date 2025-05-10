@@ -25,6 +25,7 @@ const AppContent = () => {
     categorizedDecisions,
     addNodeFromSidebar,
     handleRemoveNode,
+    newlyAddedNodes,
   } = useDecision();
 
   // Reference to track if initial node has been added
@@ -33,15 +34,16 @@ const AppContent = () => {
   // Initialize with starting node
   useEffect(() => {
     console.log(
-      'App useEffect running, nodes.length:',
-      nodes.length,
+      'App useEffect running, nodes length:',
+      nodes?.length || 0,
       'initialNodeAdded:',
       initialNodeAdded.current
     );
 
     // Only add starting node if we don't have any nodes yet
     // and we haven't already added the initial node
-    if (nodes.length === 0 && !initialNodeAdded.current) {
+    // Guard against undefined nodes with optional chaining
+    if ((nodes?.length || 0) === 0 && !initialNodeAdded.current) {
       console.log('Adding starting node');
       const startingNode = getStartingNode();
       if (startingNode) {
@@ -65,7 +67,7 @@ const AppContent = () => {
         console.log('No starting node found');
       }
     }
-  }, [nodes.length, addNodeFromSidebar]);
+  }, [nodes, addNodeFromSidebar]);
 
   // Handle node drop from sidebar
   const handleNodeDrop = (decisionData, position) => {
@@ -76,16 +78,17 @@ const AppContent = () => {
   return (
     <div className="app-container">
       <Sidebar
-        decisions={categorizedDecisions}
+        decisions={categorizedDecisions || {}}
         availableOnly={true}
-        completed={completedDecisions}
+        completed={completedDecisions || []}
       />
 
       <FlowChart
-        initialNodes={nodes}
-        initialEdges={edges}
+        initialNodes={nodes || []}
+        initialEdges={edges || []}
         onNodeDrop={handleNodeDrop}
         onNodeRemove={handleRemoveNode}
+        newlyAddedNodes={newlyAddedNodes || []}
       />
       <Analytics />
     </div>

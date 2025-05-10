@@ -1,4 +1,4 @@
-// src/hooks/useDecisionManager.js - Fixed dependencies
+// src/hooks/useDecisionManager.js - Fix undefined values with defaults
 import { useCallback, useEffect, useState } from 'react';
 import { MarkerType } from 'reactflow';
 import {
@@ -29,6 +29,9 @@ const useDecisionManager = () => {
 
   // Track the last decision that was completed
   const [lastCompletedDecision, setLastCompletedDecision] = useState(null);
+
+  // Track newly added nodes to enable focusing on them
+  const [newlyAddedNodes, setNewlyAddedNodes] = useState([]);
 
   // Find all nodes that depend on a given node (recursively)
   // Define this first to avoid the "Cannot access before initialization" error
@@ -218,9 +221,18 @@ const useDecisionManager = () => {
 
       // Update nodes and edges state if we have new nodes
       if (newNodes.length > 0) {
-        setNodes((nds) => [...nds, ...newNodes]);
+        setNodes((nds) => {
+          const updatedNodes = [...nds, ...newNodes];
+          // Set newly added nodes to enable focusing in FlowChart
+          setNewlyAddedNodes(newNodes);
+          return updatedNodes;
+        });
         setEdges((eds) => [...eds, ...newEdges]);
-        return { newNodeIds, sourceNodeId: sourceDecisionId };
+        return {
+          newNodeIds,
+          sourceNodeId: sourceDecisionId,
+          addedNodes: newNodes,
+        };
       }
 
       return null;
@@ -249,7 +261,12 @@ const useDecisionManager = () => {
       };
 
       // Add the new node to the chart
-      setNodes((nds) => [...nds, newNode]);
+      setNodes((nds) => {
+        const updatedNodes = [...nds, newNode];
+        // Set newly added nodes to enable focusing in FlowChart
+        setNewlyAddedNodes([newNode]);
+        return updatedNodes;
+      });
 
       // If this node has prerequisites, automatically create connections
       if (decisionData.prerequisites && decisionData.prerequisites.length > 0) {
@@ -281,7 +298,7 @@ const useDecisionManager = () => {
         }
       }
 
-      return { id: decisionData.id };
+      return { id: decisionData.id, node: newNode };
     },
     [nodes, handleRemoveNode]
   );
@@ -371,12 +388,6 @@ const useDecisionManager = () => {
     // Get all available decisions
     const available = getAvailableDecisions(completedDecisions);
 
-    // Split into required and optional
-    const required = available.filter(
-      (d) => d.required === true && !d.optional
-    );
-    const optional = available.filter((d) => d.optional === true);
-
     // Set all available decisions for the sidebar
     setAvailableDecisions(available);
 
@@ -417,6 +428,17 @@ const useDecisionManager = () => {
     }
   }, [lastCompletedDecision, addUnlockedNodesToCanvas]);
 
+  // Clear newly added nodes after they've been processed
+  useEffect(() => {
+    if (newlyAddedNodes.length > 0) {
+      // Clear after a delay to ensure FlowChart has processed them
+      const timer = setTimeout(() => {
+        setNewlyAddedNodes([]);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [newlyAddedNodes]);
+
   return {
     // State
     nodes,
@@ -426,6 +448,7 @@ const useDecisionManager = () => {
     completedDecisions,
     availableDecisions,
     categorizedDecisions,
+    newlyAddedNodes,
 
     // Methods
     handleDecisionComplete,
