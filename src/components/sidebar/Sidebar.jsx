@@ -1,5 +1,8 @@
 // components/sidebar/Sidebar.jsx
 import { useEffect, useState } from 'react';
+import DebugPanel from './DebugPanel';
+import SidebarContent from './SidebarContent';
+import SidebarHeader from './SidebarHeader';
 
 // Debug flag - set to true to see detailed logging
 const DEBUG = true;
@@ -142,10 +145,9 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
     return count;
   };
 
-  // Function to render the sidebar content
-  const renderSidebarContent = () => {
+  // Function to determine which categories and items to show
+  const getCategoriesToShow = () => {
     // Track decisions to show
-    let displayCount = 0;
     const categoriesToShow = {};
 
     // First pass: determine which items to show in which categories
@@ -173,7 +175,6 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         // Add to filtered items if it matches all filters
         if (matchesSearch && matchesType && matchesAvailability) {
           filteredItems.push(item);
-          displayCount++;
         }
       });
 
@@ -183,348 +184,62 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
       }
     });
 
-    if (DEBUG) {
-      console.log('Sidebar rendering stats:', {
-        displayCount,
-        categoriesShown: Object.keys(categoriesToShow).length,
-        filtering: {
-          showUnavailable,
-          showOptional,
-          showRequired,
-          searchTerm: searchTerm ? `"${searchTerm}"` : 'none',
-        },
-      });
-    }
-
-    // Return content based on filtered data
-    if (displayCount === 0) {
-      return (
-        <div
-          style={{
-            padding: '20px',
-            textAlign: 'center',
-            color: '#999',
-          }}
-        >
-          No decisions match the current filters.
-        </div>
-      );
-    }
-
-    // Render categories and items
-    return Object.entries(categoriesToShow).map(([category, items]) => (
-      <div key={category} className="decision-category">
-        <h4>{category}</h4>
-        <div className="decision-items">
-          {items.map(item => {
-            // Determine if this decision is available
-            const isAvailable = isDecisionAvailable(item.id);
-            const isOptional = item.optional === true;
-            const isRequired = item.required === true && !item.optional;
-
-            // Enhanced styling for available/unavailable items
-            const itemStyle = {
-              padding: '10px',
-              margin: '8px 0',
-              backgroundColor: isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8',
-              border: isAvailable
-                ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}`
-                : '1px dashed #999',
-              borderRadius: '4px',
-              cursor: isAvailable ? 'grab' : 'not-allowed',
-              userSelect: 'none',
-              opacity: isAvailable ? 1 : 0.6,
-              boxShadow: 'none',
-              position: 'relative',
-              transition: 'all 0.2s ease',
-            };
-
-            return (
-              <div
-                key={item.id}
-                className={`decision-item ${isAvailable ? 'available' : 'unavailable'} ${
-                  isOptional ? 'optional' : 'required'
-                }`}
-                draggable={true} // Always set draggable, but we'll prevent it in onDragStart if unavailable
-                onDragStart={event => onDragStart(event, item.type || 'decision', item)}
-                style={itemStyle}
-                onMouseEnter={e => {
-                  if (isAvailable) {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (isAvailable) {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '4px',
-                  }}
-                >
-                  <div className="item-title" style={{ fontWeight: 'bold' }}>
-                    {item.label}
-                  </div>
-
-                  {/* Status badges */}
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {!isAvailable && (
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          padding: '2px 6px',
-                          backgroundColor: '#999',
-                          color: '#fff',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        Locked
-                      </span>
-                    )}
-                    {isOptional && (
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          padding: '2px 6px',
-                          backgroundColor: '#bebebe',
-                          color: '#fff',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        Optional
-                      </span>
-                    )}
-                    {isRequired && (
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          padding: '2px 6px',
-                          backgroundColor: '#ff9900',
-                          color: '#fff',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        Required
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="item-description" style={{ fontSize: '0.8rem', color: '#666' }}>
-                  {item.description?.substring(0, 60)}...
-                </div>
-
-                {/* Show prerequisites if not available */}
-                {!isAvailable && item.prerequisites && item.prerequisites.length > 0 && (
-                  <div
-                    className="item-prerequisites"
-                    style={{
-                      fontSize: '0.7rem',
-                      marginTop: '5px',
-                      color: '#999',
-                    }}
-                  >
-                    <span style={{ fontWeight: 'bold' }}>Requires:</span>{' '}
-                    {item.prerequisites.join(', ')}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    ));
+    return categoriesToShow;
   };
 
   // Calculate counts for display
   const { available, total } = getTotalCounts();
   const displayCount = countDisplayedDecisions();
+  const categoriesToShow = getCategoriesToShow();
+
+  if (DEBUG) {
+    console.log('Sidebar rendering stats:', {
+      displayCount,
+      categoriesShown: Object.keys(categoriesToShow).length,
+      filtering: {
+        showUnavailable,
+        showOptional,
+        showRequired,
+        searchTerm: searchTerm ? `"${searchTerm}"` : 'none',
+      },
+    });
+  }
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
-        <h3>Baldur's Gate 3 Decisions</h3>
-        <p>Drag items to the canvas to create your flowchart</p>
-
-        {/* Search and filter controls */}
-        <div className="sidebar-controls">
-          <input
-            type="text"
-            placeholder="Search decisions..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="search-input"
-            style={{
-              width: '95%',
-              padding: '8px',
-              marginBottom: '10px',
-              borderRadius: '4px',
-              border: '1px solid #ddd',
-            }}
-          />
-
-          <div
-            className="legend"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              fontSize: '0.8rem',
-              padding: '8px',
-              backgroundColor: '#f0f0f0',
-              borderRadius: '4px',
-              marginBottom: '12px',
-            }}
-          >
-            {/* Required Quest with toggle */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '4px',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowRequired(!showRequired)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span
-                  style={{
-                    width: '14px',
-                    height: '14px',
-                    backgroundColor: '#ffb84d',
-                    border: '1px solid #ff9900',
-                    borderRadius: '3px',
-                    display: 'inline-block',
-                    marginRight: '6px',
-                  }}
-                ></span>
-                <span>Required Quest</span>
-              </div>
-              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
-                <input
-                  className="tgl tgl-light"
-                  id="cb-required"
-                  type="checkbox"
-                  checked={showRequired}
-                  onChange={() => setShowRequired(!showRequired)}
-                />
-                <label className="tgl-btn" htmlFor="cb-required"></label>
-              </div>
-            </div>
-
-            {/* Optional Side Quest with toggle */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '4px',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowOptional(!showOptional)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span
-                  style={{
-                    width: '14px',
-                    height: '14px',
-                    backgroundColor: '#e0e0e0',
-                    border: '1px solid #bebebe',
-                    borderRadius: '3px',
-                    display: 'inline-block',
-                    marginRight: '6px',
-                  }}
-                ></span>
-                <span>Optional Side Quest</span>
-              </div>
-              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
-                <input
-                  className="tgl tgl-light"
-                  id="cb-optional"
-                  type="checkbox"
-                  checked={showOptional}
-                  onChange={() => setShowOptional(!showOptional)}
-                />
-                <label className="tgl-btn" htmlFor="cb-optional"></label>
-              </div>
-            </div>
-
-            {/* Unavailable Decision with toggle */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowUnavailable(!showUnavailable)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span
-                  style={{
-                    width: '14px',
-                    height: '14px',
-                    backgroundColor: '#f8f8f8',
-                    border: '1px dashed #999',
-                    borderRadius: '3px',
-                    display: 'inline-block',
-                    marginRight: '6px',
-                    opacity: 0.6,
-                  }}
-                ></span>
-                <span>Unavailable Decision</span>
-              </div>
-              <div className="checkbox-wrapper-6" style={{ transform: 'scale(0.7)' }}>
-                <input
-                  className="tgl tgl-light"
-                  id="cb-available"
-                  type="checkbox"
-                  checked={showUnavailable}
-                  onChange={() => setShowUnavailable(!showUnavailable)}
-                />
-                <label className="tgl-btn" htmlFor="cb-available"></label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SidebarHeader
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        showRequired={showRequired}
+        setShowRequired={setShowRequired}
+        showOptional={showOptional}
+        setShowOptional={setShowOptional}
+        showUnavailable={showUnavailable}
+        setShowUnavailable={setShowUnavailable}
+      />
 
       {/* Render categories and decision items */}
-      <div className="decision-categories">{renderSidebarContent()}</div>
+      <div className="decision-categories">
+        <SidebarContent
+          categoriesToShow={categoriesToShow}
+          isDecisionAvailable={isDecisionAvailable}
+          onDragStart={onDragStart}
+          displayCount={displayCount}
+        />
+      </div>
 
       {/* Debug panel (only visible if DEBUG is true) */}
       {DEBUG && (
-        <div
-          style={{
-            margin: '20px 0',
-            padding: '10px',
-            backgroundColor: '#f0f0f0',
-            borderRadius: '4px',
-            fontSize: '0.8rem',
-            color: '#666',
-          }}
-        >
-          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Debug Info:</div>
-          <div>
-            Filter Settings:
-            {showUnavailable ? ' Show Unavailable,' : ' Hide Unavailable,'}
-            {showRequired ? ' Required,' : ''}
-            {showOptional ? ' Optional' : ''}
-          </div>
-          <div>
-            Decisions: {total} total, {available} available
-          </div>
-          <div>Displaying: {displayCount} decisions</div>
-          <div>Categories: {Object.keys(decisions).length}</div>
-          <div>Completed Decisions: {completed.length}</div>
-        </div>
+        <DebugPanel
+          showUnavailable={showUnavailable}
+          showRequired={showRequired}
+          showOptional={showOptional}
+          total={total}
+          available={available}
+          displayCount={displayCount}
+          categoriesCount={Object.keys(decisions).length}
+          completedCount={completed.length}
+        />
       )}
     </aside>
   );
