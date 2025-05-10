@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: 'npm'
+    # Look for `package.json` and `lock` files in the `root` directory
+    directory: '/'
+    # Check for updates once a week
+    schedule:
+      interval: 'weekly'
+    # Specify labels for npm pull requests
+    labels:
+      - 'npm'
+      - 'dependencies'
+    # Set a limit on the number of open pull requests Dependabot can have
+    open-pull-requests-limit: 10
+    # Allow up to 5 pull requests for version updates
+    pull-request-branch-name:
+      # Separate sections of the branch name with a hyphen
+      separator: '-'
+    # Specify reviewers for pull requests
+    reviewers:
+      - 'kiliantyler'
+    # Specify the versioning strategy
+    versioning-strategy: auto
+    # Specify the commit message format
+    commit-message:
+      # Prefix all commit messages with "npm"
+      prefix: 'npm'
+      # Include the scope of the dependency in the commit message
+      include: 'scope'
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: 'github-actions'
+    # Look for GitHub Actions workflow files in the `.github/workflows` directory
+    directory: '/'
+    # Check for updates once a week
+    schedule:
+      interval: 'weekly'
+    # Specify labels for GitHub Actions pull requests
+    labels:
+      - 'github-actions'
+      - 'dependencies'
+    # Set a limit on the number of open pull requests Dependabot can have
+    open-pull-requests-limit: 5
+    # Specify reviewers for pull requests
+    reviewers:
+      - 'kiliantyler'

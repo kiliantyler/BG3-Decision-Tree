@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # You can add more Node.js versions if needed
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  test-package-managers:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-manager: ['npm', 'yarn', 'pnpm', 'bun']
+        include:
+          - package-manager: npm
+            install-cmd: npm ci
+            build-cmd: npm run build
+          - package-manager: yarn
+            install-cmd: yarn install --frozen-lockfile
+            build-cmd: yarn build
+          - package-manager: pnpm
+            install-cmd: pnpm install --frozen-lockfile
+            build-cmd: pnpm build
+          - package-manager: bun
+            install-cmd: bun install
+            build-cmd: bun run build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+
+      - name: Setup ${{ matrix.package-manager }}
+        if: matrix.package-manager == 'pnpm'
+        run: npm install -g pnpm
+
+      - name: Setup ${{ matrix.package-manager }}
+        if: matrix.package-manager == 'yarn'
+        run: npm install -g yarn
+
+      - name: Setup ${{ matrix.package-manager }}
+        if: matrix.package-manager == 'bun'
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies with ${{ matrix.package-manager }}
+        run: ${{ matrix.install-cmd }}
+
+      - name: Build with ${{ matrix.package-manager }}
+        run: ${{ matrix.build-cmd }}

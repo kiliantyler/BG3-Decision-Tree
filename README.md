@@ -27,8 +27,12 @@ An interactive visual tool for planning your journey through Baldur's Gate 3 by 
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- npm or yarn
+- Node.js 22.15.0+ installed
+- One of the following package managers:
+  - npm 10.0.0+
+  - yarn 3.0.0+
+  - pnpm 8.0.0+
+  - bun 1.0.0+
 
 ### Installation
 
@@ -36,22 +40,128 @@ An interactive visual tool for planning your journey through Baldur's Gate 3 by 
 
    ```bash
    git clone https://github.com/kiliantyler/BG3-Decision-Tree.git
-   cd bg3-flowchart
+   cd BG3-Decision-Tree
    ```
 
-2. Install dependencies:
+2. Install dependencies using your preferred package manager:
+
+   **Using npm:**
 
    ```bash
    npm install
+   # or use the script
+   npm run npm:install
+   ```
+
+   **Using yarn:**
+
+   ```bash
+   yarn install
+   # or use the script
+   npm run yarn:install
+   ```
+
+   **Using pnpm:**
+
+   ```bash
+   pnpm install
+   # or use the script
+   npm run pnpm:install
+   ```
+
+   **Using bun:**
+
+   ```bash
+   bun install
+   # or use the script
+   npm run bun:install
    ```
 
 3. Start the development server:
 
+   **Using npm:**
+
    ```bash
    npm run dev
+   # or use the script
+   npm run npm:dev
+   ```
+
+   **Using yarn:**
+
+   ```bash
+   yarn dev
+   # or use the script
+   npm run yarn:dev
+   ```
+
+   **Using pnpm:**
+
+   ```bash
+   pnpm dev
+   # or use the script
+   npm run pnpm:dev
+   ```
+
+   **Using bun:**
+
+   ```bash
+   bun dev
+   # or use the script
+   npm run bun:dev
    ```
 
 4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+### Other Commands
+
+**Build the project:**
+
+```bash
+# Using npm
+npm run build
+
+# Using yarn
+yarn build
+
+# Using pnpm
+pnpm build
+
+# Using bun
+bun build
+```
+
+**Preview the production build:**
+
+```bash
+# Using npm
+npm run preview
+
+# Using yarn
+yarn preview
+
+# Using pnpm
+pnpm preview
+
+# Using bun
+bun preview
+```
+
+**Run linting:**
+
+```bash
+# Using npm
+npm run lint
+
+# Using yarn
+yarn lint
+
+# Using pnpm
+pnpm lint
+
+# Using bun
+bun lint
+```
 
 ## Usage
 
@@ -100,24 +210,24 @@ The application uses a structured data format for game decisions:
 
 ```markdown
 src/
-├── components/         # React components
-│   ├── DecisionNode.jsx    # Node component for decisions
-│   ├── FlowChart.jsx       # Main flowchart component
-│   ├── OutcomeNode.jsx     # Node for outcome display
-│   ├── Sidebar.jsx         # Sidebar with available decisions
-│   └── DebugPanel.jsx      # Debug panel (dev mode only)
-├── contexts/           # React contexts
-│   └── DecisionContext.jsx # Decision management context
-├── data/               # Game data
-│   ├── decisions/      # Decision data organized by act
-│   ├── enhancedDataManager.js # Data management with HMR support
-│   └── gameDecisionTypes.js   # Type definitions
-├── hooks/              # Custom React hooks
-│   ├── useDecisionManager.jsx # Decision state management
-│   └── useNodeLayoutManager.jsx # Node layout utilities
-├── styles/             # CSS styles
-│   └── customStyles.css     # Custom styling for the app
-└── App.jsx             # Main application component
+├── components/ # React components
+│ ├── DecisionNode.jsx # Node component for decisions
+│ ├── FlowChart.jsx # Main flowchart component
+│ ├── OutcomeNode.jsx # Node for outcome display
+│ ├── Sidebar.jsx # Sidebar with available decisions
+│ └── DebugPanel.jsx # Debug panel (dev mode only)
+├── contexts/ # React contexts
+│ └── DecisionContext.jsx # Decision management context
+├── data/ # Game data
+│ ├── decisions/ # Decision data organized by act
+│ ├── enhancedDataManager.js # Data management with HMR support
+│ └── gameDecisionTypes.js # Type definitions
+├── hooks/ # Custom React hooks
+│ ├── useDecisionManager.jsx # Decision state management
+│ └── useNodeLayoutManager.jsx # Node layout utilities
+├── styles/ # CSS styles
+│ └── customStyles.css # Custom styling for the app
+└── App.jsx # Main application component
 ```
 
 ## Future Plans

@@ -1,0 +1,69 @@
+{
+  // Editor settings
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.rulers": [
+    100
+  ],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.suggestSelection": "first",
+  "editor.linkedEditing": true,
+  "editor.wordWrap": "off",
+  // ESLint settings
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact"
+  ],
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  // JavaScript settings
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.suggest.autoImports": true,
+  "javascript.suggest.paths": true,
+  "javascript.preferences.quoteStyle": "single",
+  // React settings
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  // Path intellisense
+  "path-intellisense.mappings": {
+    "@": "${workspaceFolder}/src",
+    "components": "${workspaceFolder}/src/components",
+    "contexts": "${workspaceFolder}/src/contexts",
+    "hooks": "${workspaceFolder}/src/hooks",
+    "data": "${workspaceFolder}/src/data",
+    "styles": "${workspaceFolder}/src/styles"
+  },
+  // File associations
+  "files.associations": {
+    "*.jsx": "javascriptreact",
+    "*.js": "javascript"
+  },
+  // Search settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true
+  },
+  // Git settings
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  // Vite specific settings
+  "vite.autoStart": true,
+  "vite.port": 5173,
+  // File handling
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.eol": "\n",
+  "files.autoSave": "onFocusChange"
+}

@@ -1,0 +1,48 @@
+# Development files
+.vscode/
+.idea/
+.github/
+.git/
+.gitignore
+.gitattributes
+.editorconfig
+.eslintrc*
+.prettierrc
+.npmrc
+.yarnrc.yml
+.pnpmrc
+bunfig.toml
+
+# Build and test files
+coverage/
+.nyc_output/
+cypress/videos/
+cypress/screenshots/
+.eslintcache
+.stylelintcache
+
+# Package manager files
+node_modules/
+.yarn/
+.pnp.*
+yarn-error.log
+npm-debug.log
+pnpm-debug.log
+
+# Source files (if you're publishing compiled code)
+# src/
+
+# Configuration files
+vite.config.js
+tsconfig.json
+jsconfig.json
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,35 @@
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, they will be requested for
+# review when someone opens a pull request.
+* @kiliantyler
+
+# Core application files
+/src/App.jsx @kiliantyler
+/src/main.jsx @kiliantyler
+/src/index.css @kiliantyler
+/src/App.css @kiliantyler
+
+# Components
+/src/components/ @kiliantyler
+
+# Contexts
+/src/contexts/ @kiliantyler
+
+# Hooks
+/src/hooks/ @kiliantyler
+
+# Game data
+/src/data/ @kiliantyler
+
+# Styles
+/src/styles/ @kiliantyler
+
+# Configuration files
+*.config.js @kiliantyler
+.vscode/ @kiliantyler
+.github/ @kiliantyler
+package.json @kiliantyler
+
+# Documentation
+*.md @kiliantyler
+LICENSE @kiliantyler
