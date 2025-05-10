@@ -1,5 +1,6 @@
 // src/components/Sidebar.jsx - Complete robust revision to fix unavailable nodes issue
 import { useEffect, useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 // Debug flag - set to true to see detailed logging
 const DEBUG = true;
@@ -7,10 +8,10 @@ const DEBUG = true;
 const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
   // State for search/filter functionality
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // State for filter toggle
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(availableOnly);
-  
+
   // State for filtering by type (optional/required)
   const [showOptional, setShowOptional] = useState(true);
   const [showRequired, setShowRequired] = useState(true);
@@ -19,14 +20,14 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
   useEffect(() => {
     if (DEBUG) {
       // Log the key state values to help debug issues
-      console.log("Sidebar component state:", {
+      console.log('Sidebar component state:', {
         availableOnly,
         showOnlyAvailable,
         showOptional,
         showRequired,
         decisionCategories: Object.keys(decisions),
         totalDecisions: Object.values(decisions).flat().length,
-        completedDecisions: completed?.length || 0
+        completedDecisions: completed?.length || 0,
       });
     }
   }, [availableOnly, showOnlyAvailable, showOptional, showRequired, decisions, completed]);
@@ -39,32 +40,32 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
       event.preventDefault();
       return;
     }
-    
+
     // Set the node type data
     event.dataTransfer.setData('application/reactflow', nodeType);
-    
+
     // Set the decision data
     event.dataTransfer.setData('decision', JSON.stringify(decision));
-    
+
     // Set effectAllowed for drag operation
     event.dataTransfer.effectAllowed = 'move';
-    
+
     if (DEBUG) console.log(`Started dragging decision: ${decision.id}`);
   };
 
   // Function to check if a decision is available
-  const isDecisionAvailable = (decisionId) => {
+  const isDecisionAvailable = decisionId => {
     // Find the decision
     const allDecisions = Object.values(decisions).flat();
     const decision = allDecisions.find(d => d.id === decisionId);
-    
+
     if (!decision) {
       if (DEBUG) console.log(`Decision not found: ${decisionId}`);
       return false;
     }
 
     // A decision is available if all prerequisites are completed
-    const prerequisitesMet = (decision.prerequisites || []).every(prereq => 
+    const prerequisitesMet = (decision.prerequisites || []).every(prereq =>
       completed.includes(prereq)
     );
 
@@ -75,22 +76,22 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
     const notExcluded = !completed.some(completedId => {
       const completedDecision = allDecisions.find(d => d.id === completedId);
       return (
-        completedDecision && 
-        completedDecision.mutuallyExclusive && 
+        completedDecision &&
+        completedDecision.mutuallyExclusive &&
         completedDecision.mutuallyExclusive.includes(decisionId)
       );
     });
 
     const isAvailable = prerequisitesMet && notCompleted && notExcluded;
-    
+
     if (DEBUG && !isAvailable) {
       console.log(`Decision ${decisionId} is unavailable because:`, {
         prerequisitesMet,
         notCompleted,
-        notExcluded
+        notExcluded,
       });
     }
-    
+
     return isAvailable;
   };
 
@@ -104,21 +105,21 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
     const allDecisions = getAllDecisions();
     const available = allDecisions.filter(d => isDecisionAvailable(d.id)).length;
     const total = allDecisions.length;
-    
+
     return { available, total };
   };
 
   // Calculate which decisions to show
   const countDisplayedDecisions = () => {
     let count = 0;
-    
+
     // Check each category
-    Object.entries(decisions).forEach(([_, items]) => {
+    Object.entries(decisions).forEach(([, items]) => {
       // Apply filters to each item
       items.forEach(item => {
         // Skip items without required fields
         if (!item || !item.id || !item.label) return;
-        
+
         // Text search filter
         const matchesSearch =
           !searchTerm ||
@@ -127,8 +128,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
 
         // Optional/Required filter
         const matchesType =
-          (showOptional && item.optional) ||
-          (showRequired && item.required && !item.optional);
+          (showOptional && item.optional) || (showRequired && item.required && !item.optional);
 
         // Availability filter - only apply if showOnlyAvailable is true
         const matchesAvailability = !showOnlyAvailable || isDecisionAvailable(item.id);
@@ -139,7 +139,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         }
       });
     });
-    
+
     return count;
   };
 
@@ -148,16 +148,16 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
     // Track decisions to show
     let displayCount = 0;
     const categoriesToShow = {};
-    
+
     // First pass: determine which items to show in which categories
     Object.entries(decisions).forEach(([category, items]) => {
       const filteredItems = [];
-      
+
       // Check each item against filters
       items.forEach(item => {
         // Skip items without required fields
         if (!item || !item.id || !item.label) return;
-        
+
         // Text search filter
         const matchesSearch =
           !searchTerm ||
@@ -166,8 +166,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
 
         // Optional/Required filter
         const matchesType =
-          (showOptional && item.optional) ||
-          (showRequired && item.required && !item.optional);
+          (showOptional && item.optional) || (showRequired && item.required && !item.optional);
 
         // Availability filter - only apply if showOnlyAvailable is true
         const matchesAvailability = !showOnlyAvailable || isDecisionAvailable(item.id);
@@ -178,39 +177,41 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
           displayCount++;
         }
       });
-      
+
       // Add category if it has items to show
       if (filteredItems.length > 0) {
         categoriesToShow[category] = filteredItems;
       }
     });
-    
+
     if (DEBUG) {
-      console.log("Sidebar rendering stats:", {
+      console.log('Sidebar rendering stats:', {
         displayCount,
         categoriesShown: Object.keys(categoriesToShow).length,
         filtering: {
           showOnlyAvailable,
           showOptional,
           showRequired,
-          searchTerm: searchTerm ? `"${searchTerm}"` : "none"
-        }
+          searchTerm: searchTerm ? `"${searchTerm}"` : 'none',
+        },
       });
     }
-    
+
     // Return content based on filtered data
     if (displayCount === 0) {
       return (
-        <div style={{ 
-          padding: '20px', 
-          textAlign: 'center', 
-          color: '#999' 
-        }}>
+        <div
+          style={{
+            padding: '20px',
+            textAlign: 'center',
+            color: '#999',
+          }}
+        >
           No decisions match the current filters.
         </div>
       );
     }
-    
+
     // Render categories and items
     return Object.entries(categoriesToShow).map(([category, items]) => (
       <div key={category} className="decision-category">
@@ -226,10 +227,8 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
             const itemStyle = {
               padding: '10px',
               margin: '8px 0',
-              backgroundColor: isAvailable 
-                ? (isOptional ? '#e0e0e0' : '#ffb84d')
-                : '#f8f8f8',
-              border: isAvailable 
+              backgroundColor: isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8',
+              border: isAvailable
                 ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}`
                 : '1px dashed #999',
               borderRadius: '4px',
@@ -238,15 +237,17 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
               opacity: isAvailable ? 1 : 0.6,
               boxShadow: 'none',
               position: 'relative',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             };
 
             return (
               <div
                 key={item.id}
-                className={`decision-item ${isAvailable ? 'available' : 'unavailable'} ${isOptional ? 'optional' : 'required'}`}
+                className={`decision-item ${isAvailable ? 'available' : 'unavailable'} ${
+                  isOptional ? 'optional' : 'required'
+                }`}
                 draggable={true} // Always set draggable, but we'll prevent it in onDragStart if unavailable
-                onDragStart={(event) => onDragStart(event, item.type || 'decision', item)}
+                onDragStart={event => onDragStart(event, item.type || 'decision', item)}
                 style={itemStyle}
                 onMouseEnter={e => {
                   if (isAvailable) {
@@ -269,13 +270,10 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
                     marginBottom: '4px',
                   }}
                 >
-                  <div
-                    className="item-title"
-                    style={{ fontWeight: 'bold' }}
-                  >
+                  <div className="item-title" style={{ fontWeight: 'bold' }}>
                     {item.label}
                   </div>
-                  
+
                   {/* Status badges */}
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {!isAvailable && (
@@ -320,28 +318,24 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
                   </div>
                 </div>
 
-                <div
-                  className="item-description"
-                  style={{ fontSize: '0.8rem', color: '#666' }}
-                >
+                <div className="item-description" style={{ fontSize: '0.8rem', color: '#666' }}>
                   {item.description?.substring(0, 60)}...
                 </div>
 
                 {/* Show prerequisites if not available */}
-                {!isAvailable &&
-                  item.prerequisites &&
-                  item.prerequisites.length > 0 && (
-                    <div
-                      className="item-prerequisites"
-                      style={{
-                        fontSize: '0.7rem',
-                        marginTop: '5px',
-                        color: '#999',
-                      }}
-                    >
-                      <span style={{ fontWeight: 'bold' }}>Requires:</span> {item.prerequisites.join(', ')}
-                    </div>
-                  )}
+                {!isAvailable && item.prerequisites && item.prerequisites.length > 0 && (
+                  <div
+                    className="item-prerequisites"
+                    style={{
+                      fontSize: '0.7rem',
+                      marginTop: '5px',
+                      color: '#999',
+                    }}
+                  >
+                    <span style={{ fontWeight: 'bold' }}>Requires:</span>{' '}
+                    {item.prerequisites.join(', ')}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -366,7 +360,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
             type="text"
             placeholder="Search decisions..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="search-input"
             style={{
               width: '100%',
@@ -435,17 +429,21 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
             }}
           >
             {/* Display decision counts */}
-            <div style={{ 
-              fontSize: '0.7rem', 
-              marginBottom: '6px',
-              color: '#666',
-              textAlign: 'right'
-            }}>
-              Showing {displayCount} of {total} decisions 
-              ({available} available, {total - available} locked)
+            <div
+              style={{
+                fontSize: '0.7rem',
+                marginBottom: '6px',
+                color: '#666',
+                textAlign: 'right',
+              }}
+            >
+              Showing {displayCount} of {total} decisions ({available} available,{' '}
+              {total - available} locked)
             </div>
-            
-            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+
+            <ThemeToggle />
+
+            <div style={{ fontWeight: 'bold', marginBottom: '4px', marginTop: '10px' }}>
               Legend:
             </div>
             <div
@@ -468,11 +466,11 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
               ></span>
               <span>Required Quest</span>
             </div>
-            <div 
-              style={{ 
-                display: 'flex', 
+            <div
+              style={{
+                display: 'flex',
                 alignItems: 'center',
-                marginBottom: '4px'
+                marginBottom: '4px',
               }}
             >
               <span
@@ -488,10 +486,10 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
               ></span>
               <span>Optional Side Quest</span>
             </div>
-            <div 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center'
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
               <span
@@ -503,7 +501,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
                   borderRadius: '3px',
                   display: 'inline-block',
                   marginRight: '6px',
-                  opacity: 0.6
+                  opacity: 0.6,
                 }}
               ></span>
               <span>Unavailable Decision</span>
@@ -513,27 +511,30 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
       </div>
 
       {/* Render categories and decision items */}
-      <div className="decision-categories">
-        {renderSidebarContent()}
-      </div>
-      
+      <div className="decision-categories">{renderSidebarContent()}</div>
+
       {/* Debug panel (only visible if DEBUG is true) */}
       {DEBUG && (
-        <div style={{
-          margin: '20px 0',
-          padding: '10px',
-          backgroundColor: '#f0f0f0',
-          borderRadius: '4px',
-          fontSize: '0.8rem',
-          color: '#666',
-        }}>
+        <div
+          style={{
+            margin: '20px 0',
+            padding: '10px',
+            backgroundColor: '#f0f0f0',
+            borderRadius: '4px',
+            fontSize: '0.8rem',
+            color: '#666',
+          }}
+        >
           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Debug Info:</div>
-          <div>Filter Settings: 
-            {showOnlyAvailable ? ' Show Available Only,' : ' Show All,'} 
-            {showRequired ? ' Required,' : ''} 
+          <div>
+            Filter Settings:
+            {showOnlyAvailable ? ' Show Available Only,' : ' Show All,'}
+            {showRequired ? ' Required,' : ''}
             {showOptional ? ' Optional' : ''}
           </div>
-          <div>Decisions: {total} total, {available} available</div>
+          <div>
+            Decisions: {total} total, {available} available
+          </div>
           <div>Displaying: {displayCount} decisions</div>
           <div>Categories: {Object.keys(decisions).length}</div>
           <div>Completed Decisions: {completed.length}</div>

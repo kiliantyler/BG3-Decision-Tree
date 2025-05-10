@@ -1,0 +1,181 @@
+/* src/styles/theme.css */
+/* Theme variables for light and dark mode */
+
+:root {
+  /* Default light theme variables will be set by ThemeContext */
+  --transition-speed: 0.3s;
+}
+
+/* Apply theme variables to elements */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.app-container {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* Sidebar theming */
+.sidebar {
+  background-color: var(--sidebarBackground);
+  border-right: 1px solid var(--border);
+  color: var(--foreground);
+  transition: background-color var(--transition-speed), color var(--transition-speed),
+    border-color var(--transition-speed);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h3 {
+  color: var(--purple);
+}
+
+.decision-category h4 {
+  background-color: var(--currentLine);
+  color: var(--foreground);
+}
+
+.decision-item {
+  background-color: var(--nodeBackground) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground);
+  transition: all var(--transition-speed);
+}
+
+.decision-item:hover {
+  background-color: var(--selection) !important;
+}
+
+.decision-item.optional:not(.completed) {
+  background-color: var(--optionalNode) !important;
+  border-color: var(--optionalBorder) !important;
+}
+
+.decision-item.required:not(.completed) {
+  background-color: var(--requiredNode) !important;
+  border-color: var(--requiredBorder) !important;
+}
+
+.decision-item.completed {
+  background-color: var(--completedNode) !important;
+  border-color: var(--completedBorder) !important;
+}
+
+.item-description {
+  color: var(--comment) !important;
+}
+
+/* Input elements */
+input[type='text'],
+input[type='search'] {
+  background-color: var(--nodeBackground);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+/* Buttons */
+button {
+  background-color: var(--currentLine);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+button:hover {
+  border-color: var(--purple);
+}
+
+button.change-decision {
+  background-color: var(--currentLine);
+  border-color: var(--border);
+}
+
+button.change-decision:hover {
+  background-color: var(--selection);
+}
+
+/* ReactFlow elements */
+.react-flow__controls {
+  background-color: var(--nodeBackground) !important;
+}
+
+.react-flow__controls-button {
+  color: var(--foreground) !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: var(--selection) !important;
+}
+
+.react-flow__node {
+  background-color: var(--nodeBackground);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.react-flow__edge-path {
+  stroke: var(--comment);
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke: var(--purple);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin: 10px 0;
+  width: 100%;
+  background-color: var(--currentLine);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.theme-toggle:hover {
+  background-color: var(--selection);
+  border-color: var(--purple);
+}
+
+.theme-toggle svg {
+  margin-right: 8px;
+}
+
+/* Decision node styling */
+.decision-node.required:not(.completed) {
+  background-color: var(--requiredNode);
+  border-color: var(--requiredBorder);
+}
+
+.decision-node.optional:not(.completed) {
+  background-color: var(--optionalNode);
+  border-color: var(--optionalBorder);
+}
+
+.decision-node.completed {
+  background-color: var(--completedNode);
+  border-color: var(--completedBorder);
+}
+
+/* Legend styling */
+.legend {
+  background-color: var(--currentLine) !important;
+  color: var(--foreground) !important;
+}
+
+/* Debug panel */
+.debug-panel {
+  background-color: var(--nodeBackground);
+  color: var(--foreground);
+  border-color: var(--border);
+}

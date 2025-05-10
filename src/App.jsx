@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './styles/customStyles.css';
+import './styles/theme.css';
 
 // Components
 import DebugPanel from './components/DebugPanel.jsx';
@@ -12,6 +13,7 @@ import Sidebar from './components/Sidebar.jsx';
 
 // Context
 import { DecisionProvider, useDecision } from './contexts/DecisionContext.jsx';
+import { ThemeProvider } from './contexts/ThemeContext.jsx';
 
 // Import from enhanced data manager
 import { getStartingNode } from './data/enhancedDataManager.js';
@@ -32,18 +34,18 @@ const AppContent = () => {
 
   // Reference to track if initial node has been added
   const initialNodeAdded = useRef(false);
-  
+
   // State for app status
   const [status, setStatus] = useState({ loading: true, error: null });
-  
+
   // Log the state of the app
   useEffect(() => {
-    console.log('App Status:', { 
-      nodesCount: nodes?.length || 0, 
+    console.log('App Status:', {
+      nodesCount: nodes?.length || 0,
       edgesCount: edges?.length || 0,
       completedCount: completedDecisions?.length || 0,
       categoriesCount: Object.keys(categorizedDecisions || {}).length,
-      initialNodeAdded: initialNodeAdded.current
+      initialNodeAdded: initialNodeAdded.current,
     });
   }, [nodes, edges, completedDecisions, categorizedDecisions]);
 
@@ -52,13 +54,13 @@ const AppContent = () => {
     if (status.loading) {
       try {
         console.log('App initializing...');
-        
+
         // Only add starting node if we don't have any nodes yet
         // and we haven't already added the initial node
         if ((nodes?.length || 0) === 0 && !initialNodeAdded.current) {
           console.log('Adding starting node');
           const startingNode = getStartingNode();
-          
+
           if (startingNode) {
             console.log('Starting node found:', startingNode);
             // Add starting node to canvas with initial position
@@ -82,7 +84,7 @@ const AppContent = () => {
             return;
           }
         }
-        
+
         // Update status
         setStatus({ loading: false, error: null });
       } catch (err) {
@@ -101,14 +103,17 @@ const AppContent = () => {
   // Show loading state
   if (status.loading) {
     return (
-      <div className="loading-container" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '1.5rem',
-        color: '#666'
-      }}>
+      <div
+        className="loading-container"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          fontSize: '1.5rem',
+          color: '#666',
+        }}
+      >
         Loading Baldur's Gate 3 decision tree...
       </div>
     );
@@ -117,17 +122,20 @@ const AppContent = () => {
   // Show error state
   if (status.error) {
     return (
-      <div className="error-container" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        color: '#d32f2f'
-      }}>
+      <div
+        className="error-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          color: '#d32f2f',
+        }}
+      >
         <h3>Error loading data</h3>
         <p>{status.error}</p>
-        <button 
+        <button
           onClick={() => setStatus({ loading: true, error: null })}
           style={{
             padding: '8px 16px',
@@ -135,7 +143,7 @@ const AppContent = () => {
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         >
           Retry
@@ -161,30 +169,31 @@ const AppContent = () => {
         newlyAddedNodes={newlyAddedNodes || []}
         setNodes={setNodes} // Pass the setNodes function to update node positions
       />
-      
+
       {/* Debug panel - activated with CTRL+SHIFT+D */}
       <DebugPanel />
-      
+
       {/* Hidden debug info - appears in bottom right corner on hover */}
-      <div style={{
-        position: 'fixed',
-        bottom: '5px',
-        right: '5px',
-        fontSize: '10px',
-        color: '#999',
-        padding: '2px 5px',
-        background: 'rgba(255,255,255,0.8)',
-        borderRadius: '2px',
-        opacity: 0.3,
-        transition: 'opacity 0.3s ease',
-        cursor: 'help',
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-      onMouseLeave={(e) => e.currentTarget.style.opacity = '0.3'}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '5px',
+          right: '5px',
+          fontSize: '10px',
+          color: '#999',
+          padding: '2px 5px',
+          background: 'rgba(255,255,255,0.8)',
+          borderRadius: '2px',
+          opacity: 0.3,
+          transition: 'opacity 0.3s ease',
+          cursor: 'help',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+        onMouseLeave={e => (e.currentTarget.style.opacity = '0.3')}
       >
         Press CTRL+SHIFT+D for debug mode
       </div>
-      
+
       <Analytics />
     </div>
   );
@@ -194,9 +203,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <ReactFlowProvider>
-      <DecisionProvider>
-        <AppContent />
-      </DecisionProvider>
+      <ThemeProvider>
+        <DecisionProvider>
+          <AppContent />
+        </DecisionProvider>
+      </ThemeProvider>
     </ReactFlowProvider>
   );
 };
