@@ -59,14 +59,56 @@ export const themes = {
  * Provider component for theme management
  */
 export const ThemeProvider = ({ children }) => {
-  // Check if user has a saved theme preference
+  // Check if user has a saved theme preference or use system preference
   const getSavedTheme = () => {
     const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark' ? 'dark' : 'light';
+
+    // If there's a saved theme preference, use it
+    if (savedTheme) {
+      return savedTheme === 'dark' ? 'dark' : 'light';
+    }
+
+    // Otherwise, detect user's device preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+
+    return 'light';
   };
 
   // State for current theme
   const [theme, setTheme] = useState(getSavedTheme());
+
+  // Listen for changes in system color scheme preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Define the handler function
+    const handleChange = e => {
+      // Only update if there's no saved preference in localStorage
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+
+    // Add event listener
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+    } else {
+      // Fallback for older browsers
+      mediaQuery.addListener(handleChange);
+    }
+
+    // Cleanup
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        // Fallback for older browsers
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
 
   // Apply theme to document root and save to localStorage when changed
   useEffect(() => {
