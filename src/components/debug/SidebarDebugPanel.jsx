@@ -1,9 +1,13 @@
-// components/sidebar/DebugPanel.jsx
+// components/debug/SidebarDebugPanel.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { themes } from '../../styles/themes/dracula';
 
-const DebugPanel = ({
+/**
+ * Debug panel component for the sidebar
+ * Shows filter settings and decision counts
+ */
+const SidebarDebugPanel = ({
   showUnavailable,
   showRequired,
   showOptional,
@@ -46,4 +50,4 @@ const DebugPanel = ({
   );
 };
 
-export default DebugPanel;
+export default SidebarDebugPanel;

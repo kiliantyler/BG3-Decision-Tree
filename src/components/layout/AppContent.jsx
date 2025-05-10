@@ -176,26 +176,7 @@ const AppContent = () => {
       {/* Debug panel - activated with CTRL+SHIFT+D */}
       <DebugPanel />
 
-      {/* Hidden debug info - appears in bottom right corner on hover */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '5px',
-          right: '5px',
-          fontSize: '10px',
-          color: '#999',
-          padding: '2px 5px',
-          background: 'rgba(255,255,255,0.8)',
-          borderRadius: '2px',
-          opacity: 0.3,
-          transition: 'opacity 0.3s ease',
-          cursor: 'help',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-        onMouseLeave={e => (e.currentTarget.style.opacity = '0.3')}
-      >
-        Press CTRL+SHIFT+D for debug mode
-      </div>
+      {/* Debug panel is toggled with CTRL+SHIFT+D */}
 
       <Analytics />
     </div>

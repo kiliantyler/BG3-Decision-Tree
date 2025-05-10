@@ -1,13 +1,32 @@
 // components/sidebar/Sidebar.jsx
 import { useEffect, useState } from 'react';
-import DebugPanel from './DebugPanel';
+import { SidebarDebugPanel } from '../debug';
 import SidebarContent from './SidebarContent';
 import SidebarHeader from './SidebarHeader';
 
-// Debug flag - set to true to see detailed logging
-const DEBUG = true;
-
+// Debug flag - initially false, will be toggled with CTRL+SHIFT+D
 const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
+  // State for debug mode
+  const [DEBUG, setDEBUG] = useState(false);
+
+  // Add event listener for CTRL+SHIFT+D key combination
+  useEffect(() => {
+    const handleKeyDown = e => {
+      // Check for CTRL+SHIFT+D
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault(); // Prevent default browser behavior
+        setDEBUG(prevState => !prevState);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Clean up
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
   // State for search/filter functionality
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -230,7 +249,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
 
       {/* Debug panel (only visible if DEBUG is true) */}
       {DEBUG && (
-        <DebugPanel
+        <SidebarDebugPanel
           showUnavailable={showUnavailable}
           showRequired={showRequired}
           showOptional={showOptional}
