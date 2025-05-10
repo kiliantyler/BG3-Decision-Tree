@@ -149,11 +149,9 @@ const AppContent = () => {
 
   // Handle reset button click
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
-      resetState();
-      // Force reload the page to ensure a clean state
-      window.location.reload();
-    }
+    resetState();
+    // Force reload the page to ensure a clean state
+    window.location.reload();
   };
 
   // Render the main application

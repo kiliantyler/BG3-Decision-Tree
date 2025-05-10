@@ -1,5 +1,5 @@
 // components/ui/IconButton.jsx
-import React, { useState, useRef } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
 /**
@@ -15,23 +15,27 @@ import { useTheme } from '../../hooks/useTheme';
  * @param {string} props.darkModeBorderColor - Border color in dark mode
  * @param {string} props.hoverBorderColor - Border color on hover in dark mode
  * @param {Object} props.style - Additional inline styles
+ * @param {React.Ref} ref - Forwarded ref
  * @returns {React.ReactElement} - The icon button component
  */
-const IconButton = ({
-  children,
-  onClick,
-  title,
-  ariaLabel,
-  position = 'top-left',
-  borderColor = 'var(--border)',
-  darkModeBorderColor = 'var(--border)',
-  hoverBorderColor = 'var(--purple)',
-  style = {},
-}) => {
+const IconButton = forwardRef((props, ref) => {
+  const {
+    children,
+    onClick,
+    title,
+    ariaLabel,
+    position = 'top-left',
+    borderColor = 'var(--border)',
+    darkModeBorderColor = 'var(--border)',
+    hoverBorderColor = 'var(--purple)',
+    style = {},
+  } = props;
+
   const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const buttonRef = useRef(null);
+  const internalButtonRef = useRef(null);
+  const buttonRef = ref || internalButtonRef;
 
   // Determine position styles
   const getPositionStyles = () => {
@@ -122,6 +126,6 @@ const IconButton = ({
       {children}
     </button>
   );
-};
+});
 
 export default IconButton;
