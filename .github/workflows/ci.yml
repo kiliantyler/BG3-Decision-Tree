@@ -70,7 +70,7 @@ jobs:
 
       - name: Setup ${{ matrix.package-manager }}
         if: matrix.package-manager == 'bun'
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
