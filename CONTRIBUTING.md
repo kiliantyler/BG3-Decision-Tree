@@ -95,6 +95,6 @@ This project uses ESLint and Prettier for code formatting. Your code should:
 - `help wanted`: Extra attention is needed
 - `data`: Related to game decision data
 
-## Thank You!
+## Thank You
 
 Your contributions make this project better for everyone. We appreciate your time and effort!
