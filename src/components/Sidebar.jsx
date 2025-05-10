@@ -362,7 +362,7 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
             onChange={e => setSearchTerm(e.target.value)}
             className="search-input"
             style={{
-              width: '100%',
+              width: '95%',
               padding: '8px',
               marginBottom: '10px',
               borderRadius: '4px',
