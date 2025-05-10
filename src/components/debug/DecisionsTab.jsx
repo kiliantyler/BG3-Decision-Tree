@@ -83,25 +83,28 @@ const DecisionsTab = ({
   };
 
   return (
-    <div>
-      <h3>All Decisions</h3>
-      <input
-        type="text"
-        placeholder="Search decisions..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '8px',
-          marginBottom: '10px',
-          border: `1px solid ${themeColors.border}`,
-          borderRadius: '4px',
-          background: themeColors.currentLine,
-          color: themeColors.foreground,
-        }}
-      />
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: '10px' }}>
+        <h3>All Decisions</h3>
+        <input
+          type="text"
+          placeholder="Search decisions..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{
+            width: 'calc(100% - 16px)', // Account for padding
+            boxSizing: 'border-box',
+            padding: '8px',
+            marginBottom: '5px',
+            border: `1px solid ${themeColors.border}`,
+            borderRadius: '4px',
+            background: themeColors.currentLine,
+            color: themeColors.foreground,
+          }}
+        />
+      </div>
 
-      <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', marginBottom: '5px' }}>
         {filteredDecisions.map(decision => (
           <div
             key={decision.id}

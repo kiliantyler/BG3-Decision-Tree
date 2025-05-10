@@ -12,12 +12,15 @@ const CanvasDataTab = ({ nodes, edges }) => {
   const themeColors = themes[theme];
 
   return (
-    <div>
-      <h3>Canvas Data</h3>
-      <div style={{ display: 'flex', gap: '10px' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: '10px' }}>
+        <h3>Canvas Data</h3>
+      </div>
+
+      <div style={{ flex: 1, display: 'flex', gap: '10px', overflow: 'hidden' }}>
         <div style={{ flex: 1 }}>
           <h4>Nodes ({nodes.length})</h4>
-          <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+          <div style={{ height: 'calc(100% - 30px)', overflowY: 'auto' }}>
             {nodes.map(node => (
               <div
                 key={node.id}
@@ -39,7 +42,7 @@ const CanvasDataTab = ({ nodes, edges }) => {
         </div>
         <div style={{ flex: 1 }}>
           <h4>Edges ({edges.length})</h4>
-          <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+          <div style={{ height: 'calc(100% - 30px)', overflowY: 'auto' }}>
             {edges.map(edge => (
               <div
                 key={edge.id}

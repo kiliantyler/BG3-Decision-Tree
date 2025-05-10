@@ -124,7 +124,7 @@ const DebugPanel = () => {
             style={{
               flex: 1,
               padding: '10px',
-              overflowY: 'auto',
+              overflow: 'hidden', // Changed from overflowY: 'auto' to prevent scrollbar
             }}
           >
             {/* Stats Tab */}
