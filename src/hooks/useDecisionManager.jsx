@@ -1,5 +1,5 @@
 // src/hooks/useDecisionManager.jsx - Updated to ensure all decisions are available to the sidebar
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MarkerType } from 'reactflow';
 // Import all decisions from the data manager
 import {
@@ -39,8 +39,171 @@ const useDecisionManager = () => {
   // Track newly added nodes to enable focusing on them
   const [newlyAddedNodes, setNewlyAddedNodes] = useState([]);
 
+  // Reference to track if initialization has happened
+  const initialized = useRef(false);
+
+  // Find all nodes that depend on a given node (recursively)
+  const findDependentNodes = useCallback(
+    nodeId => {
+      // Internal version to avoid recursion issues
+      const findDependentNodesInternal = nodeId => {
+        const directDependents = edges
+          .filter(edge => edge.source === nodeId)
+          .map(edge => edge.target);
+
+        let allDependents = [...directDependents];
+
+        // Recursively find dependents of dependents, but limit depth to avoid infinite loops
+        directDependents.forEach(depId => {
+          // Avoid circular references by checking if we've already seen this node
+          if (!allDependents.includes(depId)) {
+            const childDeps = edges.filter(edge => edge.source === depId).map(edge => edge.target);
+            allDependents = [...allDependents, ...childDeps];
+          }
+        });
+
+        return allDependents;
+      };
+
+      const directDependents = edges
+        .filter(edge => edge.source === nodeId)
+        .map(edge => edge.target);
+
+      let allDependents = [...directDependents];
+
+      // Recursively find dependents of dependents
+      directDependents.forEach(depId => {
+        const subDependents = findDependentNodesInternal(depId);
+        allDependents = [...allDependents, ...subDependents];
+      });
+
+      return allDependents;
+    },
+    [edges]
+  );
+
+  // Handle when a decision is completed or changed
+  const handleDecisionComplete = useCallback(
+    (decisionId, option, isChanging = false) => {
+      console.log(
+        `Decision ${decisionId} ${isChanging ? 'changed to' : 'completed with'} option: ${option}`
+      );
+
+      // If changing a decision, we need to remove any nodes that depend on this one
+      if (isChanging) {
+        // First, find all nodes that depend on this one (recursively)
+        const nodesToRemove = findDependentNodes(decisionId);
+
+        // Remove all these nodes
+        if (nodesToRemove.length > 0) {
+          // Show warning if there are many nodes to be removed
+          if (
+            nodesToRemove.length > 2 &&
+            !window.confirm(
+              `Changing this decision will remove ${nodesToRemove.length} dependent nodes. Continue?`
+            )
+          ) {
+            return; // User cancelled
+          }
+
+          setNodes(nds => nds.filter(node => !nodesToRemove.includes(node.id)));
+          setEdges(eds =>
+            eds.filter(
+              edge => !nodesToRemove.includes(edge.source) && !nodesToRemove.includes(edge.target)
+            )
+          );
+
+          // Also remove from completedDecisions
+          setCompletedDecisions(prev =>
+            prev.filter(id => id !== decisionId && !nodesToRemove.includes(id))
+          );
+        } else {
+          // If no dependent nodes, just remove this decision from completed
+          setCompletedDecisions(prev => prev.filter(id => id !== decisionId));
+        }
+      }
+
+      // Mark the decision as completed
+      setCompletedDecisions(prev => {
+        // For a changed decision, we already removed it above
+        if (isChanging) {
+          return [...prev, decisionId];
+        }
+
+        // If already completed, don't add it again
+        if (prev.includes(decisionId)) return prev;
+
+        // Add the decision to completed list
+        return [...prev, decisionId];
+      });
+
+      // Store the last completed decision for unlocking new nodes
+      setLastCompletedDecision(decisionId);
+
+      // Store the selected option in the node data for persistence
+      // while preserving the current position of the node
+      setNodes(nds => {
+        return nds.map(node => {
+          if (node.id === decisionId) {
+            // Preserve the node's current position and update only the data
+            return {
+              ...node,
+              data: { ...node.data, selectedOption: option },
+            };
+          }
+          return node;
+        });
+      });
+    },
+    [findDependentNodes]
+  );
+
+  // Handle removing a node from the canvas
+  const handleRemoveNode = useCallback(
+    nodeId => {
+      // First check if this node has dependent nodes
+      const dependentNodes = findDependentNodes(nodeId);
+
+      if (dependentNodes.length > 0) {
+        // Show warning if there are nodes that depend on this one
+        if (
+          !window.confirm(
+            `Removing this node will also remove ${dependentNodes.length} dependent node(s). Continue?`
+          )
+        ) {
+          return; // User cancelled
+        }
+
+        // Remove this node and all its dependents
+        const allNodesToRemove = [nodeId, ...dependentNodes];
+        setNodes(nds => nds.filter(node => !allNodesToRemove.includes(node.id)));
+        setEdges(eds =>
+          eds.filter(
+            edge =>
+              !allNodesToRemove.includes(edge.source) && !allNodesToRemove.includes(edge.target)
+          )
+        );
+
+        // Also remove from completedDecisions
+        setCompletedDecisions(prev => prev.filter(id => !allNodesToRemove.includes(id)));
+      } else {
+        // Just remove this node
+        setNodes(nds => nds.filter(node => node.id !== nodeId));
+        setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
+
+        // Also remove from completedDecisions if present
+        setCompletedDecisions(prev => prev.filter(id => id !== nodeId));
+      }
+    },
+    [findDependentNodes, setNodes, setEdges, setCompletedDecisions]
+  );
+
   // Load state from localStorage on initialization
   useEffect(() => {
+    // Skip if already initialized
+    if (initialized.current) return;
+    initialized.current = true;
+
     try {
       const savedState = localStorage.getItem(STORAGE_KEY);
 
@@ -102,7 +265,7 @@ const useDecisionManager = () => {
     // Initialize states
     setCategorizedDecisions(decisionsByCategory || {});
     setAvailableDecisions(getAvailableDecisions(completedDecisions));
-  }, []);
+  }, [completedDecisions, handleDecisionComplete, handleRemoveNode]);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -140,86 +303,6 @@ const useDecisionManager = () => {
       console.error('Error saving state to localStorage:', error);
     }
   }, [completedDecisions, nodes, edges]);
-
-  // Find all nodes that depend on a given node (recursively)
-  const findDependentNodes = useCallback(
-    nodeId => {
-      const directDependents = edges
-        .filter(edge => edge.source === nodeId)
-        .map(edge => edge.target);
-
-      let allDependents = [...directDependents];
-
-      // Recursively find dependents of dependents
-      directDependents.forEach(depId => {
-        const subDependents = findDependentNodesInternal(depId);
-        allDependents = [...allDependents, ...subDependents];
-      });
-
-      return allDependents;
-    },
-    [edges]
-  );
-
-  // Internal version to avoid recursion issues
-  const findDependentNodesInternal = nodeId => {
-    const directDependents = edges.filter(edge => edge.source === nodeId).map(edge => edge.target);
-
-    let allDependents = [...directDependents];
-
-    // Recursively find dependents of dependents, but limit depth to avoid infinite loops
-    directDependents.forEach(depId => {
-      // Avoid circular references by checking if we've already seen this node
-      if (!allDependents.includes(depId)) {
-        const childDeps = edges.filter(edge => edge.source === depId).map(edge => edge.target);
-        allDependents = [...allDependents, ...childDeps];
-      }
-    });
-
-    return allDependents;
-  };
-
-  // We'll use the layout manager's calculateNodePosition function instead
-
-  // Handle removing a node from the canvas
-  const handleRemoveNode = useCallback(
-    nodeId => {
-      // First check if this node has dependent nodes
-      const dependentNodes = findDependentNodes(nodeId);
-
-      if (dependentNodes.length > 0) {
-        // Show warning if there are nodes that depend on this one
-        if (
-          !window.confirm(
-            `Removing this node will also remove ${dependentNodes.length} dependent node(s). Continue?`
-          )
-        ) {
-          return; // User cancelled
-        }
-
-        // Remove this node and all its dependents
-        const allNodesToRemove = [nodeId, ...dependentNodes];
-        setNodes(nds => nds.filter(node => !allNodesToRemove.includes(node.id)));
-        setEdges(eds =>
-          eds.filter(
-            edge =>
-              !allNodesToRemove.includes(edge.source) && !allNodesToRemove.includes(edge.target)
-          )
-        );
-
-        // Also remove from completedDecisions
-        setCompletedDecisions(prev => prev.filter(id => !allNodesToRemove.includes(id)));
-      } else {
-        // Just remove this node
-        setNodes(nds => nds.filter(node => node.id !== nodeId));
-        setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
-
-        // Also remove from completedDecisions if present
-        setCompletedDecisions(prev => prev.filter(id => id !== nodeId));
-      }
-    },
-    [findDependentNodes, setNodes, setEdges, setCompletedDecisions]
-  );
 
   // Function to add unlocked nodes to canvas with proper connections
   const addUnlockedNodesToCanvas = useCallback(
@@ -332,7 +415,7 @@ const useDecisionManager = () => {
 
       return null;
     },
-    [nodes]
+    [nodes, handleDecisionComplete, handleRemoveNode]
   );
 
   // Add a new node when dragged from sidebar
@@ -395,83 +478,7 @@ const useDecisionManager = () => {
 
       return { id: decisionData.id, node: newNode };
     },
-    [nodes, handleRemoveNode]
-  );
-
-  // Handle when a decision is completed or changed
-  const handleDecisionComplete = useCallback(
-    (decisionId, option, isChanging = false) => {
-      console.log(
-        `Decision ${decisionId} ${isChanging ? 'changed to' : 'completed with'} option: ${option}`
-      );
-
-      // If changing a decision, we need to remove any nodes that depend on this one
-      if (isChanging) {
-        // First, find all nodes that depend on this one (recursively)
-        const nodesToRemove = findDependentNodes(decisionId);
-
-        // Remove all these nodes
-        if (nodesToRemove.length > 0) {
-          // Show warning if there are many nodes to be removed
-          if (
-            nodesToRemove.length > 2 &&
-            !window.confirm(
-              `Changing this decision will remove ${nodesToRemove.length} dependent nodes. Continue?`
-            )
-          ) {
-            return; // User cancelled
-          }
-
-          setNodes(nds => nds.filter(node => !nodesToRemove.includes(node.id)));
-          setEdges(eds =>
-            eds.filter(
-              edge => !nodesToRemove.includes(edge.source) && !nodesToRemove.includes(edge.target)
-            )
-          );
-
-          // Also remove from completedDecisions
-          setCompletedDecisions(prev =>
-            prev.filter(id => id !== decisionId && !nodesToRemove.includes(id))
-          );
-        } else {
-          // If no dependent nodes, just remove this decision from completed
-          setCompletedDecisions(prev => prev.filter(id => id !== decisionId));
-        }
-      }
-
-      // Mark the decision as completed
-      setCompletedDecisions(prev => {
-        // For a changed decision, we already removed it above
-        if (isChanging) {
-          return [...prev, decisionId];
-        }
-
-        // If already completed, don't add it again
-        if (prev.includes(decisionId)) return prev;
-
-        // Add the decision to completed list
-        return [...prev, decisionId];
-      });
-
-      // Store the last completed decision for unlocking new nodes
-      setLastCompletedDecision(decisionId);
-
-      // Store the selected option in the node data for persistence
-      // while preserving the current position of the node
-      setNodes(nds => {
-        return nds.map(node => {
-          if (node.id === decisionId) {
-            // Preserve the node's current position and update only the data
-            return {
-              ...node,
-              data: { ...node.data, selectedOption: option },
-            };
-          }
-          return node;
-        });
-      });
-    },
-    [findDependentNodes]
+    [nodes, handleRemoveNode, handleDecisionComplete]
   );
 
   // Update available decisions when completedDecisions changes
