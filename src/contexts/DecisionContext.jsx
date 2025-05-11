@@ -11,11 +11,7 @@ export const DecisionProvider = ({ children }) => {
   // Use the decision manager hook
   const decisionManager = useDecisionManager();
 
-  return (
-    <DecisionContext.Provider value={decisionManager}>
-      {children}
-    </DecisionContext.Provider>
-  );
+  return <DecisionContext.Provider value={decisionManager}>{children}</DecisionContext.Provider>;
 };
 
 /**
