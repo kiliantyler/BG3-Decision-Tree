@@ -12,12 +12,14 @@ const SidebarHeader = ({
   setShowOptional,
   showUnavailable,
   setShowUnavailable,
+  collapseAllSections,
+  expandAllSections,
 }) => {
   return (
     <div className="sidebar-header">
-      <h3>Baldur's Gate 3 Decisions</h3>
-      <p>Drag items to the canvas to create your flowchart</p>
-
+      <center>
+        <h3>BG3 Decision Tree</h3>
+      </center>
       {/* Search and filter controls */}
       <div className="sidebar-controls">
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
@@ -29,6 +31,8 @@ const SidebarHeader = ({
           setShowOptional={setShowOptional}
           showUnavailable={showUnavailable}
           setShowUnavailable={setShowUnavailable}
+          collapseAllSections={collapseAllSections}
+          expandAllSections={expandAllSections}
         />
       </div>
     </div>

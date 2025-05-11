@@ -126,7 +126,6 @@ body,
   max-height: calc(100vh - 250px); /* Adjust based on header height */
   overflow-y: auto; /* Use auto scroll */
   position: relative; /* For absolute positioning of scroll indicator */
-  padding-bottom: 20px; /* Space for scroll indicator */
 }
 
 /* Hide scrollbars completely for all browsers */
@@ -149,7 +148,7 @@ body,
 /* Add a scroll indicator arrow */
 .scroll-indicator {
   position: fixed;
-  bottom: 20px;
+  bottom: 30px;
   left: 150px; /* Center in sidebar */
   font-size: 16px;
   color: rgba(0, 0, 0, 0.4);

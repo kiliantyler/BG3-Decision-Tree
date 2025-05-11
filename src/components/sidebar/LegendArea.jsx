@@ -9,6 +9,8 @@ const LegendArea = ({
   setShowOptional,
   showUnavailable,
   setShowUnavailable,
+  collapseAllSections,
+  expandAllSections,
 }) => {
   return (
     <div
@@ -51,6 +53,44 @@ const LegendArea = ({
         isChecked={showUnavailable}
         onToggle={() => setShowUnavailable(!showUnavailable)}
       />
+
+      {/* Collapse/Expand All Buttons */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: '10px',
+          borderTop: '1px solid #ddd',
+          paddingTop: '8px',
+        }}
+      >
+        <button
+          onClick={collapseAllSections}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.7rem',
+            backgroundColor: '#e0e0e0',
+            border: '1px solid #bebebe',
+            borderRadius: '3px',
+            cursor: 'pointer',
+          }}
+        >
+          Collapse All
+        </button>
+        <button
+          onClick={expandAllSections}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.7rem',
+            backgroundColor: '#e0e0e0',
+            border: '1px solid #bebebe',
+            borderRadius: '3px',
+            cursor: 'pointer',
+          }}
+        >
+          Expand All
+        </button>
+      </div>
     </div>
   );
 };

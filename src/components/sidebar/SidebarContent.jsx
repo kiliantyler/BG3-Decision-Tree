@@ -1,11 +1,27 @@
 // components/sidebar/SidebarContent.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import ActSection from './ActSection';
 
 // Debug flag - set to true to see detailed logging
 const DEBUG = true;
 
-const SidebarContent = ({ categoriesToShow, isDecisionAvailable, onDragStart, displayCount }) => {
+const SidebarContent = ({
+  categoriesToShow,
+  isDecisionAvailable,
+  onDragStart,
+  displayCount,
+  allSectionsExpanded,
+}) => {
+  // Log when allSectionsExpanded changes
+  useEffect(() => {
+    console.log('SidebarContent - allSectionsExpanded changed to:', allSectionsExpanded);
+
+    // Handle null as a special case (intermediate state during button clicks)
+    if (allSectionsExpanded === null) {
+      console.log('SidebarContent - Received intermediate null state, waiting for next update');
+    }
+  }, [allSectionsExpanded]);
+
   // Return content based on filtered data
   if (displayCount === 0) {
     return (
@@ -43,15 +59,28 @@ const SidebarContent = ({ categoriesToShow, isDecisionAvailable, onDragStart, di
   });
 
   // Render Act sections with their categories
-  return Object.entries(actCategories).map(([act, categories]) => (
-    <ActSection
-      key={act}
-      act={act}
-      categories={categories}
-      isDecisionAvailable={isDecisionAvailable}
-      onDragStart={onDragStart}
-    />
-  ));
+  return (
+    <div style={{ paddingBottom: '60px' }}>
+      {Object.entries(actCategories).map(([act, categories]) => {
+        console.log(
+          `SidebarContent - Rendering ActSection for ${act} with allSectionsExpanded:`,
+          allSectionsExpanded
+        );
+        // Force a key change when allSectionsExpanded changes to ensure a re-render
+        return (
+          <ActSection
+            key={`${act}-${allSectionsExpanded}`}
+            act={act}
+            categories={categories}
+            isDecisionAvailable={isDecisionAvailable}
+            onDragStart={onDragStart}
+            isExpanded={allSectionsExpanded}
+            allSectionsExpanded={allSectionsExpanded}
+          />
+        );
+      })}
+    </div>
+  );
 };
 
 export default SidebarContent;

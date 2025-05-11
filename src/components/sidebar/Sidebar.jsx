@@ -1,5 +1,5 @@
 // components/sidebar/Sidebar.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SidebarDebugPanel } from '../debug';
 import SidebarContent from './SidebarContent';
 import SidebarHeader from './SidebarHeader';
@@ -36,6 +36,62 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
   // State for filtering by type (optional/required)
   const [showOptional, setShowOptional] = useState(true);
   const [showRequired, setShowRequired] = useState(true);
+
+  // State to track if all sections should be expanded or collapsed
+  const [allSectionsExpanded, setAllSectionsExpanded] = useState(true);
+
+  // Use a ref to track the last time the buttons were clicked
+  const lastCollapseClickTime = useRef(0);
+  const lastExpandClickTime = useRef(0);
+
+  // Function to collapse all sections
+  const collapseAllSections = () => {
+    console.log('Collapsing all sections');
+
+    // Update the last click time
+    lastCollapseClickTime.current = Date.now();
+
+    // Force a re-render by setting to a unique value first, then to false
+    setAllSectionsExpanded(prev => {
+      console.log('Previous allSectionsExpanded:', prev);
+
+      // Use setTimeout to ensure the state changes in sequence
+      setTimeout(() => {
+        console.log('Setting allSectionsExpanded to false');
+        setAllSectionsExpanded(false);
+      }, 0);
+
+      // Return a temporary different value to force a re-render
+      return prev === false ? null : prev;
+    });
+  };
+
+  // Function to expand all sections
+  const expandAllSections = () => {
+    console.log('Expanding all sections');
+
+    // Update the last click time
+    lastExpandClickTime.current = Date.now();
+
+    // Force a re-render by setting to a unique value first, then to true
+    setAllSectionsExpanded(prev => {
+      console.log('Previous allSectionsExpanded:', prev);
+
+      // Use setTimeout to ensure the state changes in sequence
+      setTimeout(() => {
+        console.log('Setting allSectionsExpanded to true');
+        setAllSectionsExpanded(true);
+      }, 0);
+
+      // Return a temporary different value to force a re-render
+      return prev === true ? null : prev;
+    });
+  };
+
+  // Debug log when allSectionsExpanded changes
+  useEffect(() => {
+    console.log('Sidebar - allSectionsExpanded changed to:', allSectionsExpanded);
+  }, [allSectionsExpanded]);
 
   // Track rendering and state
   useEffect(() => {
@@ -224,6 +280,60 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
     });
   }
 
+  // Ref for the decision categories container
+  const categoriesRef = useRef(null);
+  // State to track if scroll indicator should be visible
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+
+  // Check if scroll is needed and update indicator visibility
+  useEffect(() => {
+    const checkScroll = () => {
+      if (categoriesRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = categoriesRef.current;
+
+        // Show indicator if there's more content to scroll AND we're not at the bottom
+        const canScroll = scrollHeight > clientHeight;
+
+        // Check if we're at the bottom with a small tolerance (1px) to account for rounding errors
+        const isAtBottom = scrollTop + clientHeight + 1 >= scrollHeight;
+
+        if (DEBUG) {
+          console.log('Scroll check:', {
+            scrollTop,
+            clientHeight,
+            scrollHeight,
+            sum: scrollTop + clientHeight,
+            isAtBottom,
+            canScroll,
+            showIndicator: canScroll && !isAtBottom,
+          });
+        }
+
+        setShowScrollIndicator(canScroll && !isAtBottom);
+      }
+    };
+
+    // Initial check
+    checkScroll();
+
+    // Add scroll event listener
+    const categoriesElement = categoriesRef.current;
+    if (categoriesElement) {
+      categoriesElement.addEventListener('scroll', checkScroll);
+
+      // Also check on resize as it might affect scroll dimensions
+      window.addEventListener('resize', checkScroll);
+    }
+
+    // Clean up
+    return () => {
+      if (categoriesElement) {
+        categoriesElement.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+      }
+    };
+  }, [displayCount, DEBUG]); // Re-run when displayed items change or debug mode changes
+
   return (
     <aside className="sidebar">
       <SidebarHeader
@@ -235,17 +345,23 @@ const Sidebar = ({ decisions, availableOnly = false, completed = [] }) => {
         setShowOptional={setShowOptional}
         showUnavailable={showUnavailable}
         setShowUnavailable={setShowUnavailable}
+        collapseAllSections={collapseAllSections}
+        expandAllSections={expandAllSections}
       />
 
       {/* Render categories and decision items */}
-      <div className="decision-categories">
+      <div className="decision-categories" ref={categoriesRef}>
         <SidebarContent
           categoriesToShow={categoriesToShow}
           isDecisionAvailable={isDecisionAvailable}
           onDragStart={onDragStart}
           displayCount={displayCount}
+          allSectionsExpanded={allSectionsExpanded}
         />
       </div>
+
+      {/* Scroll indicator */}
+      <div className={`scroll-indicator ${showScrollIndicator ? 'visible' : ''}`}>↓</div>
 
       {/* Debug panel (only visible if DEBUG is true) */}
       {DEBUG && (

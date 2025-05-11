@@ -1,20 +1,24 @@
 // components/sidebar/CategorySection.jsx
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import DecisionNode from './DecisionNode';
 import SectionTitle from './SectionTitle';
 
-const CategorySection = ({ category, items, isDecisionAvailable, onDragStart }) => {
-  // State to track if the section is expanded or collapsed
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  // Toggle expanded/collapsed state
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
+const CategorySection = ({
+  category,
+  items,
+  isDecisionAvailable,
+  onDragStart,
+  isExpanded = true,
+  onToggleExpanded,
+}) => {
+  // Log when isExpanded changes
+  useEffect(() => {
+    console.log(`CategorySection ${category} - isExpanded changed to:`, isExpanded);
+  }, [isExpanded, category]);
 
   return (
     <div className="decision-category">
-      <SectionTitle title={category} isExpanded={isExpanded} onToggle={toggleExpanded} />
+      <SectionTitle title={category} isExpanded={isExpanded} onToggle={onToggleExpanded} />
       {isExpanded && (
         <div className="decision-items">
           {items.map(item => (
