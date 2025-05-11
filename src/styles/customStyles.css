@@ -183,16 +183,66 @@ body,
   color: #215732;
 }
 
-.decision-category {
+/* Act section styling */
+.act-section {
   margin-bottom: 20px;
 }
 
-.decision-category h4 {
+/* Act header styling */
+.act-header h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding: 8px;
+  background-color: #4a5568;
+  color: white;
+  border-radius: 4px;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Location header styling */
+.location-header h4 {
   margin-top: 0;
   margin-bottom: 10px;
   padding: 5px;
   background-color: #e6e6e6;
   border-radius: 4px;
+  font-size: 0.95em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Act content container */
+.act-content {
+  padding-left: 10px;
+}
+
+/* Decision category styling */
+.decision-category {
+  margin-bottom: 15px;
+}
+
+/* Style for the section title container */
+.section-title {
+  cursor: pointer;
+  user-select: none;
+  width: 100%; /* Ensure the title container takes full width */
+}
+
+/* Style for the collapse/expand icon */
+.collapse-icon {
+  display: inline-block;
+  font-size: 1em;
+  transition: transform 0.2s ease;
+  position: absolute; /* Position absolutely */
+  right: 10px; /* Position at the right edge with some padding */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust for perfect vertical centering */
 }
 
 .decision-item {
