@@ -1,6 +1,7 @@
 // components/flowchart/BaseNode.jsx
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import CloseButton from '../ui/CloseButton';
 
 /**
  * Base node component with common functionality for all node types
@@ -202,33 +203,7 @@ const BaseNode = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Remove button - only show when specified and hovered */}
-      {showRemoveButton && isHovered && (
-        <button
-          onClick={handleRemoveNode}
-          style={{
-            position: 'absolute',
-            top: '-10px',
-            right: '-10px',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            background: '#f44336',
-            color: 'white',
-            border: '2px solid #fff',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 10,
-            boxShadow: '0 2px 3px rgba(0,0,0,0.2)',
-          }}
-          title="Remove node"
-        >
-          ×
-        </button>
-      )}
+      {showRemoveButton && isHovered && <CloseButton onClick={handleRemoveNode} />}
 
       <Handle
         type="target"
