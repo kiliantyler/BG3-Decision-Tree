@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CloseIcon = ({ color = '#ffffff', size = 16 }) => {
+const CloseIcon = ({ color = 'var(--badgeText)', size = 16 }) => {
   return (
     <div
       style={{

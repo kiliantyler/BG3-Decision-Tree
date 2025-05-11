@@ -27,7 +27,7 @@ const CloseButton = ({ onClick, title = 'Remove node', ariaLabel = 'Remove node'
         right: '5px',
         width: '22px',
         height: '22px',
-        backgroundColor: isHovered ? 'rgba(244, 67, 54, 0.4)' : 'rgba(244, 67, 54, 0.2)',
+        backgroundColor: isHovered ? 'var(--dangerBackground)' : 'var(--dangerBackground)',
         border: 'none',
         borderRadius: '4px',
         display: 'flex',
@@ -39,7 +39,7 @@ const CloseButton = ({ onClick, title = 'Remove node', ariaLabel = 'Remove node'
         transition: 'all 0.2s ease',
       }}
     >
-      <CloseIcon color="#ffffff" size={14} />
+      <CloseIcon color="var(--badgeText)" size={14} />
     </button>
   );
 };

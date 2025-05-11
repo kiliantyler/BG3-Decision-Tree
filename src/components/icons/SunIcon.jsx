@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SunIcon = ({ color = '#9580ff', size = 24 }) => {
+const SunIcon = ({ color = 'var(--purple)', size = 24 }) => {
   // Use inline SVG with explicit styling
   return (
     <div

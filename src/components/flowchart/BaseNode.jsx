@@ -77,8 +77,8 @@ const BaseNode = ({
                 <span
                   className="optional-badge"
                   style={{
-                    background: '#bebebe',
-                    color: 'white',
+                    background: 'var(--optionalBorder)',
+                    color: 'var(--badgeText)',
                     borderRadius: '12px',
                     padding: '2px 8px',
                     fontSize: '0.7rem',
@@ -93,8 +93,8 @@ const BaseNode = ({
                 <span
                   className="required-badge"
                   style={{
-                    background: '#ff9900',
-                    color: 'white',
+                    background: 'var(--requiredBorder)',
+                    color: 'var(--badgeText)',
                     borderRadius: '12px',
                     padding: '2px 8px',
                     fontSize: '0.7rem',
@@ -110,8 +110,8 @@ const BaseNode = ({
                 <span
                   className="completed-badge"
                   style={{
-                    background: '#28a745',
-                    color: 'white',
+                    background: 'var(--green)',
+                    color: 'var(--badgeText)',
                     borderRadius: '12px',
                     padding: '2px 8px',
                     fontSize: '0.7rem',
@@ -163,8 +163,8 @@ const BaseNode = ({
             style={{
               fontSize: '0.8rem',
               marginTop: '12px',
-              color: '#555',
-              borderTop: '1px dashed #ccc',
+              color: 'var(--metaText)',
+              borderTop: '1px dashed var(--metaBorder)',
               paddingTop: '8px',
             }}
           >
@@ -208,7 +208,7 @@ const BaseNode = ({
       <Handle
         type="target"
         position={Position.Top}
-        style={{ background: '#555', width: '8px', height: '8px' }}
+        style={{ background: 'var(--handleBackground)', width: '8px', height: '8px' }}
         isConnectable={isConnectable}
       />
 
@@ -217,7 +217,7 @@ const BaseNode = ({
       <Handle
         type="source"
         position={Position.Bottom}
-        style={{ background: '#555', width: '8px', height: '8px' }}
+        style={{ background: 'var(--handleBackground)', width: '8px', height: '8px' }}
         isConnectable={isConnectable}
       />
     </div>

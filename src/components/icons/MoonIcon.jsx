@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MoonIcon = ({ color = '#6f42c1', size = 24 }) => {
+const MoonIcon = ({ color = 'var(--purple)', size = 24 }) => {
   return (
     <div
       style={{

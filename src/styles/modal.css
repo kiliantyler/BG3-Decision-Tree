@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlayBackground);
   z-index: 999;
   display: flex;
   justify-content: center;
@@ -62,5 +62,5 @@
 
 .modal-footer button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px var(--boxShadowDarker);
 }

@@ -3,6 +3,7 @@ import React from 'react';
 import { MinusIcon, PlusIcon } from '../icons';
 import IconButton from '../ui/IconButton';
 import LegendRow from './LegendRow';
+import SearchBar from './SearchBar';
 
 const LegendArea = ({
   showRequired,
@@ -13,12 +14,15 @@ const LegendArea = ({
   setShowUnavailable,
   collapseAllSections,
   expandAllSections,
+  searchTerm,
+  setSearchTerm,
+  isCollapsed = false,
 }) => {
   return (
     <div
       className="legend"
       style={{
-        display: 'flex',
+        display: isCollapsed ? 'none' : 'flex',
         flexDirection: 'column',
         fontSize: '0.8rem',
         padding: '8px',
@@ -27,6 +31,8 @@ const LegendArea = ({
         marginBottom: '12px',
       }}
     >
+      {/* Search Bar */}
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {/* Required Quest with toggle */}
       <LegendRow
         color="#ffb84d"

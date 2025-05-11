@@ -66,7 +66,7 @@ const IconButton = forwardRef((props, ref) => {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 2px 4px var(--boxShadow)',
     zIndex: 10,
     transition: 'all 0.2s ease',
     outline: 'none', // Remove default focus outline

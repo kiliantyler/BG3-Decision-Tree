@@ -95,18 +95,18 @@ const Modal = ({
         style={{
           position: 'fixed',
           backgroundColor: theme === 'dark' ? 'var(--currentLine)' : 'var(--nodeBackground)',
-          color: theme === 'dark' ? 'var(--foreground)' : 'var(--text)',
+          color: theme === 'dark' ? 'var(--foreground)' : 'var(--foreground)',
           borderRadius: '8px',
           padding: '16px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          boxShadow: `0 4px 12px var(--boxShadowDarker)`,
           zIndex: 1000,
           minWidth: '250px',
           maxWidth: '350px',
-          border: `1px solid ${theme === 'dark' ? 'var(--border)' : 'var(--border)'}`,
+          border: `1px solid var(--border)`,
         }}
       >
         <div className="modal-header">
-          <h3 style={{ color: theme === 'dark' ? 'var(--red)' : 'var(--red)' }}>{title}</h3>
+          <h3 style={{ color: 'var(--red)' }}>{title}</h3>
         </div>
         <div className="modal-body">
           <p>{message}</p>
@@ -116,9 +116,9 @@ const Modal = ({
             onClick={onClose}
             style={{
               padding: '8px 16px',
-              backgroundColor: theme === 'dark' ? 'var(--background)' : 'var(--background)',
-              color: theme === 'dark' ? 'var(--foreground)' : 'var(--text)',
-              border: `1px solid ${theme === 'dark' ? 'var(--border)' : 'var(--border)'}`,
+              backgroundColor: 'var(--buttonBackground)',
+              color: 'var(--buttonText)',
+              border: `1px solid var(--buttonBorder)`,
               borderRadius: '4px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
@@ -130,8 +130,8 @@ const Modal = ({
             onClick={onConfirm}
             style={{
               padding: '8px 16px',
-              backgroundColor: theme === 'dark' ? 'var(--red)' : 'var(--red)',
-              color: 'white',
+              backgroundColor: 'var(--red)',
+              color: 'var(--badgeText)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
