@@ -1,5 +1,7 @@
 // components/sidebar/LegendArea.jsx
 import React from 'react';
+import { MinusIcon, PlusIcon } from '../icons';
+import IconButton from '../ui/IconButton';
 import LegendRow from './LegendRow';
 
 const LegendArea = ({
@@ -58,38 +60,65 @@ const LegendArea = ({
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           marginTop: '10px',
           borderTop: '1px solid #ddd',
           paddingTop: '8px',
+          gap: '8px',
         }}
       >
-        <button
-          onClick={collapseAllSections}
+        <div
           style={{
-            padding: '4px 8px',
-            fontSize: '0.7rem',
-            backgroundColor: '#e0e0e0',
-            border: '1px solid #bebebe',
-            borderRadius: '3px',
-            cursor: 'pointer',
+            position: 'relative',
+            width: '30px',
+            height: '30px',
           }}
         >
-          Collapse All
-        </button>
-        <button
-          onClick={expandAllSections}
+          <IconButton
+            onClick={collapseAllSections}
+            title="Collapse All"
+            ariaLabel="Collapse all sections"
+            style={{
+              position: 'relative',
+              width: '30px',
+              height: '30px',
+              borderRadius: '4px',
+              top: 'auto',
+              left: 'auto',
+              right: 'auto',
+              bottom: 'auto',
+              backgroundColor: '#ffffff',
+            }}
+          >
+            <MinusIcon size={16} />
+          </IconButton>
+        </div>
+        <div
           style={{
-            padding: '4px 8px',
-            fontSize: '0.7rem',
-            backgroundColor: '#e0e0e0',
-            border: '1px solid #bebebe',
-            borderRadius: '3px',
-            cursor: 'pointer',
+            position: 'relative',
+            width: '30px',
+            height: '30px',
           }}
         >
-          Expand All
-        </button>
+          <IconButton
+            onClick={expandAllSections}
+            title="Expand All"
+            ariaLabel="Expand all sections"
+            style={{
+              position: 'relative',
+              width: '30px',
+              height: '30px',
+              borderRadius: '4px',
+              top: 'auto',
+              left: 'auto',
+              right: 'auto',
+              bottom: 'auto',
+              backgroundColor: '#ffffff',
+            }}
+          >
+            <PlusIcon size={16} />
+          </IconButton>
+        </div>
       </div>
     </div>
   );
