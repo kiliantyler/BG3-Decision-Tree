@@ -13,7 +13,7 @@ import StatsTab from './StatsTab';
 
 // Import theme
 import { useTheme } from '../../hooks/useTheme';
-import { themes } from '../../styles/themes/dracula';
+import { themes } from '../../styles/themes/colorThemes';
 
 /**
  * Debug panel component to help with development and testing

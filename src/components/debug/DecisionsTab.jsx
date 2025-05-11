@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react';
 import Modal from '../../components/ui/Modal';
 import { useTheme } from '../../hooks/useTheme';
-import { themes } from '../../styles/themes/dracula';
+import { themes } from '../../styles/themes/colorThemes';
 
 /**
  * Decisions tab content for the debug panel

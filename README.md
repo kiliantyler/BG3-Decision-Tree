@@ -236,7 +236,7 @@ src/
 2. Support for saving/loading multiple flowcharts
 3. Add more detailed info about consequences
 4. Implement decision tooltips for additional information
-5. Dark mode support
+5. ~~Dark mode support~~
 6. Mobile responsive design
 7. Import/export functionality
 

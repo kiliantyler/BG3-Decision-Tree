@@ -1,7 +1,7 @@
 // components/debug/DebugModeBanner.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { themes } from '../../styles/themes/dracula';
+import { themes } from '../../styles/themes/colorThemes';
 
 /**
  * Banner displayed at the top of the debug panel

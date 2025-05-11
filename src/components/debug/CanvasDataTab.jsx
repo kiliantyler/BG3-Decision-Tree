@@ -1,7 +1,7 @@
 // components/debug/CanvasDataTab.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { themes } from '../../styles/themes/dracula';
+import { themes } from '../../styles/themes/colorThemes';
 
 /**
  * Canvas Data tab content for the debug panel

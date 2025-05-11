@@ -1,7 +1,7 @@
 // components/sidebar/DebugPanel.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { themes } from '../../styles/themes/dracula';
+import { themes } from '../../styles/themes/colorThemes';
 
 const DebugPanel = ({
   showUnavailable,
