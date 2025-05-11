@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-05-10
+
+### Added
+
+- Reset modal for clearing user selections
+- Application icon
+
+### Changed
+
+- Refactored debug panel for improved performance
+- Refactored sidebar components for better organization
+- Refactored node components for better maintainability
+- Refactored button CSS for consistent styling
+- Improved button components organization
+- Updated close button design
+
+### Fixed
+
+- Fixed ESLint warnings throughout the codebase
+- Fixed various debug panel issues
+- Fixed search bar size inconsistencies
+
+### Improved
+
+- Added persistent storage for user selections
+- Enabled fast reload for theme changes
+- Updated data structure for better consistency
+- Implemented automatic theme detection
+- Changed sidebar to show available decisions by default
+
 ## [0.2.0] - 2025-05-10
 
 ### Added
@@ -36,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sidebar for available decisions
 - Debug panel for development
 
-[Unreleased]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/kiliantyler/BG3-Decision-Tree/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kiliantyler/BG3-Decision-Tree/releases/tag/v0.1.0
