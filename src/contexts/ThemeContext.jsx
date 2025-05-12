@@ -10,26 +10,41 @@ const ThemeContext = createContext(null);
 export const ThemeProvider = ({ children }) => {
   // Check if user has a saved theme preference or use system preference
   const getSavedTheme = () => {
-    const savedTheme = localStorage.getItem('theme');
+    // Check if we're in a browser environment
+    const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 
-    // If there's a saved theme preference, use it
-    if (savedTheme) {
-      return savedTheme === 'dark' ? 'dark' : 'light';
-    }
+    if (isBrowser) {
+      const savedTheme = localStorage.getItem('theme');
 
-    // Otherwise, detect user's device preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+      // If there's a saved theme preference, use it
+      if (savedTheme) {
+        return savedTheme === 'dark' ? 'dark' : 'light';
+      }
+
+      // Otherwise, detect user's device preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
     }
 
     return 'light';
   };
 
-  // State for current theme
-  const [theme, setTheme] = useState(getSavedTheme());
+  // State for current theme with default value to prevent hydration mismatch
+  const [theme, setTheme] = useState('light');
+
+  // Initialize theme after component mounts (client-side only)
+  useEffect(() => {
+    setTheme(getSavedTheme());
+  }, []);
 
   // Listen for changes in system color scheme preference
   useEffect(() => {
+    // Check if we're in a browser environment
+    const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+
+    if (!isBrowser) return;
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     // Define the handler function
@@ -61,6 +76,14 @@ export const ThemeProvider = ({ children }) => {
 
   // Apply theme to document root and save to localStorage when changed
   useEffect(() => {
+    // Check if we're in a browser environment
+    const isBrowser =
+      typeof window !== 'undefined' &&
+      typeof document !== 'undefined' &&
+      typeof localStorage !== 'undefined';
+
+    if (!isBrowser) return;
+
     // Set data-theme attribute for CSS selectors
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);

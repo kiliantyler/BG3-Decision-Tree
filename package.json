@@ -4,10 +4,13 @@
   "version": "0.3.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "vite:dev": "vite",
+    "vite:build": "vite build",
+    "vite:preview": "vite preview",
     "npm:install": "npm install",
     "npm:dev": "npm run dev",
     "npm:build": "npm run build",
@@ -30,9 +33,12 @@
     "bun:lint": "bun lint"
   },
   "dependencies": {
+    "@astrojs/react": "4.2.7",
+    "@astrojs/vercel": "8.1.4",
     "@vercel/analytics": "^1.5.0",
+    "astro": "5.7.12",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "18.3.1",
     "reactflow": "^11.7.0"
   },
   "devDependencies": {
