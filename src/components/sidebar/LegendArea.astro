@@ -1,0 +1,170 @@
+---
+// LegendArea.astro - Legend area for the sidebar showing decision types
+import { MinusIcon, PlusIcon } from '../icons/index.astro';
+import IconButton from '../ui/IconButton.astro';
+import LegendRow from './LegendRow.astro';
+import SearchBar from './SearchBar.astro';
+
+interface Props {
+  showRequired: boolean;
+  showOptional: boolean;
+  showUnavailable: boolean;
+  searchTerm: string;
+  isCollapsed?: boolean;
+}
+
+const {
+  showRequired,
+  showOptional,
+  showUnavailable,
+  searchTerm,
+  isCollapsed = false
+} = Astro.props;
+---
+
+<div
+  class="legend"
+  style={`display: ${isCollapsed ? 'none' : 'flex'}`}
+  data-search-term={searchTerm}
+  data-show-required={showRequired}
+  data-show-optional={showOptional}
+  data-show-unavailable={showUnavailable}
+>
+  <!-- Search Bar -->
+  <SearchBar searchTerm={searchTerm} client:load />
+
+  <!-- Required Quest with toggle -->
+  <LegendRow
+    color="#ffb84d"
+    borderColor="#ff9900"
+    label="Required Quest"
+    isChecked={showRequired}
+  />
+
+  <!-- Optional Side Quest with toggle -->
+  <LegendRow
+    color="#e0e0e0"
+    borderColor="#bebebe"
+    label="Optional Side Quest"
+    isChecked={showOptional}
+  />
+
+  <!-- Unavailable Decision with toggle -->
+  <LegendRow
+    color="#f8f8f8"
+    borderColor="#999"
+    isDashed={true}
+    opacity={0.6}
+    label="Unavailable Decision"
+    isChecked={showUnavailable}
+  />
+
+  <!-- Collapse/Expand All Buttons -->
+  <div class="legend-buttons">
+    <div class="button-container">
+      <IconButton
+        title="Collapse All"
+        ariaLabel="Collapse all sections"
+        onClick="collapseAllSections()"
+      >
+        <MinusIcon size={16} />
+      </IconButton>
+    </div>
+    <div class="button-container">
+      <IconButton
+        title="Expand All"
+        ariaLabel="Expand all sections"
+        onClick="expandAllSections()"
+      >
+        <PlusIcon size={16} />
+      </IconButton>
+    </div>
+  </div>
+</div>
+
+<style>
+  .legend {
+    flex-direction: column;
+    font-size: 0.8rem;
+    padding: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .legend-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    gap: 8px;
+  }
+
+  .button-container {
+    position: relative;
+    width: 30px;
+    height: 30px;
+  }
+
+  :global([data-theme="dark"]) .legend {
+    background-color: var(--selection);
+  }
+</style>
+
+<script>
+  // Declare the global functions on the window object
+  declare global {
+    interface Window {
+      collapseAllSections: () => void;
+      expandAllSections: () => void;
+    }
+  }
+
+  // Add event listeners for legend toggles
+  document.addEventListener('DOMContentLoaded', () => {
+    const legend = document.querySelector('.legend');
+
+    if (legend) {
+      // Listen for legend-toggle events from LegendRow components
+      legend.addEventListener('legend-toggle', (event: Event) => {
+        // Cast the event to CustomEvent to access the detail property
+        const customEvent = event as CustomEvent<{ label: string; isChecked: boolean }>;
+        const { label, isChecked } = customEvent.detail;
+
+        // Update the data attributes based on which legend row was toggled
+        if (label === 'Required Quest') {
+          legend.setAttribute('data-show-required', isChecked.toString());
+          // Dispatch a custom event for parent components to handle
+          legend.dispatchEvent(new CustomEvent('required-toggle', {
+            bubbles: true,
+            detail: { isChecked }
+          }));
+        } else if (label === 'Optional Side Quest') {
+          legend.setAttribute('data-show-optional', isChecked.toString());
+          // Dispatch a custom event for parent components to handle
+          legend.dispatchEvent(new CustomEvent('optional-toggle', {
+            bubbles: true,
+            detail: { isChecked }
+          }));
+        } else if (label === 'Unavailable Decision') {
+          legend.setAttribute('data-show-unavailable', isChecked.toString());
+          // Dispatch a custom event for parent components to handle
+          legend.dispatchEvent(new CustomEvent('unavailable-toggle', {
+            bubbles: true,
+            detail: { isChecked }
+          }));
+        }
+      });
+    }
+  });
+
+  // Define global functions for collapse/expand all
+  window.collapseAllSections = () => {
+    document.dispatchEvent(new CustomEvent('collapse-all-sections'));
+  };
+
+  window.expandAllSections = () => {
+    document.dispatchEvent(new CustomEvent('expand-all-sections'));
+  };
+</script>

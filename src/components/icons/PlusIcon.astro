@@ -1,0 +1,55 @@
+---
+// PlusIcon.astro - Plus icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'currentColor', size = 24 } = Astro.props;
+---
+
+<div class="plus-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="plus-icon-svg"
+  >
+    <line
+      x1="12"
+      y1="5"
+      x2="12"
+      y2="19"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <line
+      x1="5"
+      y1="12"
+      x2="19"
+      y2="12"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .plus-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .plus-icon-svg {
+    display: block;
+    overflow: visible;
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+// DecisionNode.astro - A draggable decision node in the sidebar
+interface Props {
+  item: {
+    id: string;
+    label: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    prerequisites?: string[];
+    type?: string;
+  };
+  isAvailable: boolean;
+}
+
+const { item, isAvailable } = Astro.props;
+
+const isOptional = item.optional === true;
+const isRequired = item.required === true && !item.optional;
+
+// Enhanced styling for available/unavailable items
+const itemStyle = {
+  padding: '10px',
+  margin: '8px 0',
+  backgroundColor: isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8',
+  border: isAvailable ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}` : '1px dashed #999',
+  borderRadius: '4px',
+  cursor: isAvailable ? 'grab' : 'not-allowed',
+  userSelect: 'none',
+  opacity: isAvailable ? 1 : 0.6,
+  boxShadow: 'none',
+  position: 'relative',
+  transition: 'all 0.2s ease',
+};
+---
+
+<div
+  class={`decision-item ${isAvailable ? 'available' : 'unavailable'} ${
+    isOptional ? 'optional' : 'required'
+  }`}
+  draggable="true"
+  data-id={item.id}
+  data-type={item.type || 'decision'}
+  data-item={JSON.stringify(item)}
+  data-available={isAvailable}
+  style={`
+    padding: 10px;
+    margin: 8px 0;
+    background-color: ${isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8'};
+    border: ${isAvailable ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}` : '1px dashed #999'};
+    border-radius: 4px;
+    cursor: ${isAvailable ? 'grab' : 'not-allowed'};
+    user-select: none;
+    opacity: ${isAvailable ? 1 : 0.6};
+    box-shadow: none;
+    position: relative;
+    transition: all 0.2s ease;
+  `}
+>
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    "
+  >
+    <div class="item-title" style="font-weight: bold;">
+      {item.label}
+    </div>
+
+    <!-- Status badges -->
+    <div style="display: flex; gap: 4px;">
+      {!isAvailable && (
+        <span
+          style="
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            background-color: #999;
+            color: #fff;
+            border-radius: 10px;
+          "
+        >
+          Locked
+        </span>
+      )}
+      {isOptional && (
+        <span
+          style="
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            background-color: #bebebe;
+            color: #fff;
+            border-radius: 10px;
+          "
+        >
+          Optional
+        </span>
+      )}
+      {isRequired && (
+        <span
+          style="
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            background-color: #ff9900;
+            color: #fff;
+            border-radius: 10px;
+          "
+        >
+          Required
+        </span>
+      )}
+    </div>
+  </div>
+
+  <div class="item-description" style="font-size: 0.8rem; color: #666;">
+    {item.description ? `${item.description.substring(0, 60)}...` : ''}
+  </div>
+
+  <!-- Show prerequisites if not available -->
+  {!isAvailable && item.prerequisites && item.prerequisites.length > 0 && (
+    <div
+      class="item-prerequisites"
+      style="
+        font-size: 0.7rem;
+        margin-top: 5px;
+        color: #999;
+      "
+    >
+      <span style="font-weight: bold;">Requires:</span> {item.prerequisites.join(', ')}
+    </div>
+  )}
+</div>
+
+<script>
+  // Add event listeners for drag and hover effects
+  document.addEventListener('DOMContentLoaded', () => {
+    const decisionItems = document.querySelectorAll('.decision-item');
+
+    decisionItems.forEach(item => {
+      const isAvailable = item.getAttribute('data-available') === 'true';
+
+      // Drag start event
+      item.addEventListener('dragstart', (event: DragEvent) => {
+        if (!isAvailable) {
+          event.preventDefault();
+          return;
+        }
+
+        const nodeType = item.getAttribute('data-type') || 'decision';
+        const itemData = item.getAttribute('data-item');
+
+        if (event.dataTransfer && itemData) {
+          event.dataTransfer.setData('application/reactflow', nodeType);
+          event.dataTransfer.setData('decision', itemData);
+          event.dataTransfer.effectAllowed = 'move';
+        }
+      });
+
+      // Hover effects
+      if (isAvailable) {
+        item.addEventListener('mouseenter', () => {
+          const element = item as HTMLElement;
+          element.style.transform = 'translateY(-2px)';
+          element.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        });
+
+        item.addEventListener('mouseleave', () => {
+          const element = item as HTMLElement;
+          element.style.transform = 'none';
+          element.style.boxShadow = 'none';
+        });
+      }
+    });
+  });
+</script>

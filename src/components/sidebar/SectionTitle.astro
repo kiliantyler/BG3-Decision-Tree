@@ -1,0 +1,81 @@
+---
+// SectionTitle.astro - Title component for sidebar sections
+interface Props {
+  title: string;
+  isExpanded: boolean;
+  isActHeader?: boolean;
+}
+
+const { title, isExpanded, isActHeader = false } = Astro.props;
+
+// Extract location name from category if it's not an Act header
+const displayTitle = isActHeader ? title : title.split(' - ').pop();
+---
+
+<div
+  class={`section-title ${isActHeader ? 'act-header' : 'location-header'}`}
+  data-expanded={isExpanded}
+  data-title={title}
+>
+  <h4 class={isActHeader ? 'act-title' : ''}>
+    {displayTitle}
+    <span class="collapse-icon">{isExpanded ? '−' : '+'}</span>
+  </h4>
+</div>
+
+<style>
+  .section-title {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .act-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .location-header {
+    padding-left: 0.5rem;
+  }
+
+  .act-title {
+    font-weight: 600;
+  }
+
+  .collapse-icon {
+    float: right;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  // Add click event listeners to all section titles
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionTitles = document.querySelectorAll('.section-title');
+
+    sectionTitles.forEach(title => {
+      title.addEventListener('click', () => {
+        // Get the current expanded state
+        const isExpanded = title.getAttribute('data-expanded') === 'true';
+
+        // Toggle the expanded state
+        title.setAttribute('data-expanded', (!isExpanded).toString());
+
+        // Update the collapse icon
+        const collapseIcon = title.querySelector('.collapse-icon');
+        if (collapseIcon) {
+          collapseIcon.textContent = !isExpanded ? '−' : '+';
+        }
+
+        // Dispatch a custom event for parent components to handle
+        const titleText = title.getAttribute('data-title');
+        title.dispatchEvent(new CustomEvent('section-toggle', {
+          bubbles: true,
+          detail: {
+            title: titleText,
+            isExpanded: !isExpanded
+          }
+        }));
+      });
+    });
+  });
+</script>

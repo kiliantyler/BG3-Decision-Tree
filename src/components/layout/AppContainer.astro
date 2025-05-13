@@ -1,0 +1,65 @@
+---
+// AppContainer.astro - Main container for the application
+import { Analytics } from '@vercel/analytics/react';
+import { DebugPanel } from '../debug';
+import { FlowChart } from '../flowchart';
+import { Sidebar } from '../sidebar/index.astro';
+
+interface Props {
+  decisions: Record<string, any>;
+  completed: any[];
+  nodes: any[];
+  edges: any[];
+  newlyAddedNodes: any[];
+  onNodeDrop: (decisionData: any, position: any) => void;
+  setNodes: (nodes: any[]) => void;
+  onReset: () => void;
+}
+
+const {
+  decisions,
+  completed,
+  nodes,
+  edges,
+  newlyAddedNodes,
+  onNodeDrop,
+  setNodes,
+  onReset,
+} = Astro.props;
+---
+
+<div class="app-container">
+  <Sidebar
+    decisions={decisions}
+    availableOnly={true}
+    completed={completed}
+    client:load
+  />
+
+  <FlowChart
+    initialNodes={nodes}
+    initialEdges={edges}
+    onNodesChange={() => {}}
+    onEdgesChange={() => {}}
+    onConnect={() => {}}
+    onNodeDrop={onNodeDrop}
+    newlyAddedNodes={newlyAddedNodes}
+    setNodes={setNodes}
+    onReset={onReset}
+    client:load
+  />
+
+  <!-- Debug panel - activated with CTRL+SHIFT+D -->
+  <DebugPanel client:idle />
+
+  <Analytics client:idle />
+</div>
+
+<style>
+  .app-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+</style>

@@ -1,0 +1,70 @@
+---
+// SidebarContent.astro - Content area of the sidebar showing decision categories
+import ActSection from './ActSection.astro';
+
+interface Props {
+  categoriesToShow: Record<string, Array<{
+    id: string;
+    label: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    prerequisites?: string[];
+    type?: string;
+  }>>;
+  displayCount: number;
+}
+
+const { categoriesToShow, displayCount } = Astro.props;
+
+// Group categories by Act
+const actCategories: Record<string, Record<string, any[]>> = {};
+
+Object.entries(categoriesToShow).forEach(([category, items]) => {
+  // Extract the Act name from the category (e.g., "Act 1 - Location" -> "Act 1")
+  const actMatch = category.match(/^(Act \d+)/);
+  if (actMatch) {
+    const act = actMatch[1];
+    if (!actCategories[act]) {
+      actCategories[act] = {};
+    }
+    actCategories[act][category] = items;
+  } else {
+    // Handle categories that don't follow the Act pattern
+    if (!actCategories['Other']) {
+      actCategories['Other'] = {};
+    }
+    actCategories['Other'][category] = items;
+  }
+});
+---
+
+{displayCount === 0 ? (
+  <div
+    style="
+      padding: 20px;
+      text-align: center;
+      color: #999;
+    "
+  >
+    No decisions match the current filters.
+  </div>
+) : (
+  <div style="padding-bottom: 60px;">
+    {Object.entries(actCategories).map(([act, categories]) => (
+      <ActSection
+        act={act}
+        categories={categories}
+        isExpanded={true}
+      />
+    ))}
+  </div>
+)}
+
+<script>
+  // Listen for events from parent components
+  document.addEventListener('DOMContentLoaded', () => {
+    // Log when the component is loaded
+    console.log('SidebarContent - Component loaded');
+  });
+</script>

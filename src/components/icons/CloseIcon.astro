@@ -1,0 +1,44 @@
+---
+// CloseIcon.astro - Close icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'var(--badgeText)', size = 16 } = Astro.props;
+---
+
+<div class="close-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="close-icon-svg"
+  >
+    <!-- X shape -->
+    <path
+      d="M18 6L6 18M6 6l12 12"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .close-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-icon-svg {
+    display: block;
+    overflow: visible;
+  }
+</style>

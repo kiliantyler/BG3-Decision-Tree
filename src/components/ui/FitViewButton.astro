@@ -1,0 +1,21 @@
+---
+// FitViewButton.astro - Button to fit all nodes in view
+import { SearchIcon } from '../icons/index.astro';
+import IconButton from './IconButton.astro';
+
+interface Props {
+  onClick?: string; // JavaScript function name to call
+}
+
+const { onClick } = Astro.props;
+---
+
+<IconButton
+  position="fit-view"
+  onClick={onClick}
+  title="View all nodes"
+  ariaLabel="View all nodes"
+  hoverBorderColor="var(--purple)"
+>
+  <SearchIcon />
+</IconButton>

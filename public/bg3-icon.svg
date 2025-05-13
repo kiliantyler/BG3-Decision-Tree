@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="250" fill="#1a1a1a" />
+
+  <!-- Outer metallic ring -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="#8b7355" stroke-width="8" />
+
+  <!-- Stylized skull base -->
+  <path d="M256 120 C180 120, 130 200, 130 280 C130 340, 180 400, 256 400 C332 400, 382 340, 382 280 C382 200, 332 120, 256 120 Z"
+        fill="#2a2a2a" stroke="#3a3a3a" stroke-width="4" />
+
+  <!-- Horns/tusks -->
+  <path d="M160 220 C140 260, 130 300, 120 340 C110 320, 105 300, 100 280 C120 260, 140 240, 160 220 Z"
+        fill="#8b7355" stroke="#6a563c" stroke-width="2" />
+  <path d="M352 220 C372 260, 382 300, 392 340 C402 320, 407 300, 412 280 C392 260, 372 240, 352 220 Z"
+        fill="#8b7355" stroke="#6a563c" stroke-width="2" />
+
+  <!-- Eye sockets -->
+  <ellipse cx="200" cy="240" rx="30" ry="40" fill="#000000" />
+  <ellipse cx="312" cy="240" rx="30" ry="40" fill="#000000" />
+
+  <!-- Glowing eyes (representing choices/paths) -->
+  <ellipse cx="200" cy="240" rx="15" ry="20" fill="#d4af37" />
+  <ellipse cx="312" cy="240" rx="15" ry="20" fill="#d4af37" />
+
+  <!-- Nose cavity -->
+  <path d="M256 260 L236 320 L276 320 Z" fill="#000000" />
+
+  <!-- Decision tree elements integrated into the design -->
+  <path d="M256 320 L256 370" stroke="#d4af37" stroke-width="4" />
+  <circle cx="256" cy="380" r="10" fill="#d4af37" />
+
+  <!-- Branching paths (representing decisions) -->
+  <path d="M256 380 L220 420" stroke="#d4af37" stroke-width="3" />
+  <path d="M256 380 L292 420" stroke="#d4af37" stroke-width="3" />
+  <circle cx="220" cy="420" r="8" fill="#d4af37" />
+  <circle cx="292" cy="420" r="8" fill="#d4af37" />
+</svg>

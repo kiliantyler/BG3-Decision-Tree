@@ -1,24 +1,76 @@
 ---
 // Layout.astro - Main layout component for the application
+import Footer from '../components/layout/Footer.astro';
+
 interface Props {
   title: string;
+  description?: string;
+  image?: string;
+  showFooter?: boolean;
 }
 
-const { title } = Astro.props;
+const {
+  title,
+  description = "Interactive decision tree for Baldur's Gate 3 quests and storylines",
+  image = "/bg3-icon.svg",
+  showFooter = true
+} = Astro.props;
+
+// Base URL for canonical links and SEO
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://bg3-decision-tree.vercel.app/');
+
+// Get package version from package.json
+const version = "0.3.0";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/bg3-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
     <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/bg3-icon.svg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, canonicalURL)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, canonicalURL)} />
   </head>
   <body>
+    <header class="header">
+      <div class="header-content">
+        <h1>{title}</h1>
+        <nav class="header-nav">
+          <ul>
+            <li><a href="/" class={Astro.url.pathname === "/" ? "active" : ""}>Home</a></li>
+            <li><a href="/about" class={Astro.url.pathname === "/about" ? "active" : ""}>About</a></li>
+            <li><a href="https://github.com/kiliantyler/BG3-Decision-Tree" target="_blank">GitHub</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
     <div id="root">
       <slot />
     </div>
+
+    {showFooter && <Footer version={version} />}
   </body>
 </html>
 
@@ -27,4 +79,48 @@ const { title } = Astro.props;
   @import "../styles/theme.css";
   @import "../styles/customStyles.css";
   @import "../styles/modal.css";
+
+  /* Header styles */
+  .header {
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--purple);
+  }
+
+  .header-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem;
+  }
+
+  .header-nav a {
+    color: var(--foreground);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .header-nav a:hover,
+  .header-nav a.active {
+    color: var(--purple);
+  }
 </style>

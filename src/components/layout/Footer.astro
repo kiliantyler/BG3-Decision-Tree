@@ -1,0 +1,53 @@
+---
+// Footer.astro - Footer component for the application
+interface Props {
+  version?: string;
+}
+
+const { version = "0.3.0" } = Astro.props;
+---
+
+<footer class="footer">
+  <div class="footer-content">
+    <p>BG3 Decision Tree &copy; {new Date().getFullYear()}</p>
+    <p>Version {version}</p>
+    <p>
+      <a href="https://github.com/kiliantyler/BG3-Decision-Tree" target="_blank" rel="noopener noreferrer">
+        GitHub Repository
+      </a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--background);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--foreground);
+    z-index: 100;
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  a {
+    color: var(--purple);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>

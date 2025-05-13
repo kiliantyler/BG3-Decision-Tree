@@ -1,0 +1,73 @@
+---
+// ResetButton.astro - Button to reset all decisions
+import { ResetIcon } from '../icons/index.astro';
+import IconButton from './IconButton.astro';
+import Modal from './Modal.astro';
+
+interface Props {
+  onClick?: string; // JavaScript function name to call
+  modalId?: string;
+}
+
+const { onClick = "resetAllDecisions()", modalId = "reset-modal" } = Astro.props;
+---
+
+<div class="reset-button-container">
+  <IconButton
+    position="bottom-left"
+    onClick={`showResetModal('${modalId}')`}
+    title="Reset all decisions"
+    ariaLabel="Reset all decisions"
+    borderColor="var(--red)"
+    darkModeBorderColor="var(--border)"
+    hoverBorderColor="var(--red)"
+  >
+    <ResetIcon />
+  </IconButton>
+
+  <Modal
+    modalId={modalId}
+    title="Reset Decisions"
+    message="Are you sure you want to reset all progress? This cannot be undone."
+    confirmText="Reset"
+    cancelText="Cancel"
+  />
+</div>
+
+<script define:vars={{ onClick, modalId }}>
+  // Client-side script to handle reset button interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById(modalId);
+
+    if (modal) {
+      // Add event listener for confirm action
+      modal.addEventListener('modal-confirm', () => {
+        // Execute the onClick function
+        if (typeof window[onClick] === 'function') {
+          window[onClick]();
+        } else {
+          // Try to evaluate the onClick string as a function call
+          try {
+            eval(onClick);
+          } catch (error) {
+            console.error(`Error executing onClick function: ${error}`);
+          }
+        }
+      });
+    }
+  });
+
+  // Function to show the reset modal
+  window.showResetModal = (id) => {
+    window.showModal(id);
+  };
+
+  // Default reset function if none is provided
+  if (typeof window.resetAllDecisions !== 'function') {
+    window.resetAllDecisions = () => {
+      console.log('Reset all decisions');
+      // Default implementation: reload the page
+      window.location.reload();
+    };
+  }
+</script>

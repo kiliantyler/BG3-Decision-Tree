@@ -1,0 +1,67 @@
+---
+// CategorySection.astro - A section for a category of decisions in the sidebar
+import DecisionNode from './DecisionNode.astro';
+import SectionTitle from './SectionTitle.astro';
+
+interface Props {
+  category: string;
+  items: Array<{
+    id: string;
+    label: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    prerequisites?: string[];
+    type?: string;
+  }>;
+  isExpanded?: boolean;
+}
+
+const { category, items, isExpanded = true } = Astro.props;
+
+// Function to check if a decision is available - this will be passed from the parent
+// and implemented in client-side JavaScript
+---
+
+<div class="decision-category" data-category={category} data-expanded={isExpanded}>
+  <SectionTitle title={category} isExpanded={isExpanded} />
+
+  <div class="decision-items" style={`display: ${isExpanded ? 'block' : 'none'};`}>
+    {items.map(item => (
+      <DecisionNode
+        item={item}
+        isAvailable={false}
+      />
+    ))}
+  </div>
+</div>
+
+<script>
+  // Add event listeners for toggling sections
+  document.addEventListener('DOMContentLoaded', () => {
+    const categories = document.querySelectorAll('.decision-category');
+
+    categories.forEach(category => {
+      // Find the section title within this category
+      const sectionTitle = category.querySelector('.section-title');
+      const itemsContainer = category.querySelector('.decision-items');
+
+      if (sectionTitle && itemsContainer) {
+        // Listen for section-toggle events from SectionTitle
+        sectionTitle.addEventListener('section-toggle', (event: Event) => {
+          const customEvent = event as CustomEvent<{ isExpanded: boolean }>;
+          const isExpanded = customEvent.detail.isExpanded;
+
+          // Update the display of the items container
+          (itemsContainer as HTMLElement).style.display = isExpanded ? 'block' : 'none';
+
+          // Update the data attribute
+          category.setAttribute('data-expanded', isExpanded.toString());
+
+          // Log the change
+          console.log(`CategorySection ${category.getAttribute('data-category')} - isExpanded changed to:`, isExpanded);
+        });
+      }
+    });
+  });
+</script>

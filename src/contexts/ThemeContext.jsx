@@ -5,85 +5,50 @@ import { themes } from '../styles/themes/colorThemes';
 const ThemeContext = createContext(null);
 
 /**
- * Provider component for theme management
+ * Provider component for theme management optimized for Astro
  */
 export const ThemeProvider = ({ children }) => {
-  // Check if user has a saved theme preference or use system preference
-  const getSavedTheme = () => {
-    // Check if we're in a browser environment
-    const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  // Default theme for SSR to prevent hydration mismatches
+  const [theme, setTheme] = useState('light');
 
-    if (isBrowser) {
+  // Client-side theme initialization and management
+  useEffect(() => {
+    // Get saved theme or detect system preference
+    const initializeTheme = () => {
+      // Check for saved preference in localStorage
       const savedTheme = localStorage.getItem('theme');
-
-      // If there's a saved theme preference, use it
       if (savedTheme) {
         return savedTheme === 'dark' ? 'dark' : 'light';
       }
 
-      // Otherwise, detect user's device preference
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
-    }
+      // Check system preference
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
 
-    return 'light';
-  };
+    // Set the initial theme
+    setTheme(initializeTheme());
 
-  // State for current theme with default value to prevent hydration mismatch
-  const [theme, setTheme] = useState('light');
-
-  // Initialize theme after component mounts (client-side only)
-  useEffect(() => {
-    setTheme(getSavedTheme());
-  }, []);
-
-  // Listen for changes in system color scheme preference
-  useEffect(() => {
-    // Check if we're in a browser environment
-    const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
-
-    if (!isBrowser) return;
-
+    // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    // Define the handler function
-    const handleChange = e => {
-      // Only update if there's no saved preference in localStorage
+    const handleSystemThemeChange = e => {
+      // Only update if there's no saved preference
       if (!localStorage.getItem('theme')) {
         setTheme(e.matches ? 'dark' : 'light');
       }
     };
 
-    // Add event listener
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-    } else {
-      // Fallback for older browsers
-      mediaQuery.addListener(handleChange);
-    }
+    // Modern browsers all support addEventListener
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
 
     // Cleanup
     return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleChange);
-      } else {
-        // Fallback for older browsers
-        mediaQuery.removeListener(handleChange);
-      }
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
   }, []);
 
-  // Apply theme to document root and save to localStorage when changed
+  // Apply theme changes to document
   useEffect(() => {
-    // Check if we're in a browser environment
-    const isBrowser =
-      typeof window !== 'undefined' &&
-      typeof document !== 'undefined' &&
-      typeof localStorage !== 'undefined';
-
-    if (!isBrowser) return;
-
     // Set data-theme attribute for CSS selectors
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -94,14 +59,14 @@ export const ThemeProvider = ({ children }) => {
       document.documentElement.style.setProperty(`--${key}`, value);
     });
 
-    // Add a small delay to ensure all styles are applied properly
-    setTimeout(() => {
-      // Force a repaint to ensure all styles are applied
+    // Force a repaint to ensure all styles are applied properly
+    // Using requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
       document.body.style.display = 'none';
-      // This triggers a reflow
+      // Trigger reflow
       void document.body.offsetHeight;
       document.body.style.display = '';
-    }, 10);
+    });
   }, [theme]);
 
   // Toggle between light and dark themes

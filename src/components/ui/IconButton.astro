@@ -1,0 +1,134 @@
+---
+// IconButton.astro - A reusable icon button component
+import { useTheme } from '../../hooks/useTheme';
+
+interface Props {
+  title?: string;
+  ariaLabel?: string;
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'fit-view';
+  borderColor?: string;
+  darkModeBorderColor?: string;
+  hoverBorderColor?: string;
+  onClick?: string; // JavaScript function name to call
+}
+
+const {
+  title,
+  ariaLabel,
+  position = 'top-left',
+  borderColor = 'var(--border)',
+  darkModeBorderColor = 'var(--border)',
+  hoverBorderColor = 'var(--purple)',
+  onClick,
+} = Astro.props;
+
+// Determine position styles
+interface PositionStyles {
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+}
+
+let positionStyles: PositionStyles = {};
+switch (position) {
+  case 'top-left':
+    positionStyles = { top: '10px', left: '10px' };
+    break;
+  case 'top-right':
+    positionStyles = { top: '10px', right: '10px' };
+    break;
+  case 'bottom-left':
+    positionStyles = { bottom: '10px', left: '10px' };
+    break;
+  case 'bottom-right':
+    positionStyles = { bottom: '10px', right: '10px' };
+    break;
+  case 'fit-view': // Special case for fit view button
+    positionStyles = { top: '10px', left: '60px' };
+    break;
+  default:
+    positionStyles = { top: '10px', left: '10px' };
+}
+---
+
+<button
+  class="icon-button"
+  data-position={position}
+  aria-label={ariaLabel || title}
+  title={title}
+  onclick={onClick}
+>
+  <slot />
+</button>
+
+<style define:vars={{
+  borderColor,
+  darkModeBorderColor,
+  hoverBorderColor,
+  positionTop: positionStyles.top,
+  positionLeft: positionStyles.left,
+  positionRight: positionStyles.right,
+  positionBottom: positionStyles.bottom
+}}>
+  .icon-button {
+    position: absolute;
+    background-color: var(--nodeBackground);
+    border: 1px solid var(--borderColor);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--boxShadow);
+    z-index: 10;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  /* Position styles */
+  .icon-button {
+    top: var(--positionTop, auto);
+    left: var(--positionLeft, auto);
+    right: var(--positionRight, auto);
+    bottom: var(--positionBottom, auto);
+  }
+
+  /* Dark theme styles */
+  :global([data-theme="dark"]) .icon-button {
+    background-color: var(--currentLine);
+    border-color: var(--darkModeBorderColor);
+  }
+
+  /* Hover styles */
+  .icon-button:hover, .icon-button:focus {
+    background-color: var(--selection);
+    transform: scale(1.05);
+  }
+
+  :global([data-theme="dark"]) .icon-button:hover,
+  :global([data-theme="dark"]) .icon-button:focus {
+    border-color: var(--hoverBorderColor);
+  }
+</style>
+
+<script>
+  // Client-side script to handle button interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.icon-button');
+
+    buttons.forEach(button => {
+      // Add blur after click
+      button.addEventListener('click', () => {
+        // Use setTimeout to ensure the blur happens after any other click handlers
+        setTimeout(() => {
+          if (button instanceof HTMLButtonElement) {
+            button.blur();
+          }
+        }, 100);
+      });
+    });
+  });
+</script>

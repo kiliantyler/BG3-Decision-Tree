@@ -1,0 +1,73 @@
+---
+// SearchIcon.astro - Search icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'var(--cyan)', size = 24 } = Astro.props;
+---
+
+<div class="search-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="search-icon-svg"
+  >
+    <!-- Improved magnifying glass -->
+    <g transform="translate(0.5, 0.5)">
+      <!-- Glass part - slightly smaller and positioned better -->
+      <circle
+        cx="10"
+        cy="10"
+        r="6"
+        stroke={color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+      />
+
+      <!-- Handle - thicker and angled better -->
+      <line
+        x1="14.5"
+        y1="14.5"
+        x2="19.5"
+        y2="19.5"
+        stroke={color}
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+      <!-- Reflection highlight -->
+      <path
+        d="M7.5 7.5 Q8 6, 9.5 6.5"
+        stroke={color}
+        stroke-width="1"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.8"
+      />
+    </g>
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .search-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .search-icon-svg {
+    display: block;
+    overflow: visible;
+    fill: var(--cyan); /* Explicitly set fill color */
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+// MoonIcon.astro - Moon icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'var(--purple)', size = 24 } = Astro.props;
+---
+
+<div class="moon-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="moon-icon-svg"
+  >
+    <!-- Crescent moon -->
+    <path
+      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .moon-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .moon-icon-svg {
+    display: block;
+    overflow: visible;
+  }
+</style>

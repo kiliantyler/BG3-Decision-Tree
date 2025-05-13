@@ -1,0 +1,50 @@
+---
+// CloseButton.astro - A specialized close button component for nodes
+import { CloseIcon } from '../icons/index.astro';
+
+interface Props {
+  title?: string;
+  ariaLabel?: string;
+  onClick?: string; // JavaScript function name to call
+}
+
+const {
+  title = 'Remove node',
+  ariaLabel = 'Remove node',
+  onClick
+} = Astro.props;
+---
+
+<button
+  class="close-button"
+  aria-label={ariaLabel}
+  title={title}
+  onclick={onClick}
+>
+  <CloseIcon color="var(--badgeText)" size={14} />
+</button>
+
+<style>
+  .close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 22px;
+    height: 22px;
+    background-color: var(--dangerBackground);
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .close-button:hover {
+    background-color: var(--dangerBackgroundHover, var(--dangerBackground));
+    transform: scale(1.05);
+  }
+</style>

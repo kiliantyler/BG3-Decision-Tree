@@ -1,0 +1,112 @@
+---
+// LegendRow.astro - A row in the legend area showing decision types
+interface Props {
+  color: string;
+  borderColor: string;
+  isDashed?: boolean;
+  opacity?: number;
+  label: string;
+  isChecked: boolean;
+}
+
+const {
+  color,
+  borderColor,
+  isDashed = false,
+  opacity = 1,
+  label,
+  isChecked
+} = Astro.props;
+
+// Generate a unique ID for the checkbox
+const checkboxId = `cb-${label.toLowerCase().replace(/\s+/g, '-')}`;
+---
+
+<div class="legend-row" data-label={label}>
+  <div class="legend-label">
+    <span
+      class="legend-color-box"
+      style={`
+        background-color: ${color};
+        border: ${isDashed ? `1px dashed ${borderColor}` : `1px solid ${borderColor}`};
+        opacity: ${opacity};
+      `}
+    ></span>
+    <span>{label}</span>
+  </div>
+  <div class="checkbox-wrapper-6">
+    <input
+      class="tgl tgl-light"
+      id={checkboxId}
+      type="checkbox"
+      checked={isChecked}
+    />
+    <label
+      class="tgl-btn"
+      for={checkboxId}
+    ></label>
+  </div>
+</div>
+
+<style>
+  .legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+
+  .legend-label {
+    display: flex;
+    align-items: center;
+  }
+
+  .legend-color-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .checkbox-wrapper-6 {
+    transform: scale(0.7);
+  }
+</style>
+
+<script define:vars={{ checkboxId, label }}>
+  // Add click event listeners to the legend row
+  document.addEventListener('DOMContentLoaded', () => {
+    const legendRow = document.querySelector(`.legend-row[data-label="${label}"]`);
+    const checkbox = document.getElementById(checkboxId);
+
+    if (legendRow && checkbox) {
+      // Handle click on the row
+      legendRow.addEventListener('click', () => {
+        checkbox.checked = !checkbox.checked;
+
+        // Dispatch a custom event for parent components to handle
+        legendRow.dispatchEvent(new CustomEvent('legend-toggle', {
+          bubbles: true,
+          detail: {
+            label,
+            isChecked: checkbox.checked
+          }
+        }));
+      });
+
+      // Handle change on the checkbox
+      checkbox.addEventListener('change', () => {
+        // Dispatch a custom event for parent components to handle
+        legendRow.dispatchEvent(new CustomEvent('legend-toggle', {
+          bubbles: true,
+          detail: {
+            label,
+            isChecked: checkbox.checked
+          }
+        }));
+      });
+    }
+  });
+</script>

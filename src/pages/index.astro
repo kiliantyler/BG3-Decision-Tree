@@ -1,9 +1,20 @@
 ---
 // pages/index.astro - Main entry point for the application
-import { App } from '../components';
+import { App } from '../components/layout';
 import Layout from '../layouts/Layout.astro';
+
+// Page metadata
+const title = "BG3 Decision Tree";
+const description = "Interactive decision tree for Baldur's Gate 3 quests and storylines. Visualize your choices and their consequences.";
 ---
 
-<Layout title="BG3 Decision Tree">
+<Layout
+  title={title}
+  description={description}
+>
+  <!--
+    Using client:load directive to ensure the React component is
+    hydrated immediately when the page loads
+  -->
   <App client:load />
 </Layout>

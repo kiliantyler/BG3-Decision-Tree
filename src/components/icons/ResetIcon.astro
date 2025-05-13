@@ -1,0 +1,52 @@
+---
+// ResetIcon.astro - Reset icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'var(--red)', size = 24 } = Astro.props;
+---
+
+<div class="reset-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="reset-icon-svg"
+  >
+    <!-- Simple counterclockwise circular arrow -->
+    <g>
+      <!-- Main circular arrow -->
+      <path
+        d="M 4 12
+           A 8 8 0 1 1 12 20
+           M 12 20
+           L 8 20
+           L 12 16"
+        stroke={color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+      />
+    </g>
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .reset-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reset-icon-svg {
+    display: block;
+    overflow: visible;
+    fill: var(--red); /* Explicitly set fill color */
+  }
+</style>

@@ -1,0 +1,260 @@
+---
+// AppContent.astro - Main content area of the application
+import { Analytics } from '@vercel/analytics/react';
+import { DebugPanel } from '../debug';
+import { FlowChart } from '../flowchart';
+import Sidebar from '../sidebar/Sidebar.astro';
+
+// Import from enhanced data manager
+import { getStartingNode } from '../../data/enhancedDataManager';
+
+// Get the starting node for initialization
+const startingNode = getStartingNode();
+---
+
+<div class="app-container" id="app-container">
+  <!-- Loading state (initially visible, hidden by JS) -->
+  <div
+    id="loading-container"
+    class="loading-container"
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-size: 1.5rem;
+      color: #666;
+    "
+  >
+    Loading Baldur's Gate 3 decision tree...
+  </div>
+
+  <!-- Error state (initially hidden, shown by JS if needed) -->
+  <div
+    id="error-container"
+    class="error-container"
+    style="
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #d32f2f;
+    "
+  >
+    <h3>Error loading data</h3>
+    <p id="error-message"></p>
+    <button
+      id="retry-button"
+      style="
+        padding: 8px 16px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      "
+    >
+      Retry
+    </button>
+  </div>
+
+  <!-- Main content (initially hidden, shown by JS when loaded) -->
+  <div id="main-content" style="display: none; height: 100%;">
+    <Sidebar
+      decisions={{}}
+      availableOnly={true}
+      completed={[]}
+    />
+
+    <FlowChart
+      initialNodes={[]}
+      initialEdges={[]}
+      onNodesChange={() => {}}
+      onEdgesChange={() => {}}
+      onConnect={() => {}}
+      onNodeDrop={() => {}}
+      newlyAddedNodes={[]}
+      setNodes={() => {}}
+      onReset={() => {}}
+      client:load
+    />
+
+    <!-- Debug panel - activated with CTRL+SHIFT+D -->
+    <DebugPanel client:load />
+
+    <Analytics client:load />
+  </div>
+</div>
+
+<script define:vars={{ startingNode }}>
+  import { useDecision } from '../../contexts/DecisionContext';
+
+  // Initialize state
+  let nodes = [];
+  let edges = [];
+  let completedDecisions = [];
+  let categorizedDecisions = {};
+  let newlyAddedNodes = [];
+  let initialNodeAdded = false;
+  let status = { loading: true, error: null };
+
+  // DOM elements
+  const loadingContainer = document.getElementById('loading-container');
+  const errorContainer = document.getElementById('error-container');
+  const errorMessage = document.getElementById('error-message');
+  const retryButton = document.getElementById('retry-button');
+  const mainContent = document.getElementById('main-content');
+
+  // Initialize the app
+  async function initializeApp() {
+    try {
+      console.log('App initializing...');
+
+      // Get the decision context
+      const decisionContext = await useDecision();
+
+      // Extract methods and state from context
+      const {
+        nodes: contextNodes,
+        edges: contextEdges,
+        setNodes,
+        completedDecisions: contextCompletedDecisions,
+        categorizedDecisions: contextCategorizedDecisions,
+        addNodeFromSidebar,
+        handleRemoveNode,
+        newlyAddedNodes: contextNewlyAddedNodes,
+        resetState
+      } = decisionContext;
+
+      // Update local state
+      nodes = contextNodes || [];
+      edges = contextEdges || [];
+      completedDecisions = contextCompletedDecisions || [];
+      categorizedDecisions = contextCategorizedDecisions || {};
+      newlyAddedNodes = contextNewlyAddedNodes || [];
+
+      // Only add starting node if we don't have any nodes yet
+      // and we haven't already added the initial node
+      if ((nodes?.length || 0) === 0 && !initialNodeAdded) {
+        console.log('Adding starting node');
+
+        if (startingNode) {
+          console.log('Starting node found:', startingNode);
+          // Add starting node to canvas with initial position
+          const initialPosition = { x: 50, y: 50 };
+
+          const result = addNodeFromSidebar(
+            {
+              ...startingNode,
+            },
+            initialPosition
+          );
+
+          // Mark that we've added the initial node
+          if (result) {
+            console.log('Starting node added successfully');
+            initialNodeAdded = true;
+          }
+        } else {
+          console.warn('No starting node found');
+          setStatus({ loading: false, error: "Couldn't find starting node" });
+          return;
+        }
+      }
+
+      // Update status
+      setStatus({ loading: false, error: null });
+
+      // Set up event handlers
+
+      // Handle node drop from sidebar
+      window.handleNodeDrop = (decisionData, position) => {
+        console.log('Handling node drop:', decisionData.id, position);
+        return addNodeFromSidebar(decisionData, position);
+      };
+
+      // Handle reset button click
+      window.handleReset = () => {
+        resetState();
+        // Force reload the page to ensure a clean state
+        window.location.reload();
+      };
+
+      // Update the sidebar component with the actual data
+      const sidebarComponent = document.querySelector('astro-island[component-url*="Sidebar"]');
+      if (sidebarComponent) {
+        // Update props
+        sidebarComponent.setAttribute('decisions', JSON.stringify(categorizedDecisions));
+        sidebarComponent.setAttribute('completed', JSON.stringify(completedDecisions));
+      }
+
+      // Update the flowchart component with the actual data
+      const flowchartComponent = document.querySelector('astro-island[component-url*="FlowChart"]');
+      if (flowchartComponent) {
+        // Update props
+        flowchartComponent.setAttribute('initialNodes', JSON.stringify(nodes));
+        flowchartComponent.setAttribute('initialEdges', JSON.stringify(edges));
+        flowchartComponent.setAttribute('newlyAddedNodes', JSON.stringify(newlyAddedNodes));
+        flowchartComponent.setAttribute('onNodeDrop', 'window.handleNodeDrop');
+        flowchartComponent.setAttribute('onNodeRemove', 'window.handleRemoveNode');
+        flowchartComponent.setAttribute('setNodes', 'window.setNodes');
+        flowchartComponent.setAttribute('onReset', 'window.handleReset');
+      }
+
+      // Expose necessary functions to window for component communication
+      window.setNodes = setNodes;
+      window.handleRemoveNode = handleRemoveNode;
+
+    } catch (err) {
+      console.error('Error initializing app:', err);
+      setStatus({ loading: false, error: err.message });
+    }
+  }
+
+  // Update UI based on status
+  function setStatus(newStatus) {
+    status = newStatus;
+
+    if (loadingContainer) {
+      loadingContainer.style.display = status.loading ? 'flex' : 'none';
+    }
+
+    if (errorContainer && errorMessage) {
+      errorContainer.style.display = status.error ? 'flex' : 'none';
+      if (status.error) {
+        errorMessage.textContent = status.error;
+      }
+    }
+
+    if (mainContent) {
+      mainContent.style.display = (!status.loading && !status.error) ? 'block' : 'none';
+    }
+  }
+
+  // Add retry functionality
+  if (retryButton) {
+    retryButton.addEventListener('click', () => {
+      setStatus({ loading: true, error: null });
+      initializeApp();
+    });
+  }
+
+  // Initialize the app when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
+
+<style>
+  .app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #main-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+</style>

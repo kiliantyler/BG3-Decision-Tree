@@ -1,0 +1,423 @@
+---
+// Sidebar.astro - Main sidebar component for the decision tree
+import { SidebarDebugPanel } from '../debug';
+import SidebarContent from './SidebarContent.astro';
+import SidebarHeader from './SidebarHeader.astro';
+
+interface Props {
+  decisions: Record<string, Array<{
+    id: string;
+    label: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    prerequisites?: string[];
+    type?: string;
+  }>>;
+  availableOnly?: boolean;
+  completed?: string[];
+}
+
+const { decisions, availableOnly = false, completed = [] } = Astro.props;
+
+// Initial state values
+const searchTerm = '';
+const showUnavailable = false;
+const showOptional = true;
+const showRequired = true;
+
+// Function to get all decisions regardless of availability
+const getAllDecisions = () => {
+  return Object.values(decisions).flat();
+};
+
+// Count both total and available decisions
+const getTotalCounts = () => {
+  const allDecisions = getAllDecisions();
+  const available = 0; // Will be calculated client-side
+  const total = allDecisions.length;
+  return { available, total };
+};
+
+// Calculate which decisions to show initially
+const countDisplayedDecisions = () => {
+  let count = 0;
+
+  // Check each category
+  Object.entries(decisions).forEach(([, items]) => {
+    // Apply filters to each item
+    items.forEach(item => {
+      // Skip items without required fields
+      if (!item || !item.id || !item.label) return;
+
+      // Text search filter - always true initially since searchTerm is empty
+      const matchesSearch = true;
+
+      // Optional/Required filter
+      const matchesType = (showOptional && item.optional) || (showRequired && item.required && !item.optional);
+
+      // Availability filter - show unavailable items if showUnavailable is true
+      const matchesAvailability = showUnavailable || true; // Will be calculated client-side
+
+      // Count if matches all filters
+      if (matchesSearch && matchesType && matchesAvailability) {
+        count++;
+      }
+    });
+  });
+
+  return count;
+};
+
+// Function to determine which categories and items to show initially
+const getCategoriesToShow = () => {
+  // Track decisions to show
+  const categoriesToShow = {};
+
+  // First pass: determine which items to show in which categories
+  Object.entries(decisions).forEach(([category, items]) => {
+    const filteredItems = [];
+
+    // Check each item against filters
+    items.forEach(item => {
+      // Skip items without required fields
+      if (!item || !item.id || !item.label) return;
+
+      // Text search filter - always true initially since searchTerm is empty
+      const matchesSearch = true;
+
+      // Optional/Required filter
+      const matchesType = (showOptional && item.optional) || (showRequired && item.required && !item.optional);
+
+      // Availability filter - show unavailable items if showUnavailable is true
+      const matchesAvailability = showUnavailable || true; // Will be calculated client-side
+
+      // Add to filtered items if it matches all filters
+      if (matchesSearch && matchesType && matchesAvailability) {
+        filteredItems.push(item);
+      }
+    });
+
+    // Add category if it has items to show
+    if (filteredItems.length > 0) {
+      categoriesToShow[category] = filteredItems;
+    }
+  });
+
+  return categoriesToShow;
+};
+
+// Calculate counts for display
+const { available, total } = getTotalCounts();
+const displayCount = countDisplayedDecisions();
+const categoriesToShow = getCategoriesToShow();
+---
+
+<aside class="sidebar">
+  <SidebarHeader
+    searchTerm={searchTerm}
+    showRequired={showRequired}
+    showOptional={showOptional}
+    showUnavailable={showUnavailable}
+  />
+
+  <!-- Render categories and decision items -->
+  <div class="decision-categories" id="decision-categories">
+    <SidebarContent
+      categoriesToShow={categoriesToShow}
+      displayCount={displayCount}
+    />
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-indicator" id="scroll-indicator">↓</div>
+
+  <!-- Debug panel (only visible if DEBUG is true) -->
+  <div id="debug-panel-container" style="display: none;">
+    <!-- Debug panel will be rendered client-side when DEBUG is true -->
+  </div>
+</aside>
+
+<script define:vars={{ decisions, completed, availableOnly }}>
+  // State for debug mode
+  let DEBUG = false;
+
+  // State for search/filter functionality
+  let searchTerm = '';
+
+  // State for filter toggle
+  let showUnavailable = false;
+
+  // State for filtering by type (optional/required)
+  let showOptional = true;
+  let showRequired = true;
+
+  // State to track if all sections should be expanded or collapsed
+  let allSectionsExpanded = true;
+
+  // State to track if scroll indicator should be visible
+  let showScrollIndicator = false;
+
+  // Function to check if a decision is available
+  const isDecisionAvailable = (decisionId) => {
+    // Find the decision
+    const allDecisions = Object.values(decisions).flat();
+    const decision = allDecisions.find(d => d.id === decisionId);
+
+    if (!decision) {
+      if (DEBUG) console.log(`Decision not found: ${decisionId}`);
+      return false;
+    }
+
+    // A decision is available if all prerequisites are completed
+    const prerequisitesMet = (decision.prerequisites || []).every(prereq =>
+      completed.includes(prereq)
+    );
+
+    // And it's not already completed itself
+    const notCompleted = !completed.includes(decisionId);
+
+    // And it's not mutually exclusive with any completed decisions
+    const notExcluded = !completed.some(completedId => {
+      const completedDecision = allDecisions.find(d => d.id === completedId);
+      return (
+        completedDecision &&
+        completedDecision.mutuallyExclusive &&
+        completedDecision.mutuallyExclusive.includes(decisionId)
+      );
+    });
+
+    const isAvailable = prerequisitesMet && notCompleted && notExcluded;
+
+    if (DEBUG && !isAvailable) {
+      console.log(`Decision ${decisionId} is unavailable because:`, {
+        prerequisitesMet,
+        notCompleted,
+        notExcluded,
+      });
+    }
+
+    return isAvailable;
+  };
+
+  // Function to update decision availability
+  const updateDecisionAvailability = () => {
+    const decisionNodes = document.querySelectorAll('.decision-item');
+
+    decisionNodes.forEach(node => {
+      const decisionId = node.getAttribute('data-id');
+      if (decisionId) {
+        const isAvailable = isDecisionAvailable(decisionId);
+        node.setAttribute('data-available', isAvailable.toString());
+
+        // Update the appearance based on availability
+        const isOptional = node.classList.contains('optional');
+
+        // Update background color
+        node.style.backgroundColor = isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8';
+
+        // Update border
+        node.style.border = isAvailable ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}` : '1px dashed #999';
+
+        // Update cursor
+        node.style.cursor = isAvailable ? 'grab' : 'not-allowed';
+
+        // Update opacity
+        node.style.opacity = isAvailable ? '1' : '0.6';
+      }
+    });
+  };
+
+  // Function to handle the start of drag
+  const onDragStart = (event, nodeType, decision) => {
+    // Only allow dragging if the decision is available
+    if (!isDecisionAvailable(decision.id)) {
+      if (DEBUG) console.log(`Prevented dragging unavailable decision: ${decision.id}`);
+      event.preventDefault();
+      return;
+    }
+
+    // Set the node type data
+    event.dataTransfer.setData('application/reactflow', nodeType);
+
+    // Set the decision data
+    event.dataTransfer.setData('decision', JSON.stringify(decision));
+
+    // Set effectAllowed for drag operation
+    event.dataTransfer.effectAllowed = 'move';
+
+    if (DEBUG) console.log(`Started dragging decision: ${decision.id}`);
+  };
+
+  // Function to collapse all sections
+  const collapseAllSections = () => {
+    console.log('Collapsing all sections');
+    document.dispatchEvent(new CustomEvent('collapse-all-sections'));
+  };
+
+  // Function to expand all sections
+  const expandAllSections = () => {
+    console.log('Expanding all sections');
+    document.dispatchEvent(new CustomEvent('expand-all-sections'));
+  };
+
+  // Function to check if scroll is needed and update indicator visibility
+  const checkScroll = () => {
+    const categoriesElement = document.getElementById('decision-categories');
+    const scrollIndicator = document.getElementById('scroll-indicator');
+
+    if (categoriesElement && scrollIndicator) {
+      const { scrollTop, scrollHeight, clientHeight } = categoriesElement;
+
+      // Show indicator if there's more content to scroll AND we're not at the bottom
+      const canScroll = scrollHeight > clientHeight;
+
+      // Check if we're at the bottom with a small tolerance (1px) to account for rounding errors
+      const isAtBottom = scrollTop + clientHeight + 1 >= scrollHeight;
+
+      if (DEBUG) {
+        console.log('Scroll check:', {
+          scrollTop,
+          clientHeight,
+          scrollHeight,
+          sum: scrollTop + clientHeight,
+          isAtBottom,
+          canScroll,
+          showIndicator: canScroll && !isAtBottom,
+        });
+      }
+
+      showScrollIndicator = canScroll && !isAtBottom;
+      scrollIndicator.classList.toggle('visible', showScrollIndicator);
+    }
+  };
+
+  // Add event listener for CTRL+SHIFT+D key combination
+  document.addEventListener('keydown', e => {
+    // Check for CTRL+SHIFT+D
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      e.preventDefault(); // Prevent default browser behavior
+      DEBUG = !DEBUG;
+
+      // Toggle debug panel visibility
+      const debugPanelContainer = document.getElementById('debug-panel-container');
+      if (debugPanelContainer) {
+        debugPanelContainer.style.display = DEBUG ? 'block' : 'none';
+
+        // If showing debug panel, render it
+        if (DEBUG) {
+          // We'll use a React component for the debug panel
+          // This is just a placeholder for now
+          debugPanelContainer.innerHTML = `
+            <div style="
+              margin: 20px 0;
+              padding: 10px;
+              background-color: var(--currentLine);
+              border-radius: 4px;
+              font-size: 0.8rem;
+              color: var(--comment);
+              border: 1px solid var(--border);
+            ">
+              <div style="font-weight: bold; margin-bottom: 4px;">Debug Info:</div>
+              <div>
+                Filter Settings:
+                ${showUnavailable ? ' Show Unavailable,' : ' Hide Unavailable,'}
+                ${showRequired ? ' Required,' : ''}
+                ${showOptional ? ' Optional' : ''}
+              </div>
+              <div>
+                Decisions: ${Object.values(decisions).flat().length} total
+              </div>
+              <div>Completed Decisions: ${completed.length}</div>
+            </div>
+          `;
+        }
+      }
+    }
+  });
+
+  // Set up event listeners when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Update decision availability
+    updateDecisionAvailability();
+
+    // Set up scroll checking
+    const categoriesElement = document.getElementById('decision-categories');
+    if (categoriesElement) {
+      categoriesElement.addEventListener('scroll', checkScroll);
+      window.addEventListener('resize', checkScroll);
+
+      // Initial check
+      checkScroll();
+    }
+
+    // Listen for filter changes
+    document.addEventListener('sidebar-required-toggle', (event) => {
+      const customEvent = /** @type {CustomEvent<{ isChecked: boolean }>} */ (event);
+      showRequired = customEvent.detail.isChecked;
+      // In a real implementation, we would update the UI here
+      console.log('Required filter changed:', showRequired);
+    });
+
+    document.addEventListener('sidebar-optional-toggle', (event) => {
+      const customEvent = /** @type {CustomEvent<{ isChecked: boolean }>} */ (event);
+      showOptional = customEvent.detail.isChecked;
+      // In a real implementation, we would update the UI here
+      console.log('Optional filter changed:', showOptional);
+    });
+
+    document.addEventListener('sidebar-unavailable-toggle', (event) => {
+      const customEvent = /** @type {CustomEvent<{ isChecked: boolean }>} */ (event);
+      showUnavailable = customEvent.detail.isChecked;
+      // In a real implementation, we would update the UI here
+      console.log('Unavailable filter changed:', showUnavailable);
+    });
+
+    document.addEventListener('sidebar-search-term-change', (event) => {
+      const customEvent = /** @type {CustomEvent<{ searchTerm: string }>} */ (event);
+      searchTerm = customEvent.detail.searchTerm;
+      // In a real implementation, we would update the UI here
+      console.log('Search term changed:', searchTerm);
+    });
+  });
+</script>
+
+<style>
+  .sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--background);
+    border-right: 1px solid var(--border);
+  }
+
+  .decision-categories {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .scroll-indicator.visible {
+    opacity: 0.7;
+  }
+</style>

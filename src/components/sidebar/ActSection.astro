@@ -1,0 +1,168 @@
+---
+// ActSection.astro - A section for an act containing categories of decisions
+import CategorySection from './CategorySection.astro';
+import SectionTitle from './SectionTitle.astro';
+
+interface Props {
+  act: string;
+  categories: Record<string, Array<{
+    id: string;
+    label: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    prerequisites?: string[];
+    type?: string;
+  }>>;
+  isExpanded?: boolean;
+}
+
+const { act, categories, isExpanded = true } = Astro.props;
+---
+
+<div class="act-section" data-act={act} data-expanded={isExpanded}>
+  <SectionTitle
+    title={act}
+    isExpanded={isExpanded}
+    isActHeader={true}
+  />
+
+  <div class="act-content" style={`display: ${isExpanded ? 'block' : 'none'};`}>
+    {Object.entries(categories).map(([category, items]) => (
+      <CategorySection
+        category={category}
+        items={items}
+        isExpanded={true}
+      />
+    ))}
+  </div>
+</div>
+
+<script>
+  // Add event listeners for toggling sections
+  document.addEventListener('DOMContentLoaded', () => {
+    const actSections = document.querySelectorAll('.act-section');
+
+    actSections.forEach(section => {
+      // Find the section title within this act
+      const sectionTitle = section.querySelector('.section-title');
+      const actContent = section.querySelector('.act-content');
+
+      if (sectionTitle && actContent) {
+        // Listen for section-toggle events from SectionTitle
+        sectionTitle.addEventListener('section-toggle', (event: Event) => {
+          const customEvent = event as CustomEvent<{ isExpanded: boolean }>;
+          const isExpanded = customEvent.detail.isExpanded;
+
+          // Update the display of the content container
+          (actContent as HTMLElement).style.display = isExpanded ? 'block' : 'none';
+
+          // Update the data attribute
+          section.setAttribute('data-expanded', isExpanded.toString());
+
+          // Log the change
+          console.log(`ActSection ${section.getAttribute('data-act')} - isExpanded changed to:`, isExpanded);
+        });
+      }
+    });
+
+    // Listen for global collapse/expand events
+    document.addEventListener('collapse-all-sections', () => {
+      actSections.forEach(section => {
+        // Find the content container
+        const actContent = section.querySelector('.act-content');
+        const sectionTitle = section.querySelector('.section-title');
+
+        if (actContent && sectionTitle) {
+          // Update the display
+          (actContent as HTMLElement).style.display = 'none';
+
+          // Update the data attribute
+          section.setAttribute('data-expanded', 'false');
+
+          // Update the section title
+          sectionTitle.setAttribute('data-expanded', 'false');
+
+          // Update the collapse icon
+          const collapseIcon = sectionTitle.querySelector('.collapse-icon');
+          if (collapseIcon) {
+            collapseIcon.textContent = '+';
+          }
+
+          // Also collapse all category sections within this act
+          const categoryContainers = section.querySelectorAll('.decision-items');
+          const categorySectionTitles = section.querySelectorAll('.decision-category .section-title');
+
+          categoryContainers.forEach(container => {
+            (container as HTMLElement).style.display = 'none';
+          });
+
+          categorySectionTitles.forEach(title => {
+            title.setAttribute('data-expanded', 'false');
+            const icon = title.querySelector('.collapse-icon');
+            if (icon) {
+              icon.textContent = '+';
+            }
+          });
+
+          // Update data attributes on category sections
+          const categoryDivs = section.querySelectorAll('.decision-category');
+          categoryDivs.forEach(div => {
+            div.setAttribute('data-expanded', 'false');
+          });
+        }
+      });
+
+      console.log('Collapsed all sections');
+    });
+
+    document.addEventListener('expand-all-sections', () => {
+      actSections.forEach(section => {
+        // Find the content container
+        const actContent = section.querySelector('.act-content');
+        const sectionTitle = section.querySelector('.section-title');
+
+        if (actContent && sectionTitle) {
+          // Update the display
+          (actContent as HTMLElement).style.display = 'block';
+
+          // Update the data attribute
+          section.setAttribute('data-expanded', 'true');
+
+          // Update the section title
+          sectionTitle.setAttribute('data-expanded', 'true');
+
+          // Update the collapse icon
+          const collapseIcon = sectionTitle.querySelector('.collapse-icon');
+          if (collapseIcon) {
+            collapseIcon.textContent = '−';
+          }
+
+          // Also expand all category sections within this act
+          const categoryContainers = section.querySelectorAll('.decision-items');
+          const categorySectionTitles = section.querySelectorAll('.decision-category .section-title');
+
+          categoryContainers.forEach(container => {
+            (container as HTMLElement).style.display = 'block';
+          });
+
+          categorySectionTitles.forEach(title => {
+            title.setAttribute('data-expanded', 'true');
+            const icon = title.querySelector('.collapse-icon');
+            if (icon) {
+              icon.textContent = '−';
+            }
+          });
+
+          // Update data attributes on category sections
+          const categoryDivs = section.querySelectorAll('.decision-category');
+          categoryDivs.forEach(div => {
+            div.setAttribute('data-expanded', 'true');
+          });
+        }
+      });
+
+      console.log('Expanded all sections');
+    });
+  });
+</script>

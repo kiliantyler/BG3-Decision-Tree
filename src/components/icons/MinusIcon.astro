@@ -1,0 +1,45 @@
+---
+// MinusIcon.astro - Minus icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'currentColor', size = 24 } = Astro.props;
+---
+
+<div class="minus-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="minus-icon-svg"
+  >
+    <line
+      x1="5"
+      y1="12"
+      x2="19"
+      y2="12"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .minus-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .minus-icon-svg {
+    display: block;
+    overflow: visible;
+  }
+</style>

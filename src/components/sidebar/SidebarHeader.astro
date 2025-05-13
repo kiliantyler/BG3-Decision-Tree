@@ -1,0 +1,93 @@
+---
+// SidebarHeader.astro - Header section of the sidebar with search and filter controls
+import LegendArea from './LegendArea.astro';
+
+interface Props {
+  searchTerm: string;
+  showRequired: boolean;
+  showOptional: boolean;
+  showUnavailable: boolean;
+}
+
+const { searchTerm, showRequired, showOptional, showUnavailable } = Astro.props;
+---
+
+<div class="sidebar-header">
+  <div
+    class="legend-toggle"
+    style="
+      width: 100%;
+      cursor: pointer;
+      text-align: center;
+    "
+    data-collapsed="false"
+  >
+    <h3 style="margin: 10px 0;">BG3 Decision Tree</h3>
+  </div>
+
+  <!-- Search and filter controls -->
+  <div class="sidebar-controls">
+    <LegendArea
+      showRequired={showRequired}
+      showOptional={showOptional}
+      showUnavailable={showUnavailable}
+      searchTerm={searchTerm}
+      isCollapsed={false}
+    />
+  </div>
+</div>
+
+<script>
+  // Add event listeners for toggling the legend
+  document.addEventListener('DOMContentLoaded', () => {
+    const legendToggle = document.querySelector('.legend-toggle');
+    const legendArea = document.querySelector('.legend');
+
+    if (legendToggle && legendArea) {
+      legendToggle.addEventListener('click', () => {
+        // Get the current state
+        const isCollapsed = legendToggle.getAttribute('data-collapsed') === 'true';
+
+        // Toggle the state
+        const newState = !isCollapsed;
+        legendToggle.setAttribute('data-collapsed', newState.toString());
+
+        // Update the legend display
+        (legendArea as HTMLElement).style.display = newState ? 'none' : 'flex';
+
+        // Update the title attribute
+        legendToggle.setAttribute('title', newState ? 'Expand Legend' : 'Collapse Legend');
+      });
+    }
+
+    // Set up event listeners for the legend area events
+    document.addEventListener('required-toggle', (event: Event) => {
+      const customEvent = event as CustomEvent<{ isChecked: boolean }>;
+      document.dispatchEvent(new CustomEvent('sidebar-required-toggle', {
+        detail: { isChecked: customEvent.detail.isChecked }
+      }));
+    });
+
+    document.addEventListener('optional-toggle', (event: Event) => {
+      const customEvent = event as CustomEvent<{ isChecked: boolean }>;
+      document.dispatchEvent(new CustomEvent('sidebar-optional-toggle', {
+        detail: { isChecked: customEvent.detail.isChecked }
+      }));
+    });
+
+    document.addEventListener('unavailable-toggle', (event: Event) => {
+      const customEvent = event as CustomEvent<{ isChecked: boolean }>;
+      document.dispatchEvent(new CustomEvent('sidebar-unavailable-toggle', {
+        detail: { isChecked: customEvent.detail.isChecked }
+      }));
+    });
+
+    // Listen for search term changes
+    document.addEventListener('search-term-change', (event: Event) => {
+      const customEvent = event as CustomEvent<{ searchTerm: string }>;
+      document.dispatchEvent(new CustomEvent('sidebar-search-term-change', {
+        detail: { searchTerm: customEvent.detail.searchTerm }
+      }));
+    });
+  });
+</script>

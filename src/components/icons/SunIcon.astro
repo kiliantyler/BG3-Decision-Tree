@@ -1,0 +1,70 @@
+---
+// SunIcon.astro - Sun icon component
+interface Props {
+  color?: string;
+  size?: number;
+}
+
+const { color = 'var(--purple)', size = 24 } = Astro.props;
+
+// Calculate sun ray coordinates
+const rays = [0, 45, 90, 135, 180, 225, 270, 315].map((angle) => {
+  const radians = (angle * Math.PI) / 180;
+  const innerX = 12 + 5.5 * Math.cos(radians);
+  const innerY = 12 + 5.5 * Math.sin(radians);
+  const outerX = 12 + 8 * Math.cos(radians);
+  const outerY = 12 + 8 * Math.sin(radians);
+
+  return { innerX, innerY, outerX, outerY };
+});
+---
+
+<div class="sun-icon-container">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    class="sun-icon-svg"
+  >
+    <!-- Cute sun face with a circle -->
+    <circle
+      cx="12"
+      cy="12"
+      r="5"
+      stroke={color}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+
+    <!-- Sun rays -->
+    {rays.map(({ innerX, innerY, outerX, outerY }) => (
+      <line
+        x1={innerX}
+        y1={innerY}
+        x2={outerX}
+        y2={outerY}
+        stroke={color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    ))}
+  </svg>
+</div>
+
+<style define:vars={{ size }}>
+  .sun-icon-container {
+    width: var(--size)px;
+    height: var(--size)px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sun-icon-svg {
+    display: block;
+    overflow: visible;
+  }
+</style>

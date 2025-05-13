@@ -1,0 +1,18 @@
+---
+// Re-export all components
+export * from './icons/index.astro';
+export * from './layout/index.astro';
+export * from './sidebar/index.astro';
+export * from './ui/index.astro';
+
+// Re-export React components
+// Import and re-export specific components to avoid naming conflicts
+import * as Debug from './debug';
+import * as Flowchart from './flowchart';
+
+// Re-export with namespace to avoid conflicts
+export { Debug, Flowchart };
+
+// Note: The Debug and Flowchart components are still React components
+// They will be migrated to Astro in a future update
+---

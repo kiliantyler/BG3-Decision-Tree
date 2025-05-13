@@ -1,0 +1,22 @@
+---
+// App.astro - Main application component
+import { ReactFlowProvider } from 'reactflow';
+import 'reactflow/dist/style.css';
+import '../../styles/customStyles.css';
+import '../../styles/theme.css';
+
+// Components
+import AppContent from './AppContent.astro';
+
+// Context
+import { DecisionProvider } from '../../contexts/DecisionContext';
+import { ThemeProvider } from '../../contexts/ThemeContext';
+---
+
+<ReactFlowProvider client:load>
+  <ThemeProvider client:load>
+    <DecisionProvider client:load>
+      <AppContent client:load />
+    </DecisionProvider>
+  </ThemeProvider>
+</ReactFlowProvider>
