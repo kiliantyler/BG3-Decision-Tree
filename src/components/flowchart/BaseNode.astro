@@ -1,0 +1,347 @@
+---
+// BaseNode.astro - Base node component with common functionality for all node types
+import CloseButton from '../ui/CloseButton.astro';
+
+// Props
+interface Props {
+  data?: {
+    id?: string;
+    label?: string;
+    description?: string;
+    optional?: boolean;
+    required?: boolean;
+    selectedOption?: string;
+    prerequisites?: string[];
+    unlocks?: string[];
+  };
+  isConnectable?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+  onRemove?: (id: string) => void;
+  showRemoveButton?: boolean;
+  isExpandable?: boolean;
+  showBadges?: boolean;
+  nodeType?: 'decision' | 'outcome';
+}
+
+// Default props
+const {
+  data = {},
+  isConnectable = true,
+  className = '',
+  style = {},
+  onRemove,
+  showRemoveButton = false,
+  isExpandable = false,
+  showBadges = false,
+  nodeType = 'decision',
+} = Astro.props;
+
+// Determine if this is an optional or required node
+const isOptional = data.optional === true;
+const isRequired = data.required === true && !data.optional;
+const isCompleted = data.selectedOption !== undefined;
+---
+
+<div
+  id={`node-${data.id}`}
+  class={`base-node ${className} ${isExpandable ? 'expandable' : ''}`}
+  data-node-id={data.id}
+  data-node-type={nodeType}
+  data-is-optional={isOptional}
+  data-is-required={isRequired}
+  data-is-completed={isCompleted}
+  style={{
+    padding: '10px',
+    borderRadius: '5px',
+    position: 'relative',
+    transition: 'all 0.3s ease',
+    ...style,
+  }}
+>
+  <!-- Remove button - initially hidden, shown on hover via JS -->
+  {showRemoveButton && (
+    <div class="remove-button-container" style="display: none; position: absolute; top: -10px; right: -10px; z-index: 10;">
+      <CloseButton />
+    </div>
+  )}
+
+  <!-- Target handle (top) - will be replaced by React Flow's Handle component in client JS -->
+  <div
+    class="react-flow__handle react-flow__handle-top nodrag nopan"
+    style="position: absolute; top: -4px; left: 50%; transform: translate(-50%, 0); width: 8px; height: 8px; border-radius: 50%; background: var(--handleBackground);"
+  ></div>
+
+  <div class="node-content">
+    <!-- Header with expand/collapse button -->
+    <div
+      class="node-header"
+      style={{
+        fontWeight: 'bold',
+        marginBottom: '8px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{ flex: 1 }}>{data.label}</div>
+
+      <!-- Type badge -->
+      {showBadges && (
+        <>
+          {isOptional && !isCompleted && (
+            <span
+              class="optional-badge"
+              style={{
+                background: 'var(--optionalBorder)',
+                color: 'var(--badgeText)',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '0.7rem',
+                marginRight: '5px',
+              }}
+            >
+              Optional
+            </span>
+          )}
+
+          {isRequired && !isCompleted && (
+            <span
+              class="required-badge"
+              style={{
+                background: 'var(--requiredBorder)',
+                color: 'var(--badgeText)',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '0.7rem',
+                marginRight: '5px',
+              }}
+            >
+              Required
+            </span>
+          )}
+
+          <!-- Completion badge -->
+          {isCompleted && (
+            <span
+              class="completed-badge"
+              style={{
+                background: 'var(--green)',
+                color: 'var(--badgeText)',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '0.7rem',
+                marginRight: '5px',
+              }}
+            >
+              Completed
+            </span>
+          )}
+        </>
+      )}
+
+      <!-- Expand/collapse button -->
+      {isExpandable && (
+        <button
+          class="expand-button"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            padding: '0 5px',
+          }}
+        >
+          +
+        </button>
+      )}
+    </div>
+
+    <!-- Description -->
+    <div
+      class="node-description"
+      style={{
+        fontSize: '0.85rem',
+        marginBottom: '10px',
+        lineHeight: '1.3',
+      }}
+    >
+      {data.description}
+    </div>
+
+    <!-- Slot for custom content -->
+    <slot />
+
+    <!-- Metadata (prerequisites, unlocks) - initially hidden, shown when expanded -->
+    {isExpandable && (
+      <div
+        class="node-meta"
+        style={{
+          fontSize: '0.8rem',
+          marginTop: '12px',
+          color: 'var(--metaText)',
+          borderTop: '1px dashed var(--metaBorder)',
+          paddingTop: '8px',
+          display: 'none',
+        }}
+      >
+        {data.prerequisites && data.prerequisites.length > 0 && (
+          <div style={{ marginBottom: '5px' }}>
+            <strong>Requires:</strong> {data.prerequisites.join(', ')}
+          </div>
+        )}
+        {data.unlocks && data.unlocks.length > 0 && (
+          <div>
+            <strong>Unlocks:</strong> {data.unlocks.join(', ')}
+          </div>
+        )}
+        {nodeType === 'decision' && (
+          <div style={{ marginTop: '5px' }}>
+            <strong>Type:</strong> {isOptional ? 'Optional Side Quest' : 'Required Main Quest'}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+
+  <!-- Source handle (bottom) - will be replaced by React Flow's Handle component in client JS -->
+  <div
+    class="react-flow__handle react-flow__handle-bottom nodrag nopan"
+    style="position: absolute; bottom: -4px; left: 50%; transform: translate(-50%, 0); width: 8px; height: 8px; border-radius: 50%; background: var(--handleBackground);"
+  ></div>
+</div>
+
+<script>
+  // Client-side code to handle node interactions
+
+  // Initialize state for all nodes
+  const nodeStates = new Map();
+
+  // Function to initialize a node's state
+  function initNodeState(nodeId) {
+    if (!nodeStates.has(nodeId)) {
+      nodeStates.set(nodeId, {
+        isHovered: false,
+        isExpanded: false
+      });
+    }
+    return nodeStates.get(nodeId);
+  }
+
+  // Function to handle node hover
+  function handleNodeHover(nodeId, isHovered) {
+    const state = initNodeState(nodeId);
+    state.isHovered = isHovered;
+    updateNodeUI(nodeId);
+  }
+
+  // Function to toggle node expansion
+  function toggleNodeExpansion(nodeId) {
+    const state = initNodeState(nodeId);
+    state.isExpanded = !state.isExpanded;
+    updateNodeUI(nodeId);
+  }
+
+  // Function to update node UI based on state
+  function updateNodeUI(nodeId) {
+    const node = document.getElementById(`node-${nodeId}`);
+    if (!node) return;
+
+    const state = nodeStates.get(nodeId);
+    if (!state) return;
+
+    // Update remove button visibility
+    const removeButton = node.querySelector('.remove-button-container');
+    if (removeButton) {
+      // Use style property safely
+      removeButton.setAttribute('style', `display: ${state.isHovered ? 'block' : 'none'}; position: absolute; top: -10px; right: -10px; z-index: 10;`);
+    }
+
+    // Update expand button text
+    const expandButton = node.querySelector('.expand-button');
+    if (expandButton) {
+      expandButton.textContent = state.isExpanded ? '−' : '+';
+    }
+
+    // Update metadata visibility
+    const metadata = node.querySelector('.node-meta');
+    if (metadata) {
+      metadata.setAttribute('style', `
+        font-size: 0.8rem;
+        margin-top: 12px;
+        color: var(--metaText);
+        border-top: 1px dashed var(--metaBorder);
+        padding-top: 8px;
+        display: ${state.isExpanded ? 'block' : 'none'};
+      `);
+    }
+
+    // Update node class
+    if (state.isExpanded) {
+      node.classList.add('expanded');
+    } else {
+      node.classList.remove('expanded');
+    }
+  }
+
+  // Set up event listeners for all nodes
+  function setupNodeEventListeners() {
+    document.querySelectorAll('.base-node').forEach(node => {
+      const nodeId = node.getAttribute('data-node-id');
+      if (!nodeId) return;
+
+      // Initialize state
+      initNodeState(nodeId);
+
+      // Set up hover events
+      node.addEventListener('mouseenter', () => handleNodeHover(nodeId, true));
+      node.addEventListener('mouseleave', () => handleNodeHover(nodeId, false));
+
+      // Set up expand/collapse button
+      const expandButton = node.querySelector('.expand-button');
+      if (expandButton) {
+        expandButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleNodeExpansion(nodeId);
+        });
+      }
+
+      // Set up remove button
+      const removeButton = node.querySelector('.remove-button-container');
+      if (removeButton) {
+        removeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Dispatch custom event for node removal
+          const removeEvent = new CustomEvent('nodeRemove', {
+            detail: { nodeId }
+          });
+          document.dispatchEvent(removeEvent);
+        });
+      }
+    });
+  }
+
+  // Set up when DOM is loaded
+  document.addEventListener('DOMContentLoaded', setupNodeEventListeners);
+
+  // Re-initialize when React Flow updates the DOM
+  document.addEventListener('reactFlowNodeAdded', setupNodeEventListeners);
+</script>
+
+<style>
+  .base-node {
+    transition: all 0.3s ease;
+  }
+
+  .base-node.expanded {
+    min-height: 120px;
+  }
+
+  .expand-button {
+    transition: transform 0.2s ease;
+  }
+
+  .base-node.expanded .expand-button {
+    transform: rotate(180deg);
+  }
+</style>

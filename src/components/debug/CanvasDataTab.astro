@@ -1,0 +1,113 @@
+---
+// CanvasDataTab.astro - Canvas Data tab content for the debug panel
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Props
+interface Props {
+  nodes?: any[];
+  edges?: any[];
+  theme?: string;
+}
+
+// Default props
+const { nodes = [], edges = [], theme = 'dark' } = Astro.props;
+const themeColors = themes[theme];
+---
+
+<div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <div style={{ marginBottom: '10px' }}>
+    <h3>Canvas Data</h3>
+  </div>
+
+  <div style={{ flex: 1, display: 'flex', gap: '10px', overflow: 'hidden' }}>
+    <div style={{ flex: 1 }}>
+      <h4>Nodes ({nodes.length})</h4>
+      <div style={{ height: 'calc(100% - 30px)', overflowY: 'auto' }}>
+        {nodes.map(node => (
+          <div
+            style={{
+              padding: '5px',
+              borderBottom: `1px solid ${themeColors.border}`,
+              fontSize: '0.8rem',
+            }}
+          >
+            <div>
+              <strong style={{ color: themeColors.cyan }}>{node.data?.label || 'Unnamed'}</strong>
+            </div>
+            <div style={{ color: themeColors.comment }}>
+              ID: {node.id}, Pos: ({Math.round(node.position?.x || 0)}, {Math.round(node.position?.y || 0)})
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div style={{ flex: 1 }}>
+      <h4>Edges ({edges.length})</h4>
+      <div style={{ height: 'calc(100% - 30px)', overflowY: 'auto' }}>
+        {edges.map(edge => (
+          <div
+            style={{
+              padding: '5px',
+              borderBottom: `1px solid ${themeColors.border}`,
+              fontSize: '0.8rem',
+            }}
+          >
+            <div>
+              <strong style={{ color: themeColors.green }}>{edge.source}</strong>{' '}
+              <span style={{ color: themeColors.comment }}>→</span>{' '}
+              <strong style={{ color: themeColors.orange }}>{edge.target}</strong>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ initialTheme: theme }}>
+  // Client-side code to update the component when theme changes
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  let currentTheme = initialTheme;
+
+  function updateThemeStyles() {
+    const { theme } = useTheme();
+    currentTheme = theme;
+    const themeColors = themes[theme];
+
+    // Update node styles
+    document.querySelectorAll('.node-label').forEach(el => {
+      el.style.color = themeColors.cyan;
+    });
+
+    document.querySelectorAll('.node-info').forEach(el => {
+      el.style.color = themeColors.comment;
+    });
+
+    // Update edge styles
+    document.querySelectorAll('.edge-source').forEach(el => {
+      el.style.color = themeColors.green;
+    });
+
+    document.querySelectorAll('.edge-target').forEach(el => {
+      el.style.color = themeColors.orange;
+    });
+
+    document.querySelectorAll('.edge-arrow').forEach(el => {
+      el.style.color = themeColors.comment;
+    });
+
+    // Update borders
+    document.querySelectorAll('.data-item').forEach(el => {
+      el.style.borderBottom = `1px solid ${themeColors.border}`;
+    });
+  }
+
+  // Listen for theme changes
+  document.addEventListener('themeChange', updateThemeStyles);
+
+  // Initial update
+  document.addEventListener('DOMContentLoaded', updateThemeStyles);
+</script>

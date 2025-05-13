@@ -1,0 +1,46 @@
+---
+// DebugModeBanner.astro - Banner displayed at the top of the debug panel
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Get current theme (will be handled client-side)
+const { theme = 'dark' } = Astro.props;
+const themeColors = themes[theme];
+---
+
+<div
+  id="debug-mode-banner"
+  class="debug-mode-banner"
+  style={{
+    padding: '4px 8px',
+    background: themeColors.red,
+    color: theme === 'dark' ? themeColors.background : 'white',
+    fontSize: '12px',
+    textAlign: 'center',
+  }}
+>
+  Debug Mode - Press CTRL+SHIFT+D to deactivate
+</div>
+
+<script>
+  // Client-side code to update the banner styling based on theme
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  function updateBannerStyle() {
+    const { theme } = useTheme();
+    const themeColors = themes[theme];
+    const banner = document.getElementById('debug-mode-banner');
+
+    if (banner) {
+      banner.style.background = themeColors.red;
+      banner.style.color = theme === 'dark' ? themeColors.background : 'white';
+    }
+  }
+
+  // Update styles when theme changes
+  document.addEventListener('themeChange', updateBannerStyle);
+
+  // Initial update
+  updateBannerStyle();
+</script>

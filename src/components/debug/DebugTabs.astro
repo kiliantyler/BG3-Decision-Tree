@@ -1,0 +1,131 @@
+---
+// DebugTabs.astro - Tab navigation for the debug panel
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Props
+interface Props {
+  tabIndex?: number;
+  setTabIndex?: (index: number) => void;
+  theme?: string;
+}
+
+// Default props
+const { tabIndex = 0, theme = 'dark' } = Astro.props;
+const themeColors = themes[theme];
+
+// Tab definitions
+const tabs = [
+  { id: 0, label: 'Tree Stats' },
+  { id: 1, label: 'Decisions' },
+  { id: 2, label: 'Canvas Data' },
+];
+---
+
+<div
+  id="debug-tabs"
+  class="debug-tabs"
+  style={{
+    display: 'flex',
+    borderBottom: `1px solid ${themeColors.border}`,
+    background: themeColors.currentLine,
+  }}
+>
+  {tabs.map(tab => (
+    <button
+      data-tab-id={tab.id}
+      class="tab-button"
+      style={{
+        flex: 1,
+        padding: '8px',
+        border: 'none',
+        background: tabIndex === tab.id ? themeColors.background : 'transparent',
+        borderBottom: tabIndex === tab.id ? `2px solid ${themeColors.purple}` : 'none',
+        cursor: 'pointer',
+        color: themeColors.foreground,
+      }}
+    >
+      {tab.label}
+    </button>
+  ))}
+</div>
+
+<script>
+  // Client-side code to handle tab switching and theme updates
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  // Current tab index
+  let currentTabIndex = 0;
+
+  // Tab definitions
+  const tabs = [
+    { id: 0, label: 'Tree Stats' },
+    { id: 1, label: 'Decisions' },
+    { id: 2, label: 'Canvas Data' },
+  ];
+
+  // Function to update tab styles based on current tab and theme
+  function updateTabStyles() {
+    const { theme } = useTheme();
+    const themeColors = themes[theme];
+    const tabsContainer = document.getElementById('debug-tabs');
+
+    if (tabsContainer) {
+      const tabsContainerEl = tabsContainer as HTMLElement;
+      tabsContainerEl.style.borderBottom = `1px solid ${themeColors.border}`;
+      tabsContainerEl.style.background = themeColors.currentLine;
+
+      // Update each tab button
+      const tabButtons = document.querySelectorAll('.tab-button');
+      tabButtons.forEach(button => {
+        const buttonEl = button as HTMLElement;
+        const tabId = parseInt(buttonEl.getAttribute('data-tab-id') || '0', 10);
+
+        buttonEl.style.background = currentTabIndex === tabId ? themeColors.background : 'transparent';
+        buttonEl.style.borderBottom = currentTabIndex === tabId ? `2px solid ${themeColors.purple}` : 'none';
+        buttonEl.style.color = themeColors.foreground;
+      });
+    }
+  }
+
+  // Function to handle tab click
+  function handleTabClick(event) {
+    const tabId = parseInt(event.target.getAttribute('data-tab-id') || '0', 10);
+    currentTabIndex = tabId;
+
+    // Update tab styles
+    updateTabStyles();
+
+    // Dispatch custom event for tab change
+    const tabChangeEvent = new CustomEvent('tabChange', {
+      detail: { tabIndex: tabId }
+    });
+    document.dispatchEvent(tabChangeEvent);
+  }
+
+  // Add click event listeners to tab buttons
+  function setupTabListeners() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+      button.addEventListener('click', handleTabClick);
+    });
+  }
+
+  // Update styles when theme changes
+  document.addEventListener('themeChange', updateTabStyles);
+
+  // Setup when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    setupTabListeners();
+    updateTabStyles();
+  });
+
+  // Set initial tab index from props
+  const tabsContainer = document.getElementById('debug-tabs');
+  if (tabsContainer) {
+    const initialTabIndex = parseInt(tabsContainer.getAttribute('data-initial-tab-index') || '0', 10);
+    currentTabIndex = initialTabIndex;
+    updateTabStyles();
+  }
+</script>

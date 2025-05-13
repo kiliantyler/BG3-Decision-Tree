@@ -1,0 +1,89 @@
+---
+// SidebarDebugPanel.astro - Debug panel component for the sidebar
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Props
+interface Props {
+  showUnavailable?: boolean;
+  showRequired?: boolean;
+  showOptional?: boolean;
+  total?: number;
+  available?: number;
+  displayCount?: number;
+  categoriesCount?: number;
+  completedCount?: number;
+  theme?: string;
+}
+
+// Default props
+const {
+  showUnavailable = false,
+  showRequired = true,
+  showOptional = true,
+  total = 0,
+  available = 0,
+  displayCount = 0,
+  categoriesCount = 0,
+  completedCount = 0,
+  theme = 'dark'
+} = Astro.props;
+
+const themeColors = themes[theme];
+---
+
+<div
+  id="sidebar-debug-panel"
+  class="sidebar-debug-panel"
+  style={{
+    margin: '20px 0',
+    padding: '10px',
+    backgroundColor: themeColors.currentLine,
+    borderRadius: '4px',
+    fontSize: '0.8rem',
+    color: themeColors.comment,
+    border: `1px solid ${themeColors.border}`,
+  }}
+>
+  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Debug Info:</div>
+  <div>
+    Filter Settings:
+    {showUnavailable ? ' Show Unavailable,' : ' Hide Unavailable,'}
+    {showRequired ? ' Required,' : ''}
+    {showOptional ? ' Optional' : ''}
+  </div>
+  <div>
+    Decisions: {total} total, {available} available
+  </div>
+  <div>Displaying: {displayCount} decisions</div>
+  <div>Categories: {categoriesCount}</div>
+  <div>Completed Decisions: {completedCount}</div>
+</div>
+
+<script define:vars={{ initialTheme: theme }}>
+  // Client-side code to update the component when theme changes
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  let currentTheme = initialTheme;
+
+  function updateThemeStyles() {
+    const { theme } = useTheme();
+    currentTheme = theme;
+    const themeColors = themes[theme];
+
+    const panel = document.getElementById('sidebar-debug-panel');
+    if (panel) {
+      // Cast to HTMLElement
+      panel.style.backgroundColor = themeColors.currentLine;
+      panel.style.color = themeColors.comment;
+      panel.style.border = `1px solid ${themeColors.border}`;
+    }
+  }
+
+  // Listen for theme changes
+  document.addEventListener('themeChange', updateThemeStyles);
+
+  // Initial update
+  document.addEventListener('DOMContentLoaded', updateThemeStyles);
+</script>

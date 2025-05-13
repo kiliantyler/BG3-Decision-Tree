@@ -1,0 +1,452 @@
+---
+// FlowChart.astro - Flowchart component using ReactFlow
+import 'reactflow/dist/style.css';
+
+// Import UI components
+import FitViewButton from '../ui/FitViewButton.astro';
+import ResetButton from '../ui/ResetButton.astro';
+import ThemeToggle from '../ui/ThemeToggle.astro';
+
+// Props
+interface Props {
+  initialNodes?: any[];
+  initialEdges?: any[];
+  onNodesChange?: (changes: any) => void;
+  onEdgesChange?: (changes: any) => void;
+  onConnect?: (connection: any) => void;
+  onNodeDrop?: (data: any, position: any) => void;
+  newlyAddedNodes?: any[];
+  setNodes?: (nodes: any[]) => void;
+  onReset?: () => void;
+}
+
+// Default props
+const {
+  initialNodes = [],
+  initialEdges = [],
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onNodeDrop,
+  newlyAddedNodes = [],
+  setNodes: setParentNodes,
+  onReset,
+} = Astro.props;
+---
+
+<div class="reactflow-wrapper">
+  <!-- ReactFlow will be initialized here by client-side script -->
+  <div id="reactflow-container" style="width: 100%; height: 100%;"></div>
+
+  <!-- Theme toggle button -->
+  <ThemeToggle />
+
+  <!-- Custom fit view button -->
+  <FitViewButton />
+
+  <!-- Reset button -->
+  {onReset && <ResetButton />}
+</div>
+
+<script define:vars={{
+  initialNodesData: initialNodes,
+  initialEdgesData: initialEdges,
+  newlyAddedNodesData: newlyAddedNodes
+}}>
+  // Client-side code to initialize and manage ReactFlow
+  import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactFlow, {
+addEdge,
+Background,
+Controls,
+MarkerType,
+useEdgesState,
+useNodesState,
+} from 'reactflow';
+
+  // Import custom node components
+  import DecisionNode from './DecisionNode.jsx';
+import OutcomeNode from './OutcomeNode.jsx';
+
+  // Import custom hooks
+  import useNodeLayoutManager from '../../hooks/useNodeLayoutManager';
+
+  // Define node types for the flow chart
+  const nodeTypes = {
+    decision: DecisionNode,
+    outcome: OutcomeNode,
+  };
+
+  // Create a React component for the flow chart
+  function FlowChartComponent() {
+    // ReactFlow states
+    const [nodes, setNodes, onNodesChangeInternal] = useNodesState(initialNodesData);
+    const [edges, setEdges, onEdgesChangeInternal] = useEdgesState(initialEdgesData);
+    const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
+
+    // Use the layout manager hook
+    const layoutManager = useNodeLayoutManager(reactFlowInstance);
+
+    // Debug logging
+    React.useEffect(() => {
+      console.log('FlowChart received initialNodes:', initialNodesData.length);
+    }, []);
+
+    // Update nodes and edges when props change
+    React.useEffect(() => {
+      console.log('Updating nodes in FlowChart to:', initialNodesData.length);
+      setNodes(initialNodesData);
+    }, []);
+
+    React.useEffect(() => {
+      setEdges(initialEdgesData);
+    }, []);
+
+    // Focus on newly added nodes
+    React.useEffect(() => {
+      if (newlyAddedNodesData.length > 0 && reactFlowInstance) {
+        console.log(
+          'Focusing on newly added nodes:',
+          newlyAddedNodesData.map(n => n.id)
+        );
+        layoutManager.focusOnNewNodes(newlyAddedNodesData);
+      }
+    }, [newlyAddedNodesData, reactFlowInstance]);
+
+    // Forward node changes to parent if needed
+    const handleNodesChange = React.useCallback(
+      changes => {
+        onNodesChangeInternal(changes);
+
+        // Update parent nodes state with current positions
+        if (window.setParentNodes && reactFlowInstance) {
+          // Get the current nodes with updated positions
+          const currentNodes = reactFlowInstance.getNodes();
+
+          // Only update parent state after position changes (not during other operations)
+          const positionChanges = changes.filter(
+            change => change.type === 'position' && change.dragging === false
+          );
+
+          if (positionChanges.length > 0) {
+            // Update the parent nodes state with the current positions
+            window.setParentNodes(currentNodes);
+          }
+        }
+
+        // Call the original onNodesChange if provided
+        if (window.onNodesChange) {
+          window.onNodesChange(changes);
+        }
+      },
+      [onNodesChangeInternal, reactFlowInstance]
+    );
+
+    // Forward edge changes to parent if needed
+    const handleEdgesChange = React.useCallback(
+      changes => {
+        onEdgesChangeInternal(changes);
+        if (window.onEdgesChange) {
+          window.onEdgesChange(changes);
+        }
+      },
+      [onEdgesChangeInternal]
+    );
+
+    // Handle connections between nodes
+    const handleConnect = React.useCallback(
+      params => {
+        // Create connection with arrow marker
+        const connection = {
+          ...params,
+          animated: true,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+        };
+
+        // Update internal edges
+        setEdges(eds => addEdge(connection, eds));
+
+        // Notify parent
+        if (window.onConnect) {
+          window.onConnect(connection);
+        }
+      },
+      [setEdges]
+    );
+
+    // Handle dropping new nodes onto the canvas
+    const handleDrop = React.useCallback(
+      event => {
+        event.preventDefault();
+
+        if (!reactFlowInstance) return;
+
+        const reactFlowBounds = event.target.getBoundingClientRect();
+        const nodeType = event.dataTransfer.getData('application/reactflow');
+        const decisionDataStr = event.dataTransfer.getData('decision');
+
+        // Check if the dropped element is valid
+        if (typeof nodeType === 'undefined' || !nodeType || !decisionDataStr) {
+          return;
+        }
+
+        // Parse the decision data
+        let decisionData;
+        try {
+          decisionData = JSON.parse(decisionDataStr);
+        } catch (e) {
+          console.error('Failed to parse decision data', e);
+          return;
+        }
+
+        // Calculate position of the new node
+        const position = reactFlowInstance.project({
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        });
+
+        // Notify parent about the new node
+        if (window.onNodeDrop) {
+          console.log('Dropping node:', decisionData.id, 'at position:', position);
+          return window.onNodeDrop(decisionData, position);
+        }
+      },
+      [reactFlowInstance]
+    );
+
+    // Allow dropping on the pane
+    const handleDragOver = React.useCallback(event => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }, []);
+
+    // Initialize ReactFlow instance
+    const handleInit = React.useCallback(instance => {
+      console.log('ReactFlow instance initialized');
+      setReactFlowInstance(instance);
+
+      // Initial fit view after a short delay to ensure all nodes are rendered
+      setTimeout(() => {
+        instance.fitView({ padding: 0.3 });
+      }, 200);
+
+      // Add scroll indicator functionality
+      setTimeout(() => {
+        // Create scroll indicator element if it doesn't exist
+        let scrollIndicator = document.querySelector('.scroll-indicator');
+        if (!scrollIndicator) {
+          scrollIndicator = document.createElement('div');
+          scrollIndicator.className = 'scroll-indicator';
+          scrollIndicator.innerHTML = '▼';
+          document.body.appendChild(scrollIndicator);
+        }
+
+        const categoriesEl = document.querySelector('.decision-categories');
+        if (categoriesEl) {
+          // Check if scrollable on load
+          checkIfScrollable(categoriesEl, scrollIndicator);
+
+          // Add scroll event listener
+          categoriesEl.addEventListener('scroll', () => {
+            checkIfScrollable(categoriesEl, scrollIndicator);
+          });
+
+          // Add resize observer to check when content changes
+          const resizeObserver = new ResizeObserver(() => {
+            checkIfScrollable(categoriesEl, scrollIndicator);
+          });
+          resizeObserver.observe(categoriesEl);
+
+          // Also check when showUnavailable changes
+          const availableCheckbox = document.getElementById('cb-available');
+          if (availableCheckbox) {
+            availableCheckbox.addEventListener('change', () => {
+              // Wait a moment for the DOM to update
+              setTimeout(() => {
+                checkIfScrollable(categoriesEl, scrollIndicator);
+              }, 100);
+            });
+          }
+        }
+      }, 500);
+
+      // Dispatch event to notify that ReactFlow is ready
+      document.dispatchEvent(new CustomEvent('reactFlowReady', { detail: { instance } }));
+    }, []);
+
+    // Function to check if content is scrollable and show/hide indicator
+    const checkIfScrollable = (element, indicator) => {
+      console.log('Checking if scrollable:', element.scrollHeight, element.clientHeight);
+      if (element.scrollHeight > element.clientHeight) {
+        indicator.classList.add('visible');
+      } else {
+        indicator.classList.remove('visible');
+      }
+    };
+
+    // Function to fit all nodes in the view
+    const handleFitView = React.useCallback(() => {
+      if (reactFlowInstance) {
+        // Get the container element to calculate proper dimensions
+        const container = document.querySelector('.reactflow-wrapper');
+        if (!container) {
+          console.warn('Could not find ReactFlow container');
+          return;
+        }
+
+        // First, fit all nodes
+        reactFlowInstance.fitView({
+          padding: 0.3,
+          includeHiddenNodes: false,
+          minZoom: 0.2,
+          maxZoom: 1.5,
+        });
+
+        // After fitting, adjust the viewport if needed
+        setTimeout(() => {
+          const { y, zoom } = reactFlowInstance.getViewport();
+
+          // Get the dimensions of the container
+          const containerWidth = container.clientWidth;
+
+          // Calculate the center point of the visible area
+          const effectiveCenterX = containerWidth / 2;
+
+          // Get all nodes to calculate their center
+          const nodes = reactFlowInstance.getNodes();
+          if (nodes.length === 0) return;
+
+          // Calculate the center of all nodes
+          const positions = nodes.map(node => node.position);
+          const nodesCenterX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
+
+          // Adjust viewport to center nodes properly
+          reactFlowInstance.setViewport(
+            {
+              x: -nodesCenterX * zoom + effectiveCenterX,
+              y,
+              zoom,
+            },
+            { duration: 200 }
+          );
+        }, 50);
+      }
+    }, [reactFlowInstance]);
+
+    // Connect the fit view button
+    React.useEffect(() => {
+      const fitViewButton = document.querySelector('.fit-view-button');
+      if (fitViewButton) {
+        fitViewButton.addEventListener('click', handleFitView);
+      }
+
+      return () => {
+        if (fitViewButton) {
+          fitViewButton.removeEventListener('click', handleFitView);
+        }
+      };
+    }, [handleFitView]);
+
+    // Connect the reset button
+    React.useEffect(() => {
+      const resetButton = document.querySelector('.reset-button');
+      if (resetButton && window.onReset) {
+        resetButton.addEventListener('click', window.onReset);
+      }
+
+      return () => {
+        if (resetButton && window.onReset) {
+          resetButton.removeEventListener('click', window.onReset);
+        }
+      };
+    }, []);
+
+    return (
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
+        onConnect={handleConnect}
+        onInit={handleInit}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        nodeTypes={nodeTypes}
+        fitView={false}
+        minZoom={0.1}
+        maxZoom={2}
+        attributionPosition="hidden"
+      >
+        <Controls position="bottom-right" />
+        <Background variant="dots" gap={12} size={1} />
+      </ReactFlow>
+    );
+  }
+
+  // Initialize the component when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Expose callback functions to window for component communication
+    window.onNodesChange = onNodesChange;
+    window.onEdgesChange = onEdgesChange;
+    window.onConnect = onConnect;
+    window.onNodeDrop = onNodeDrop;
+    window.setParentNodes = setParentNodes;
+    window.onReset = onReset;
+
+    // Render the React component
+    const container = document.getElementById('reactflow-container');
+    if (container) {
+      ReactDOM.render(
+        React.createElement(FlowChartComponent),
+        container
+      );
+
+      // Dispatch event to notify that the component has been rendered
+      document.dispatchEvent(new CustomEvent('reactFlowNodeAdded'));
+    }
+  });
+</script>
+
+<style>
+  .reactflow-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  :global(.scroll-indicator) {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  :global(.scroll-indicator.visible) {
+    opacity: 0.7;
+    animation: bounce 1.5s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+</style>

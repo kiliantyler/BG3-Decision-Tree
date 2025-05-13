@@ -1,0 +1,147 @@
+---
+// DiagnosticSidebar.astro - Diagnostic sidebar component for debugging
+// Props
+interface Props {
+  data?: {
+    nodes?: any[];
+    edges?: any[];
+    completedDecisions?: string[];
+  };
+}
+
+// Default props
+const { data = null } = Astro.props;
+---
+
+{!data ? (
+  <div class="diagnostic-sidebar">
+    <h3>No diagnostic data available</h3>
+  </div>
+) : (
+  <div class="diagnostic-sidebar">
+    <h3>Diagnostic Information</h3>
+
+    {/* Display general stats */}
+    <div class="diagnostic-section">
+      <h4>General Stats</h4>
+      <ul>
+        <li>
+          <strong>Total Nodes:</strong> {data.nodes?.length || 0}
+        </li>
+        <li>
+          <strong>Total Edges:</strong> {data.edges?.length || 0}
+        </li>
+        <li>
+          <strong>Completed Decisions:</strong> {data.completedDecisions?.length || 0}
+        </li>
+      </ul>
+    </div>
+
+    {/* Display node details */}
+    {data.nodes && data.nodes.length > 0 && (
+      <div class="diagnostic-section">
+        <h4>Node Details</h4>
+        <div class="scrollable-content">
+          {data.nodes.map(node => (
+            <div class="node-item">
+              <div class="node-header">
+                <strong>{node.data.label}</strong> ({node.id})
+              </div>
+              <div class="node-details">
+                <div>
+                  <small>Type: {node.type}</small>
+                </div>
+                <div>
+                  <small>
+                    Position: ({Math.round(node.position?.x || 0)}, {Math.round(node.position?.y || 0)})
+                  </small>
+                </div>
+                {node.data.selectedOption && (
+                  <div>
+                    <small>Selected: {node.data.selectedOption}</small>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Display edge details */}
+    {data.edges && data.edges.length > 0 && (
+      <div class="diagnostic-section">
+        <h4>Edge Details</h4>
+        <div class="scrollable-content">
+          {data.edges.map(edge => (
+            <div class="edge-item">
+              <small>
+                {edge.source} → {edge.target}
+              </small>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Display completed decisions */}
+    {data.completedDecisions && data.completedDecisions.length > 0 && (
+      <div class="diagnostic-section">
+        <h4>Completed Decisions</h4>
+        <div class="scrollable-content">
+          <ul>
+            {data.completedDecisions.map(id => (
+              <li>
+                <small>{id}</small>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+<style>
+  .diagnostic-sidebar {
+    padding: 15px;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  .diagnostic-section {
+    margin-bottom: 20px;
+  }
+
+  .scrollable-content {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+  }
+
+  .node-item, .edge-item {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .node-header {
+    margin-bottom: 4px;
+  }
+
+  .node-details {
+    padding-left: 10px;
+  }
+
+  /* Dark mode styles will be applied via CSS variables */
+  :global(.dark-theme) .scrollable-content {
+    border-color: #444;
+  }
+
+  :global(.dark-theme) .node-item,
+  :global(.dark-theme) .edge-item {
+    border-bottom-color: #333;
+  }
+</style>

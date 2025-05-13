@@ -1,0 +1,299 @@
+---
+// DebugPanel.astro - Debug panel component to help with development and testing
+import { useDecision } from '../../contexts/DecisionContext';
+import * as DataManager from '../../data/enhancedDataManager';
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Import smaller components
+import CanvasDataTab from './CanvasDataTab.astro';
+import DebugModeBanner from './DebugModeBanner.astro';
+import DebugTabs from './DebugTabs.astro';
+import DebugToggleButton from './DebugToggleButton.astro';
+import DecisionsTab from './DecisionsTab.astro';
+import StatsTab from './StatsTab.astro';
+
+// Default props
+const { theme = 'dark' } = Astro.props;
+const themeColors = themes[theme];
+---
+
+<div id="debug-panel-container">
+  <!-- Toggle Button - Initially visible -->
+  <DebugToggleButton isVisible={false} theme={theme} />
+
+  <!-- Debug Panel - Initially hidden -->
+  <div
+    id="debug-panel"
+    class="debug-panel"
+    style={{
+      position: 'fixed',
+      bottom: '70px',
+      right: '20px',
+      width: '500px',
+      height: '400px',
+      background: themeColors.background,
+      border: `1px solid ${themeColors.border}`,
+      borderRadius: '6px',
+      boxShadow: `0 5px 15px ${theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'}`,
+      zIndex: 1000,
+      overflow: 'hidden',
+      display: 'none', /* Initially hidden */
+      flexDirection: 'column',
+      color: themeColors.foreground,
+    }}
+  >
+    <!-- Debug Mode Banner -->
+    <DebugModeBanner theme={theme} />
+
+    <!-- Tabs -->
+    <DebugTabs tabIndex={0} theme={theme} />
+
+    <!-- Content Area -->
+    <div
+      id="debug-content-area"
+      class="debug-content-area"
+      style={{
+        flex: 1,
+        padding: '10px',
+        overflow: 'hidden',
+      }}
+    >
+      <!-- Tab content will be dynamically inserted here -->
+      <div id="stats-tab" class="tab-content" style="display: block;">
+        <StatsTab decisions={[]} nodes={[]} edges={[]} completedDecisions={[]} client:load />
+      </div>
+
+      <div id="decisions-tab" class="tab-content" style="display: none;">
+        <DecisionsTab
+          searchTerm=""
+          setSearchTerm={() => {}}
+          filteredDecisions={[]}
+          selectedDecision={null}
+          setSelectedDecision={() => {}}
+          addToCanvas={() => {}}
+          client:load
+        />
+      </div>
+
+      <div id="canvas-data-tab" class="tab-content" style="display: none;">
+        <CanvasDataTab nodes={[]} edges={[]} client:load />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side code to handle debug panel functionality
+  import { useDecision } from '../../contexts/DecisionContext';
+import * as DataManager from '../../data/enhancedDataManager';
+
+  // Declare global functions
+  declare global {
+    interface Window {
+      addToCanvas: () => void;
+    }
+  }
+
+  // State
+  let isVisible = false;
+  let isDebugModeActivated = false;
+  let tabIndex = 0;
+  let searchTerm = '';
+  let selectedDecision = null;
+  let decisions = [];
+  let filteredDecisions = [];
+
+  // DOM elements
+  const debugPanel = document.getElementById('debug-panel');
+  const statsTab = document.getElementById('stats-tab');
+  const decisionsTab = document.getElementById('decisions-tab');
+  const canvasDataTab = document.getElementById('canvas-data-tab');
+
+  // Initialize data
+  async function initializeData() {
+    try {
+      // Get decision context
+      const decisionContext = await useDecision();
+      const { nodes, edges, completedDecisions, addNodeFromSidebar } = decisionContext;
+
+      // Get all decisions for debugging
+      decisions = DataManager.allDecisions;
+
+      // Filter decisions based on search term
+      updateFilteredDecisions();
+
+      // Update tab content with actual data
+      updateTabContent(nodes, edges, completedDecisions, addNodeFromSidebar);
+    } catch (err) {
+      console.error('Error initializing debug panel data:', err);
+    }
+  }
+
+  // Update filtered decisions based on search term
+  function updateFilteredDecisions() {
+    filteredDecisions = decisions.filter(
+      d =>
+        d.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Update decisions tab with new filtered decisions
+    const decisionsTabComponent = document.querySelector('astro-island[component-url*="DecisionsTab"]');
+    if (decisionsTabComponent) {
+      decisionsTabComponent.setAttribute('filteredDecisions', JSON.stringify(filteredDecisions));
+      decisionsTabComponent.setAttribute('searchTerm', searchTerm);
+    }
+  }
+
+  // Update tab content with actual data
+  function updateTabContent(nodes, edges, completedDecisions, addNodeFromSidebar) {
+    // Update stats tab
+    const statsTabComponent = document.querySelector('astro-island[component-url*="StatsTab"]');
+    if (statsTabComponent) {
+      statsTabComponent.setAttribute('decisions', JSON.stringify(decisions));
+      statsTabComponent.setAttribute('nodes', JSON.stringify(nodes));
+      statsTabComponent.setAttribute('edges', JSON.stringify(edges));
+      statsTabComponent.setAttribute('completedDecisions', JSON.stringify(completedDecisions));
+    }
+
+    // Update canvas data tab
+    const canvasDataTabComponent = document.querySelector('astro-island[component-url*="CanvasDataTab"]');
+    if (canvasDataTabComponent) {
+      canvasDataTabComponent.setAttribute('nodes', JSON.stringify(nodes));
+      canvasDataTabComponent.setAttribute('edges', JSON.stringify(edges));
+    }
+
+    // Set up add to canvas function
+    window.addToCanvas = () => {
+      if (selectedDecision) {
+        const position = { x: 100, y: 100 }; // Default position
+        addNodeFromSidebar(selectedDecision, position);
+      }
+    };
+
+    // Update decisions tab with add to canvas function
+    const decisionsTabComponent = document.querySelector('astro-island[component-url*="DecisionsTab"]');
+    if (decisionsTabComponent) {
+      decisionsTabComponent.setAttribute('addToCanvas', 'window.addToCanvas');
+    }
+  }
+
+  // Toggle panel visibility
+  function togglePanel(newVisibility) {
+    if (typeof newVisibility === 'boolean') {
+      isVisible = newVisibility;
+    } else {
+      isVisible = !isVisible;
+    }
+
+    if (debugPanel) {
+      const debugPanelEl = debugPanel as HTMLElement;
+      debugPanelEl.style.display = isVisible ? 'flex' : 'none';
+    }
+
+    // Dispatch event to update toggle button
+    const visibilityEvent = new CustomEvent('debugPanelVisibilityChange', {
+      detail: { isVisible }
+    });
+    document.dispatchEvent(visibilityEvent);
+  }
+
+  // Handle tab change
+  function handleTabChange(newTabIndex) {
+    tabIndex = newTabIndex;
+
+    // Hide all tab content
+    if (statsTab) statsTab.style.display = 'none';
+    if (decisionsTab) decisionsTab.style.display = 'none';
+    if (canvasDataTab) canvasDataTab.style.display = 'none';
+
+    // Show selected tab content
+    switch (tabIndex) {
+      case 0:
+        if (statsTab) statsTab.style.display = 'block';
+        break;
+      case 1:
+        if (decisionsTab) decisionsTab.style.display = 'block';
+        break;
+      case 2:
+        if (canvasDataTab) canvasDataTab.style.display = 'block';
+        break;
+    }
+  }
+
+  // Toggle debug mode
+  function toggleDebugMode() {
+    isDebugModeActivated = !isDebugModeActivated;
+
+    // If activating debug mode, also show the panel
+    if (isDebugModeActivated) {
+      togglePanel(true);
+    }
+
+    // Update visibility of debug panel container
+    const container = document.getElementById('debug-panel-container');
+    if (container) {
+      container.style.display = isDebugModeActivated ? 'block' : 'none';
+    }
+
+    console.log('Debug mode ' + (isDebugModeActivated ? 'activated' : 'deactivated'));
+  }
+
+  // Add event listener for CTRL+SHIFT+D key combination
+  function setupKeyboardShortcut() {
+    document.addEventListener('keydown', e => {
+      // Check for CTRL+SHIFT+D
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault(); // Prevent default browser behavior
+        toggleDebugMode();
+      }
+    });
+  }
+
+  // Listen for toggle button click
+  document.addEventListener('debugPanelToggle', (event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && typeof customEvent.detail.isVisible === 'boolean') {
+      togglePanel(customEvent.detail.isVisible);
+    }
+  });
+
+  // Listen for tab change
+  document.addEventListener('tabChange', (event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && typeof customEvent.detail.tabIndex === 'number') {
+      handleTabChange(customEvent.detail.tabIndex);
+    }
+  });
+
+  // Listen for search term change
+  document.addEventListener('searchTermChange', (event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && typeof customEvent.detail.searchTerm === 'string') {
+      searchTerm = customEvent.detail.searchTerm;
+      updateFilteredDecisions();
+    }
+  });
+
+  // Listen for selected decision change
+  document.addEventListener('selectedDecisionChange', (event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && customEvent.detail.selectedDecision) {
+      selectedDecision = customEvent.detail.selectedDecision;
+    }
+  });
+
+  // Setup when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    setupKeyboardShortcut();
+    initializeData();
+
+    // Initially hide debug panel container
+    const container = document.getElementById('debug-panel-container');
+    if (container) {
+      container.style.display = 'none';
+    }
+  });
+</script>

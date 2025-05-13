@@ -1,0 +1,104 @@
+---
+// DebugToggleButton.astro - Toggle button for the debug panel
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Props
+interface Props {
+  isVisible?: boolean;
+  theme?: string;
+}
+
+// Default props
+const { isVisible = false, theme = 'dark' } = Astro.props;
+const themeColors = themes[theme];
+---
+
+<button
+  id="debug-toggle-button"
+  class="debug-toggle-button"
+  style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    zIndex: 1000,
+    background: themeColors.currentLine,
+    color: themeColors.foreground,
+    border: `1px solid ${themeColors.border}`,
+    borderRadius: '4px',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    boxShadow: `0 2px 10px ${
+      theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'
+    }`,
+  }}
+>
+  {isVisible ? 'Close Debug' : 'Debug'}
+</button>
+
+<script>
+  // Client-side code to handle button click and theme updates
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  // Track visibility state
+  let isVisible = false;
+
+  // Function to update button style based on theme
+  function updateButtonStyle() {
+    const { theme } = useTheme();
+    const themeColors = themes[theme];
+    const button = document.getElementById('debug-toggle-button');
+
+    if (button) {
+      const buttonEl = button as HTMLElement;
+      buttonEl.style.background = themeColors.currentLine;
+      buttonEl.style.color = themeColors.foreground;
+      buttonEl.style.border = `1px solid ${themeColors.border}`;
+      buttonEl.style.boxShadow = `0 2px 10px ${
+        theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'
+      }`;
+
+      // Update text based on visibility
+      buttonEl.textContent = isVisible ? 'Close Debug' : 'Debug';
+    }
+  }
+
+  // Function to toggle panel visibility
+  function togglePanel() {
+    isVisible = !isVisible;
+    updateButtonStyle();
+
+    // Dispatch custom event for panel toggle
+    const toggleEvent = new CustomEvent('debugPanelToggle', {
+      detail: { isVisible }
+    });
+    document.dispatchEvent(toggleEvent);
+  }
+
+  // Add click event listener to button
+  function setupButtonListener() {
+    const button = document.getElementById('debug-toggle-button');
+    if (button) {
+      button.addEventListener('click', togglePanel);
+    }
+  }
+
+  // Update styles when theme changes
+  document.addEventListener('themeChange', updateButtonStyle);
+
+  // Listen for external visibility changes
+  document.addEventListener('debugPanelVisibilityChange', (event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && typeof customEvent.detail.isVisible === 'boolean') {
+      isVisible = customEvent.detail.isVisible;
+      updateButtonStyle();
+    }
+  });
+
+  // Setup when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    setupButtonListener();
+    updateButtonStyle();
+  });
+</script>

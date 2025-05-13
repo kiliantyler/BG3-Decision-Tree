@@ -1,0 +1,64 @@
+---
+// OutcomeNode.astro - Outcome node component for the flowchart
+import BaseNode from './BaseNode.astro';
+
+// Props
+interface Props {
+  data?: {
+    id?: string;
+    label?: string;
+    description?: string;
+    optional?: boolean;
+    prerequisites?: string[];
+    unlocks?: string[];
+    onRemove?: (id: string) => void;
+  };
+  isConnectable?: boolean;
+}
+
+// Default props
+const { data = {}, isConnectable = true } = Astro.props;
+---
+
+<BaseNode
+  data={data}
+  isConnectable={isConnectable}
+  className="outcome-node"
+  style={{
+    background: '#a3cfbb',
+    border: '1px solid #68b088',
+    width: '180px',
+    padding: '12px',
+    borderRadius: '5px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  }}
+  showRemoveButton={data.optional === true}
+  isExpandable={true}
+  showBadges={true}
+  nodeType="outcome"
+/>
+
+<script define:vars={{ nodeId: data.id }}>
+  // Client-side code to handle outcome node functionality
+
+  // Function to handle node removal
+  function handleRemoveNode() {
+    // Dispatch event for node removal
+    const removeEvent = new CustomEvent('nodeRemove', {
+      detail: { nodeId }
+    });
+    document.dispatchEvent(removeEvent);
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set up node removal event listener
+    const node = document.getElementById(`node-${nodeId}`);
+    if (node) {
+      const removeButton = node.querySelector('.remove-button-container');
+      if (removeButton) {
+        removeButton.addEventListener('click', handleRemoveNode);
+      }
+    }
+  });
+</script>

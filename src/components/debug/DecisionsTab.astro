@@ -1,0 +1,388 @@
+---
+// DecisionsTab.astro - Decisions tab content for the debug panel
+import Modal from '../ui/Modal.astro';
+import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+// Props
+interface Props {
+  searchTerm?: string;
+  setSearchTerm?: (term: string) => void;
+  filteredDecisions?: any[];
+  selectedDecision?: any;
+  setSelectedDecision?: (decision: any) => void;
+  addToCanvas?: () => void;
+  theme?: string;
+}
+
+// Default props
+const {
+  searchTerm = '',
+  filteredDecisions = [],
+  selectedDecision = null,
+  theme = 'dark'
+} = Astro.props;
+
+const themeColors = themes[theme];
+---
+
+<div class="decisions-tab" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <div style={{ marginBottom: '10px' }}>
+    <h3>All Decisions</h3>
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Search decisions..."
+      value={searchTerm}
+      style={{
+        width: 'calc(100% - 16px)', // Account for padding
+        boxSizing: 'border-box',
+        padding: '8px',
+        marginBottom: '5px',
+        border: `1px solid ${themeColors.border}`,
+        borderRadius: '4px',
+        background: themeColors.currentLine,
+        color: themeColors.foreground,
+      }}
+    />
+  </div>
+
+  <div id="decisions-list" style={{ flex: 1, overflowY: 'auto', marginBottom: '5px' }}>
+    {filteredDecisions.map(decision => (
+      <div
+        class="decision-item"
+        data-decision-id={decision.id}
+        style={{
+          padding: '8px',
+          borderBottom: `1px solid ${themeColors.border}`,
+          cursor: 'pointer',
+          background: selectedDecision?.id === decision.id
+            ? theme === 'dark'
+              ? themeColors.selection
+              : themeColors.currentLine
+            : 'transparent',
+        }}
+      >
+        <div>
+          <strong>{decision.label}</strong> ({decision.id})
+        </div>
+        <div style={{ fontSize: '0.8rem', color: themeColors.comment }}>
+          {decision.description.substring(0, 50)}...
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Decision Details Modal (initially hidden) -->
+  <div id="modal-container"></div>
+</div>
+
+<script define:vars={{ initialTheme: theme, initialSearchTerm: searchTerm, initialFilteredDecisions: filteredDecisions }}>
+  // Client-side code to handle decisions tab functionality
+  import { useTheme } from '../../hooks/useTheme';
+import { themes } from '../../styles/themes/colorThemes';
+
+  // State
+  let currentTheme = initialTheme;
+  let searchTerm = initialSearchTerm;
+  let filteredDecisions = initialFilteredDecisions;
+  let selectedDecision = null;
+  let isModalOpen = false;
+
+  // DOM elements
+  const searchInput = document.getElementById('search-input');
+  const decisionsList = document.getElementById('decisions-list');
+  const modalContainer = document.getElementById('modal-container');
+
+  // Update theme styles
+  function updateThemeStyles() {
+    const { theme } = useTheme();
+    currentTheme = theme;
+    const themeColors = themes[theme];
+
+    // Update search input styles
+    if (searchInput) {
+      searchInput.style.border = `1px solid ${themeColors.border}`;
+      searchInput.style.background = themeColors.currentLine;
+      searchInput.style.color = themeColors.foreground;
+    }
+
+    // Update decision items
+    document.querySelectorAll('.decision-item').forEach(item => {
+      const isSelected = item.getAttribute('data-decision-id') === selectedDecision?.id;
+      item.style.borderBottom = `1px solid ${themeColors.border}`;
+      item.style.background = isSelected
+        ? theme === 'dark'
+          ? themeColors.selection
+          : themeColors.currentLine
+        : 'transparent';
+
+      // Update description color
+      const descriptionEl = item.querySelector('div:nth-child(2)');
+      if (descriptionEl) {
+        descriptionEl.style.color = themeColors.comment;
+      }
+    });
+  }
+
+  // Handle search input change
+  function handleSearchChange(event) {
+    searchTerm = event.target.value;
+
+    // Dispatch custom event for search term change
+    const searchEvent = new CustomEvent('searchTermChange', {
+      detail: { searchTerm }
+    });
+    document.dispatchEvent(searchEvent);
+  }
+
+  // Handle decision item click
+  function handleDecisionClick(event) {
+    // Find the decision item element
+    let target = event.target;
+    while (target && !target.classList.contains('decision-item')) {
+      target = target.parentElement;
+    }
+
+    if (!target) return;
+
+    // Get decision ID
+    const decisionId = target.getAttribute('data-decision-id');
+
+    // Find decision in filtered decisions
+    selectedDecision = filteredDecisions.find(d => d.id === decisionId);
+
+    if (selectedDecision) {
+      // Update selected item styling
+      document.querySelectorAll('.decision-item').forEach(item => {
+        const isSelected = item.getAttribute('data-decision-id') === selectedDecision.id;
+        item.style.background = isSelected
+          ? currentTheme === 'dark'
+            ? themes[currentTheme].selection
+            : themes[currentTheme].currentLine
+          : 'transparent';
+      });
+
+      // Dispatch custom event for selected decision change
+      const selectionEvent = new CustomEvent('selectedDecisionChange', {
+        detail: { selectedDecision }
+      });
+      document.dispatchEvent(selectionEvent);
+
+      // Show modal
+      showModal();
+    }
+  }
+
+  // Show modal with decision details
+  function showModal() {
+    if (!selectedDecision || !modalContainer) return;
+
+    isModalOpen = true;
+
+    // Create modal content
+    const modalContent = `
+      <div class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>${selectedDecision.label}</h3>
+            <button class="close-button">×</button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <strong>ID:</strong> ${selectedDecision.id}
+            </div>
+            <div>
+              <strong>Type:</strong> ${selectedDecision.type}
+            </div>
+            <div>
+              <strong>Required:</strong>
+              <span style="color: ${selectedDecision.required ? 'var(--green)' : 'var(--comment)'}">
+                ${selectedDecision.required ? 'Yes' : 'No'}
+              </span>
+            </div>
+            <div>
+              <strong>Optional:</strong>
+              <span style="color: ${selectedDecision.optional ? 'var(--green)' : 'var(--comment)'}">
+                ${selectedDecision.optional ? 'Yes' : 'No'}
+              </span>
+            </div>
+            <div>
+              <strong>Prerequisites:</strong>
+              <span style="color: var(--cyan)">
+                ${selectedDecision.prerequisites?.join(', ') || 'None'}
+              </span>
+            </div>
+            <div>
+              <strong>Unlocks:</strong>
+              <span style="color: var(--orange)">
+                ${selectedDecision.unlocks?.join(', ') || 'None'}
+              </span>
+            </div>
+            <div style="margin-top: 10px">${selectedDecision.description}</div>
+          </div>
+          <div class="modal-footer">
+            <button class="cancel-button">Close</button>
+            <button class="confirm-button">Add to Canvas</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add modal to container
+    modalContainer.innerHTML = modalContent;
+
+    // Add event listeners
+    const closeButton = modalContainer.querySelector('.close-button');
+    const cancelButton = modalContainer.querySelector('.cancel-button');
+    const confirmButton = modalContainer.querySelector('.confirm-button');
+
+    if (closeButton) closeButton.addEventListener('click', closeModal);
+    if (cancelButton) cancelButton.addEventListener('click', closeModal);
+    if (confirmButton) confirmButton.addEventListener('click', handleAddToCanvas);
+
+    // Add modal styles
+    const modalStyle = document.createElement('style');
+    modalStyle.textContent = `
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background-color: ${themes[currentTheme].background};
+        border-radius: 4px;
+        width: 400px;
+        max-width: 90%;
+        max-height: 90%;
+        overflow-y: auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        color: ${themes[currentTheme].foreground};
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid ${themes[currentTheme].border};
+      }
+
+      .modal-body {
+        padding: 15px;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 15px;
+        border-top: 1px solid ${themes[currentTheme].border};
+      }
+
+      .close-button {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: ${themes[currentTheme].comment};
+      }
+
+      .cancel-button, .confirm-button {
+        padding: 6px 12px;
+        margin-left: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .cancel-button {
+        background-color: ${themes[currentTheme].currentLine};
+        color: ${themes[currentTheme].foreground};
+        border: 1px solid ${themes[currentTheme].border};
+      }
+
+      .confirm-button {
+        background-color: ${themes[currentTheme].purple};
+        color: white;
+        border: none;
+      }
+    `;
+
+    document.head.appendChild(modalStyle);
+  }
+
+  // Close modal
+  function closeModal() {
+    isModalOpen = false;
+    if (modalContainer) {
+      modalContainer.innerHTML = '';
+    }
+  }
+
+  // Handle add to canvas
+  function handleAddToCanvas() {
+    // Dispatch custom event for add to canvas
+    const addEvent = new CustomEvent('addToCanvas');
+    document.dispatchEvent(addEvent);
+
+    closeModal();
+  }
+
+  // Set up event listeners
+  function setupEventListeners() {
+    if (searchInput) {
+      searchInput.addEventListener('input', handleSearchChange);
+    }
+
+    if (decisionsList) {
+      decisionsList.addEventListener('click', handleDecisionClick);
+    }
+  }
+
+  // Update filtered decisions when they change
+  document.addEventListener('filteredDecisionsChange', (event) => {
+    const customEvent = event;
+    if (customEvent.detail && Array.isArray(customEvent.detail.filteredDecisions)) {
+      filteredDecisions = customEvent.detail.filteredDecisions;
+
+      // Update the decisions list
+      if (decisionsList) {
+        // This would require a more complex implementation to update the DOM
+        // For now, we'll rely on the component being re-rendered
+      }
+    }
+  });
+
+  // Listen for theme changes
+  document.addEventListener('themeChange', updateThemeStyles);
+
+  // Setup when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    updateThemeStyles();
+  });
+</script>
+
+<style>
+  /* Base styles for the decisions tab */
+  .decisions-tab {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .decision-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .decision-item:hover {
+    filter: brightness(1.1);
+  }
+</style>

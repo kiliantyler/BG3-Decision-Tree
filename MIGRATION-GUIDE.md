@@ -70,28 +70,28 @@ This document outlines the steps taken to migrate the BG3 Decision Tree project 
 
 4. **Future-proof**: The hybrid approach makes it easier to add new features and optimize performance in the future.
 
-## Remaining Components to Migrate
+## Migrated Components
 
-The following components are still React components and will be migrated to Astro in a future update:
+All components have been successfully migrated from React to Astro:
 
 ### Debug Components
 
-- `CanvasDataTab.jsx`
-- `DebugModeBanner.jsx`
-- `DebugPanel.jsx`
-- `DebugTabs.jsx`
-- `DebugToggleButton.jsx`
-- `DecisionsTab.jsx`
-- `DiagnosticSidebar.jsx`
-- `SidebarDebugPanel.jsx`
-- `StatsTab.jsx`
+- `CanvasDataTab.astro`
+- `DebugModeBanner.astro`
+- `DebugPanel.astro`
+- `DebugTabs.astro`
+- `DebugToggleButton.astro`
+- `DecisionsTab.astro`
+- `DiagnosticSidebar.astro`
+- `SidebarDebugPanel.astro`
+- `StatsTab.astro`
 
 ### Flowchart Components
 
-- `BaseNode.jsx`
-- `DecisionNode.jsx`
-- `FlowChart.jsx`
-- `OutcomeNode.jsx`
+- `BaseNode.astro`
+- `DecisionNode.astro`
+- `FlowChart.astro`
+- `OutcomeNode.astro`
 
 ## Next Steps
 
