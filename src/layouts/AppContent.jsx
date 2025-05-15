@@ -1,17 +1,17 @@
 // components/layout/AppContent.jsx
-import { Analytics } from '@vercel/analytics/react';
-import React, { useEffect, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // Components
-import { DebugPanel } from '../debug';
-import { FlowChart } from '../flowchart';
-import { Sidebar } from '../sidebar';
+import { DebugPanel } from '../debug'
+import { FlowChart } from '../flowchart'
+import { Sidebar } from '../sidebar'
 
 // Context
-import { useDecision } from '../../contexts/DecisionContext';
+import { useDecision } from '../contexts/DecisionContext'
 
 // Import from enhanced data manager
-import { getStartingNode } from '../../data/enhancedDataManager';
+import { getStartingNode } from '../data/enhancedDataManager'
 
 const AppContent = () => {
   // Use the decision context
@@ -25,13 +25,13 @@ const AppContent = () => {
     handleRemoveNode,
     newlyAddedNodes,
     resetState,
-  } = useDecision();
+  } = useDecision()
 
   // Reference to track if initial node has been added
-  const initialNodeAdded = useRef(false);
+  const initialNodeAdded = useRef(false)
 
   // State for app status
-  const [status, setStatus] = useState({ loading: true, error: null });
+  const [status, setStatus] = useState({ loading: true, error: null })
 
   // Log the state of the app
   useEffect(() => {
@@ -41,59 +41,59 @@ const AppContent = () => {
       completedCount: completedDecisions?.length || 0,
       categoriesCount: Object.keys(categorizedDecisions || {}).length,
       initialNodeAdded: initialNodeAdded.current,
-    });
-  }, [nodes, edges, completedDecisions, categorizedDecisions]);
+    })
+  }, [nodes, edges, completedDecisions, categorizedDecisions])
 
   // Initialize with starting node
   useEffect(() => {
     if (status.loading) {
       try {
-        console.log('App initializing...');
+        console.log('App initializing...')
 
         // Only add starting node if we don't have any nodes yet
         // and we haven't already added the initial node
         if ((nodes?.length || 0) === 0 && !initialNodeAdded.current) {
-          console.log('Adding starting node');
-          const startingNode = getStartingNode();
+          console.log('Adding starting node')
+          const startingNode = getStartingNode()
 
           if (startingNode) {
-            console.log('Starting node found:', startingNode);
+            console.log('Starting node found:', startingNode)
             // Add starting node to canvas with initial position
-            const initialPosition = { x: 50, y: 50 };
+            const initialPosition = { x: 50, y: 50 }
 
             const result = addNodeFromSidebar(
               {
                 ...startingNode,
               },
               initialPosition
-            );
+            )
 
             // Mark that we've added the initial node
             if (result) {
-              console.log('Starting node added successfully');
-              initialNodeAdded.current = true;
+              console.log('Starting node added successfully')
+              initialNodeAdded.current = true
             }
           } else {
-            console.warn('No starting node found');
-            setStatus({ loading: false, error: "Couldn't find starting node" });
-            return;
+            console.warn('No starting node found')
+            setStatus({ loading: false, error: "Couldn't find starting node" })
+            return
           }
         }
 
         // Update status
-        setStatus({ loading: false, error: null });
+        setStatus({ loading: false, error: null })
       } catch (err) {
-        console.error('Error initializing app:', err);
-        setStatus({ loading: false, error: err.message });
+        console.error('Error initializing app:', err)
+        setStatus({ loading: false, error: err.message })
       }
     }
-  }, [nodes, addNodeFromSidebar, status.loading]);
+  }, [nodes, addNodeFromSidebar, status.loading])
 
   // Handle node drop from sidebar
   const handleNodeDrop = (decisionData, position) => {
-    console.log('Handling node drop:', decisionData.id, position);
-    return addNodeFromSidebar(decisionData, position);
-  };
+    console.log('Handling node drop:', decisionData.id, position)
+    return addNodeFromSidebar(decisionData, position)
+  }
 
   // Show loading state
   if (status.loading) {
@@ -111,7 +111,7 @@ const AppContent = () => {
       >
         Loading Baldur's Gate 3 decision tree...
       </div>
-    );
+    )
   }
 
   // Show error state
@@ -144,15 +144,15 @@ const AppContent = () => {
           Retry
         </button>
       </div>
-    );
+    )
   }
 
   // Handle reset button click
   const handleReset = () => {
-    resetState();
+    resetState()
     // Force reload the page to ensure a clean state
-    window.location.reload();
-  };
+    window.location.reload()
+  }
 
   // Render the main application
   return (
@@ -180,7 +180,7 @@ const AppContent = () => {
 
       <Analytics />
     </div>
-  );
-};
+  )
+}
 
-export { AppContent };
+export { AppContent }

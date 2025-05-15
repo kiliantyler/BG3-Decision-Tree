@@ -27,7 +27,7 @@
         "src/components/ui/*"
       ],
       "@layout/*": [
-        "src/components/layout/*"
+        "src/layouts/*"
       ],
     }
   },

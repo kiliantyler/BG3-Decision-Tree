@@ -1,7 +1,8 @@
+import { FlowChart } from '@/components/flowchart/flowchart'
+import '@/styles/customStyles.css'
 import { ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
-import '../../styles/customStyles.css'
-import '../../styles/theme.css'
+// import '../../styles/theme.css'
 
 // Components
 
@@ -10,6 +11,7 @@ import '../../styles/theme.css'
 function App() {
   return (
     <ReactFlowProvider>
+      <FlowChart />
       {/* <ThemeProvider>
         <DecisionProvider>
           <AppContent />
