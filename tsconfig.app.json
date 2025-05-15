@@ -21,7 +21,6 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
@@ -46,6 +45,12 @@
       ],
       "@style/*": [
         "src/styles/*"
+      ],
+      "@ui/*": [
+        "src/components/ui/*"
+      ],
+      "@layout/*": [
+        "src/components/layout/*"
       ],
     }
   },

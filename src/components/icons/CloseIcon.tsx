@@ -1,7 +1,4 @@
-// components/icons/MinusIcon.jsx
-import React from 'react';
-
-const MinusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
+const CloseIcon = ({ color = 'var(--badgeText)', size = 16 }) => {
   return (
     <div
       style={{
@@ -21,21 +18,19 @@ const MinusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
           display: 'block',
           overflow: 'visible',
         }}
-        {...props}
       >
-        <line
-          x1="5"
-          y1="12"
-          x2="19"
-          y2="12"
+        {/* X shape */}
+        <path
+          d="M18 6L6 18M6 6l12 12"
           stroke={color}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          fill="none"
         />
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default MinusIcon;
+export default CloseIcon

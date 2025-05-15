@@ -1,14 +1,13 @@
-// components/layout/App.jsx
-import { ReactFlowProvider } from 'reactflow';
-import 'reactflow/dist/style.css';
-import '../../styles/customStyles.css';
-import '../../styles/theme.css';
+import { ReactFlowProvider } from 'reactflow'
+import 'reactflow/dist/style.css'
+import '../../styles/customStyles.css'
+import '../../styles/theme.css'
 
 // Components
 
 // Context
 
-const App = () => {
+function App() {
   return (
     <ReactFlowProvider>
       {/* <ThemeProvider>
@@ -17,7 +16,7 @@ const App = () => {
         </DecisionProvider>
       </ThemeProvider> */}
     </ReactFlowProvider>
-  );
-};
+  )
+}
 
-export default App;
+export { App }

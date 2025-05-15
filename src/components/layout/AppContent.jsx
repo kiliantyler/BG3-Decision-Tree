@@ -183,4 +183,4 @@ const AppContent = () => {
   );
 };
 
-export default AppContent;
+export { AppContent };

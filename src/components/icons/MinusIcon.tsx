@@ -1,7 +1,6 @@
-// components/icons/PlusIcon.jsx
-import React from 'react';
+// components/icons/MinusIcon.jsx
 
-const PlusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
+const MinusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
   return (
     <div
       style={{
@@ -24,16 +23,6 @@ const PlusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
         {...props}
       >
         <line
-          x1="12"
-          y1="5"
-          x2="12"
-          y2="19"
-          stroke={color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <line
           x1="5"
           y1="12"
           x2="19"
@@ -45,7 +34,7 @@ const PlusIcon = ({ size = 24, color = 'currentColor', ...props }) => {
         />
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default PlusIcon;
+export default MinusIcon

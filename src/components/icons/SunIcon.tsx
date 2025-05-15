@@ -1,5 +1,3 @@
-import React from 'react';
-
 const SunIcon = ({ color = 'var(--purple)', size = 24 }) => {
   // Use inline SVG with explicit styling
   return (
@@ -36,11 +34,11 @@ const SunIcon = ({ color = 'var(--purple)', size = 24 }) => {
 
         {/* Sun rays */}
         {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
-          const radians = (angle * Math.PI) / 180;
-          const innerX = 12 + 5.5 * Math.cos(radians);
-          const innerY = 12 + 5.5 * Math.sin(radians);
-          const outerX = 12 + 8 * Math.cos(radians);
-          const outerY = 12 + 8 * Math.sin(radians);
+          const radians = (angle * Math.PI) / 180
+          const innerX = 12 + 5.5 * Math.cos(radians)
+          const innerY = 12 + 5.5 * Math.sin(radians)
+          const outerX = 12 + 8 * Math.cos(radians)
+          const outerY = 12 + 8 * Math.sin(radians)
 
           return (
             <line
@@ -53,11 +51,11 @@ const SunIcon = ({ color = 'var(--purple)', size = 24 }) => {
               strokeWidth="1.5"
               strokeLinecap="round"
             />
-          );
+          )
         })}
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default SunIcon;
+export default SunIcon

@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Using the red color from theme variables
 const ResetIcon = ({ color = 'var(--red)', size = 24 }) => {
   return (
@@ -41,7 +39,7 @@ const ResetIcon = ({ color = 'var(--red)', size = 24 }) => {
         </g>
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default ResetIcon;
+export default ResetIcon

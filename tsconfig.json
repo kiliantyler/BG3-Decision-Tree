@@ -1,7 +1,43 @@
 {
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@asset/*": [
+        "src/assets/*"
+      ],
+      "@component/*": [
+        "src/components/*"
+      ],
+      "@context/*": [
+        "src/contexts/*"
+      ],
+      "@data/*": [
+        "src/data/*"
+      ],
+      "@hook/*": [
+        "src/hooks/*"
+      ],
+      "@style/*": [
+        "src/styles/*"
+      ],
+      "@ui/*": [
+        "src/components/ui/*"
+      ],
+      "@layout/*": [
+        "src/components/layout/*"
+      ],
+    }
+  },
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ]
 }

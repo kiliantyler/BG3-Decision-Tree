@@ -1,6 +1,4 @@
-import React from 'react';
-
-const CloseIcon = ({ color = 'var(--badgeText)', size = 16 }) => {
+const MoonIcon = ({ color = 'var(--purple)', size = 24 }) => {
   return (
     <div
       style={{
@@ -21,9 +19,9 @@ const CloseIcon = ({ color = 'var(--badgeText)', size = 16 }) => {
           overflow: 'visible',
         }}
       >
-        {/* X shape */}
+        {/* Crescent moon */}
         <path
-          d="M18 6L6 18M6 6l12 12"
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
           stroke={color}
           strokeWidth="2"
           strokeLinecap="round"
@@ -32,7 +30,7 @@ const CloseIcon = ({ color = 'var(--badgeText)', size = 16 }) => {
         />
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default CloseIcon;
+export default MoonIcon

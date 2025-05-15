@@ -1,6 +1,6 @@
 // components/debug/DecisionsTab.jsx
 import React, { useRef, useState } from 'react';
-import Modal from '../../components/ui/Modal';
+import Modal from '../ui/Modal';
 import { useTheme } from '../../hooks/useTheme';
 import { themes } from '../../styles/themes/colorThemes';
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Using the cyan color from theme variables
 const SearchIcon = ({ color = 'var(--cyan)', size = 24 }) => {
   // Use inline SVG with explicit styling
@@ -63,7 +61,7 @@ const SearchIcon = ({ color = 'var(--cyan)', size = 24 }) => {
         </g>
       </svg>
     </div>
-  );
-};
+  )
+}
 
-export default SearchIcon;
+export default SearchIcon
