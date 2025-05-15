@@ -7,27 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "npm:install": "npm install",
-    "npm:dev": "npm run dev",
-    "npm:build": "npm run build",
-    "npm:preview": "npm run preview",
-    "npm:lint": "npm run lint",
-    "yarn:install": "yarn install",
-    "yarn:dev": "yarn dev",
-    "yarn:build": "yarn build",
-    "yarn:preview": "yarn preview",
-    "yarn:lint": "yarn lint",
-    "pnpm:install": "pnpm install",
-    "pnpm:dev": "pnpm dev",
-    "pnpm:build": "pnpm build",
-    "pnpm:preview": "pnpm preview",
-    "pnpm:lint": "pnpm lint",
-    "bun:install": "bun install",
-    "bun:dev": "bun dev",
-    "bun:build": "bun build",
-    "bun:preview": "bun preview",
-    "bun:lint": "bun lint"
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
@@ -45,10 +25,7 @@
   },
   "engines": {
     "node": ">=22.14.0",
-    "npm": ">=10.0.0",
-    "yarn": ">=3.0.0",
-    "pnpm": ">=8.0.0",
-    "bun": ">=1.0.0"
+    "npm": ">=10.0.0"
   },
   "packageManager": "npm@10.2.3"
 }
