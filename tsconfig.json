@@ -1,36 +1,4 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@asset/*": [
-        "src/assets/*"
-      ],
-      "@component/*": [
-        "src/components/*"
-      ],
-      "@context/*": [
-        "src/contexts/*"
-      ],
-      "@data/*": [
-        "src/data/*"
-      ],
-      "@hook/*": [
-        "src/hooks/*"
-      ],
-      "@style/*": [
-        "src/styles/*"
-      ],
-      "@ui/*": [
-        "src/components/ui/*"
-      ],
-      "@layout/*": [
-        "src/layouts/*"
-      ],
-    }
-  },
   "files": [],
   "references": [
     {
@@ -39,5 +7,13 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
 }

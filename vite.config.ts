@@ -9,15 +9,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@component': path.resolve(__dirname, './src/components'),
-      '@context': path.resolve(__dirname, './src/contexts'),
-      '@hook': path.resolve(__dirname, './src/hooks'),
-      '@data': path.resolve(__dirname, './src/data'),
-      '@style': path.resolve(__dirname, './src/styles'),
-      '@asset': path.resolve(__dirname, './src/assets'),
-      '@ui': path.resolve(__dirname, './src/components/ui'),
-      '@layout': path.resolve(__dirname, './src/components/layout'),
     },
-    extensions: ['.ts', '.tsx', '.json'],
   },
 })
