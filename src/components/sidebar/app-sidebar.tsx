@@ -1,5 +1,7 @@
+import DecisionNode from '@/components/sidebar/DecisionNode'
 import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader } from '@/components/ui/sidebar'
 import { Label } from '../ui/label'
+import { DecisionCard } from './decision-card'
 
 export function AppSidebar() {
   return (
@@ -9,7 +11,11 @@ export function AppSidebar() {
           <Label>BG3 Descision Tree</Label>
         </SidebarHeader>
         <SidebarGroup>
-          <Label>Decision Tree</Label>
+          <DecisionCard />
+          <DecisionNode
+            isAvailable={false}
+            item={{ id: 'example-id', label: 'Example Node', optional: true }}
+          />
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

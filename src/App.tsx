@@ -2,7 +2,8 @@ import { FlowChart } from '@/components/flowchart/flowchart'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ReactFlowProvider } from 'reactflow'
 import { AppSidebar } from './components/sidebar/app-sidebar'
-import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar'
+import { SidebarProvider } from './components/ui/sidebar'
+import { SidebarButton } from './components/ui/sidebarbutton'
 
 export function App() {
   return (
@@ -12,7 +13,7 @@ export function App() {
           {/* Reactflow needs full width and height in the surrounding container */}
           <AppSidebar />
           <FlowChart>
-            <SidebarTrigger className="absolute z-100" />
+            <SidebarButton className="absolute z-100 ml-4 mt-4" />
           </FlowChart>
           {/* <DecisionProvider>
           <AppContent />
