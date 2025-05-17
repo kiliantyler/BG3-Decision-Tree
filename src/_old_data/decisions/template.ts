@@ -5,7 +5,7 @@
  * Copy this file and fill in the values for your specific decision.
  */
 
-import type { Decision } from '@/types/decisions'
+import type { Decision } from '@/types/decision'
 
 export const decisionTemplate: Decision = {
   // Core fields (required)

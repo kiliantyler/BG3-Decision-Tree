@@ -1,4 +1,4 @@
-import { PlayableCharacterType } from '@/types/characters'
+import { PlayableCharacterType } from '@/types/character'
 
 /**
  * Type for an individual option within a decision
