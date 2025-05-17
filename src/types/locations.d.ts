@@ -18,3 +18,8 @@
  * Act 2 Locations
  *
  */
+
+export interface Location {
+  id: string
+  name: string
+}

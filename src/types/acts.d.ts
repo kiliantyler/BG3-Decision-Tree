@@ -1,7 +1,4 @@
-export enum Act {
-  Act1 = 'Act 1',
-  Act2 = 'Act 2',
-  Act3 = 'Act 3',
+export interface Act {
+  id: string
+  name: string
 }
-
-export type ActType = `${Act}`
