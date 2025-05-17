@@ -1,11 +1,12 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PlayableCharacter } from '@/data/characters/characters'
 
 export function DecisionCard() {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Card Title</CardTitle>
-        <CardDescription>Card Description</CardDescription>
+        <CardDescription>/characters/{PlayableCharacter.ASTARION}.png</CardDescription>
       </CardHeader>
       {/* <CardContent>
         <p>Card Content</p>
