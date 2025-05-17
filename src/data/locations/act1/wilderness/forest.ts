@@ -1,8 +1,10 @@
-import type { Sublocation } from '@/types/location'
+import { Act } from '@/data/acts'
+import type { Location } from '@/types/location'
 import { Wilderness } from './wilderness'
 
-export const Forest: Sublocation = {
+export const Forest: Location = {
   id: 'forest',
   name: 'Forest',
-  location: Wilderness,
+  act: Act.I,
+  region: Wilderness,
 }

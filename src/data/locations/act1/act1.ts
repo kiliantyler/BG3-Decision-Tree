@@ -1,13 +1,20 @@
 import {
+  AstralPlaneAct1,
+  AstralPlaneAct1Loc,
   BlightedVillage,
+  CrecheYllek,
   EmeraldGrove,
   Forest,
   GoblinCamp,
   MountainPass,
-  Nautoloid,
+  Nautiloid,
+  NautiloidLoc,
+  OvergrownRuins,
   RavagedBeach,
   RisenRoad,
-  Rosymorn,
+  RosymornMonastery,
+  RosymornMonasteryTrail,
+  RosymornMT,
   SecludedCove,
   SunlitWetlands,
   Underdark,
@@ -15,26 +22,39 @@ import {
   Wilderness,
 } from '.'
 
-export const Act1Locations = {
-  NAUTOLOID: Nautoloid,
-  WILDERNESS: Wilderness,
-  EMERALDGROVE: EmeraldGrove,
-  GOBLINCAMP: GoblinCamp,
-  ROSYMORN: Rosymorn,
-  MOUNTAINPASS: MountainPass,
+export const Act1Regions = {
+  NAUTILOID: Nautiloid,
+  ROSYMORN: RosymornMT,
   UNDERDARK: Underdark,
+  WILDERNESS: Wilderness,
+  ASTRALPLANEACT1: AstralPlaneAct1,
+}
+
+export type Act1Regions = (typeof Act1Regions)[keyof typeof Act1Regions]
+
+export const Act1Locations = {
+  // Astral Plane
+  ASTRALPLANEACT1: AstralPlaneAct1Loc,
+  // Nautiloid
+  NAUTILOID: NautiloidLoc,
+  // Wilderness
+  BLIGHTEDVILLAGE: BlightedVillage,
+  EMERALDGROVE: EmeraldGrove,
+  FOREST: Forest,
+  GOBLINCAMP: GoblinCamp,
+  MOUNTAINPASS: MountainPass,
+  OVERGROWNRUINS: OvergrownRuins,
+  RAVAGEDBEACH: RavagedBeach,
+  RISENROAD: RisenRoad,
+  SECLUDEDCOVE: SecludedCove,
+  SUNLITWETLANDS: SunlitWetlands,
+  WAUKEENSREST: WaukeensRest,
+  // Underdark
+
+  // Rosymorn Monastery Trail
+  CRECHEYLLEK: CrecheYllek,
+  ROSYMORNMONASTERY: RosymornMonastery,
+  ROSYMORNMONASTERYTRAIL: RosymornMonasteryTrail,
 }
 
 export type Act1Locations = (typeof Act1Locations)[keyof typeof Act1Locations]
-
-export const Act1Sublocations = {
-  RAVAGEDBEACH: RavagedBeach,
-  SECLUDEDCOVE: SecludedCove,
-  FOREST: Forest,
-  BLIGHTEDVILLAGE: BlightedVillage,
-  RISENROAD: RisenRoad,
-  WAUKEENSREST: WaukeensRest,
-  SUNLITWETLANDS: SunlitWetlands,
-}
-
-export type Act1Sublocations = (typeof Act1Sublocations)[keyof typeof Act1Sublocations]

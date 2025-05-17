@@ -1,5 +1,11 @@
-export enum Acts {
-  ACT1 = 'act1',
-  ACT2 = 'act2',
-  ACT3 = 'act3',
+import { Act1 } from './act1'
+import { Act2 } from './act2'
+import { Act3 } from './act3'
+
+export const Act = {
+  I: Act1,
+  II: Act2,
+  III: Act3,
 }
+
+export type Act = (typeof Act)[keyof typeof Act]

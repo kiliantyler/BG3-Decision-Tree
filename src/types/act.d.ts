@@ -1,4 +1,8 @@
+import type { Region } from '.'
+import type { ID } from './id'
+
 export interface Act {
-  id: string
+  id: ID
   name: string
+  regions: Region[]
 }

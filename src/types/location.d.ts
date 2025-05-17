@@ -1,13 +1,8 @@
-export interface Sublocation {
-  id: string
-  name: string
-  location: Location
-}
+import type { Act, ID, Region } from '.'
 
 export interface Location {
-  id: string
+  id: ID
   name: string
-  sublocations?: Sublocation[]
+  act: Act
+  region: Region
 }
-
-export type AnyLocation = Location | Sublocation

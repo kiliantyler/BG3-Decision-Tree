@@ -2,9 +2,9 @@ import { Act } from '@/data/acts'
 import type { Location } from '@/types/location'
 import { Wilderness } from './wilderness'
 
-export const RisenRoad: Location = {
-  id: 'risen_road',
-  name: 'Risen Road',
+export const OvergrownRuins: Location = {
+  id: 'overgrownruins',
+  name: 'Overgrown Ruins',
   act: Act.I,
   region: Wilderness,
 }

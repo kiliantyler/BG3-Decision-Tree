@@ -1,14 +1,16 @@
-/**
- * @file characters.d.ts
- * @description Type definitions for character data in the game.
- */
+import type { ID } from './id'
 
-export type Character = {
-  id: string
-  name: string
-  type: 'playable' | 'hireling' | 'npc' | 'camp_follower' | 'pet'
-  portrait?: string
-  description?: string
+export enum CharacterType {
+  PLAYABLE = 'playable',
+  HIRELING = 'hireling',
+  NPC = 'npc',
+  CAMPFOLLOWER = 'camp_follower',
+  PET = 'pet',
 }
 
-export type PlayableCharacterType = PartyCharacter
+export type Character = {
+  id: ID
+  name: string
+  type: CharacterType
+  description?: string
+}
