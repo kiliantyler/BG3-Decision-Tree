@@ -1,5 +1,5 @@
 import { Act } from '@/data/acts'
-import type { Location } from '@/types/location'
+import type { Location } from '@/types'
 import { Wilderness } from './wilderness'
 
 export const GoblinCamp: Location = {
