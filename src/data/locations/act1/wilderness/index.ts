@@ -1,3 +1,5 @@
+export * from './wilderness'
+
 export * from './blighted_village'
 export * from './emerald_grove'
 export * from './forest'
@@ -9,5 +11,4 @@ export * from './risen_road'
 export * from './secluded_cove'
 export * from './sunlit_wetlands'
 export * from './waukeens_rest'
-export * from './wilderness'
 export * from './wilderness_loc'

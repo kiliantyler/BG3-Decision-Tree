@@ -1,11 +1,17 @@
 import {
+  ArcaneTower,
   AstralPlaneAct1,
   AstralPlaneAct1Loc,
   BlightedVillage,
   CrecheYllek,
+  DecrepitVillage,
+  DreadHollow,
+  EbonlakeGrotto,
   EmeraldGrove,
+  FesteringCove,
   Forest,
   GoblinCamp,
+  Grymforge,
   MountainPass,
   Nautiloid,
   NautiloidLoc,
@@ -13,48 +19,63 @@ import {
   RavagedBeach,
   RisenRoad,
   RosymornMonastery,
+  RosymornMonasteryLoc,
   RosymornMonasteryTrail,
-  RosymornMT,
   SecludedCove,
+  SeluniteOutpost,
+  Storehouse,
   SunlitWetlands,
   Underdark,
+  UnderdarkLoc,
   WaukeensRest,
   Wilderness,
 } from '.'
 
 export const Act1Regions = {
-  NAUTILOID: Nautiloid,
-  ROSYMORN: RosymornMT,
-  UNDERDARK: Underdark,
-  WILDERNESS: Wilderness,
-  ASTRALPLANEACT1: AstralPlaneAct1,
+  Nautiloid: Nautiloid,
+  RosymornMonastery: RosymornMonastery,
+  Underdark: Underdark,
+  Wilderness: Wilderness,
+  AstralPlane: AstralPlaneAct1,
 }
 
 export type Act1Regions = (typeof Act1Regions)[keyof typeof Act1Regions]
 
 export const Act1Locations = {
   // Astral Plane
-  ASTRALPLANEACT1: AstralPlaneAct1Loc,
+  AstralPlane: AstralPlaneAct1Loc,
+
   // Nautiloid
-  NAUTILOID: NautiloidLoc,
+  Nautiloid: NautiloidLoc,
+
   // Wilderness
-  BLIGHTEDVILLAGE: BlightedVillage,
-  EMERALDGROVE: EmeraldGrove,
-  FOREST: Forest,
-  GOBLINCAMP: GoblinCamp,
-  MOUNTAINPASS: MountainPass,
-  OVERGROWNRUINS: OvergrownRuins,
-  RAVAGEDBEACH: RavagedBeach,
-  RISENROAD: RisenRoad,
-  SECLUDEDCOVE: SecludedCove,
-  SUNLITWETLANDS: SunlitWetlands,
-  WAUKEENSREST: WaukeensRest,
+  BlightedVillage: BlightedVillage,
+  EmeraldGrove: EmeraldGrove,
+  Forest: Forest,
+  GoblinCamp: GoblinCamp,
+  MountainPass: MountainPass,
+  OvergrownRuins: OvergrownRuins,
+  RavagedBeach: RavagedBeach,
+  RisenRoad: RisenRoad,
+  SecludedCove: SecludedCove,
+  SunlitWetlands: SunlitWetlands,
+  WaukeensRest: WaukeensRest,
+
   // Underdark
+  ArcaneTower: ArcaneTower,
+  DecrepitVillage: DecrepitVillage,
+  DreadHollow: DreadHollow,
+  EbonlakeGrotto: EbonlakeGrotto,
+  FesteringCove: FesteringCove,
+  Grymforge: Grymforge,
+  SeluniteOutpost: SeluniteOutpost,
+  Storehouse: Storehouse,
+  Underdark: UnderdarkLoc,
 
   // Rosymorn Monastery Trail
-  CRECHEYLLEK: CrecheYllek,
-  ROSYMORNMONASTERY: RosymornMonastery,
-  ROSYMORNMONASTERYTRAIL: RosymornMonasteryTrail,
+  CrecheYllek: CrecheYllek,
+  RosymornMonastery: RosymornMonasteryLoc,
+  RosymornMonasteryTrail: RosymornMonasteryTrail,
 }
 
 export type Act1Locations = (typeof Act1Locations)[keyof typeof Act1Locations]

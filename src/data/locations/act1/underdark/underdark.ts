@@ -2,7 +2,7 @@ import { Act } from '@/data/acts'
 import type { Region } from '@/types/region'
 import {
   ArcaneTower,
-  DecrepiVillage,
+  DecrepitVillage,
   DreadHollow,
   EbonlakeGrotto,
   FesteringCove,
@@ -20,7 +20,7 @@ export const Underdark: Region = {
     UnderdarkLoc,
     ArcaneTower,
     EbonlakeGrotto,
-    DecrepiVillage,
+    DecrepitVillage,
     DreadHollow,
     FesteringCove,
     SeluniteOutpost,

@@ -1,6 +1,6 @@
 // components/ui/IconButton.jsx
-import React, { forwardRef, useRef, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import React, { forwardRef, useRef, useState } from 'react'
+import { useTheme } from '../../../src/hooks/useTheme'
 
 /**
  * A reusable icon button component
@@ -29,31 +29,31 @@ const IconButton = forwardRef((props, ref) => {
     darkModeBorderColor = 'var(--border)',
     hoverBorderColor = 'var(--purple)',
     style = {},
-  } = props;
+  } = props
 
-  const { theme } = useTheme();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const internalButtonRef = useRef(null);
-  const buttonRef = ref || internalButtonRef;
+  const { theme } = useTheme()
+  const [isHovered, setIsHovered] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const internalButtonRef = useRef(null)
+  const buttonRef = ref || internalButtonRef
 
   // Determine position styles
   const getPositionStyles = () => {
     switch (position) {
       case 'top-left':
-        return { top: '10px', left: '10px' };
+        return { top: '10px', left: '10px' }
       case 'top-right':
-        return { top: '10px', right: '10px' };
+        return { top: '10px', right: '10px' }
       case 'bottom-left':
-        return { bottom: '10px', left: '10px' };
+        return { bottom: '10px', left: '10px' }
       case 'bottom-right':
-        return { bottom: '10px', right: '10px' };
+        return { bottom: '10px', right: '10px' }
       case 'fit-view': // Special case for fit view button
-        return { top: '10px', left: '60px' };
+        return { top: '10px', left: '60px' }
       default:
-        return { top: '10px', left: '10px' };
+        return { top: '10px', left: '10px' }
     }
-  };
+  }
 
   const baseStyle = {
     position: 'absolute',
@@ -72,7 +72,7 @@ const IconButton = forwardRef((props, ref) => {
     outline: 'none', // Remove default focus outline
     ...getPositionStyles(),
     ...style,
-  };
+  }
 
   // Apply dark theme specific styles
   const getThemeSpecificStyles = () => {
@@ -80,10 +80,10 @@ const IconButton = forwardRef((props, ref) => {
       return {
         backgroundColor: 'var(--currentLine)',
         borderColor: isHovered || isFocused ? hoverBorderColor : darkModeBorderColor,
-      };
+      }
     }
-    return {};
-  };
+    return {}
+  }
 
   // Apply hover/focus styles
   const getInteractionStyles = () => {
@@ -91,21 +91,21 @@ const IconButton = forwardRef((props, ref) => {
       return {
         backgroundColor: 'var(--selection)',
         transform: 'scale(1.05)',
-      };
+      }
     }
-    return {};
-  };
+    return {}
+  }
 
   // Handle click and blur focus
   const handleClick = e => {
     if (onClick) {
-      onClick(e);
+      onClick(e)
     }
     // Blur the button after click to remove focus
     if (buttonRef.current) {
-      buttonRef.current.blur();
+      buttonRef.current.blur()
     }
-  };
+  }
 
   return (
     <button
@@ -125,7 +125,7 @@ const IconButton = forwardRef((props, ref) => {
     >
       {children}
     </button>
-  );
-});
+  )
+})
 
-export default IconButton;
+export default IconButton

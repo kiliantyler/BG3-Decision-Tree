@@ -1,10 +1,10 @@
 import { Act } from '@/data/acts'
-import type { Location } from '@/types/location'
-import { RosymornMT } from '.'
+import type { Region } from '@/types/region'
+import { CrecheYllek, RosymornMonasteryLoc, RosymornMonasteryTrail } from '.'
 
-export const RosymornMonastery: Location = {
-  id: 'rosymornmonastery',
-  name: 'Rosymorn Monastery',
+export const RosymornMonastery: Region = {
+  id: 'rosymorn',
+  name: 'Rosymorn Monastery Trail',
   act: Act.I,
-  region: RosymornMT,
+  sublocations: [RosymornMonasteryLoc, RosymornMonasteryTrail, CrecheYllek],
 }

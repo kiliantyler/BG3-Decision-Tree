@@ -11,22 +11,22 @@ import {
 } from '.'
 
 export const Act2Regions = {
-  SHADOWFELL: Shadowfell,
-  SHADOWCURSE: ShadowCursedLands,
+  Shadowfell: Shadowfell,
+  ShadowCursedLands: ShadowCursedLands,
 }
 
 export type Act2Regions = (typeof Act2Regions)[keyof typeof Act2Regions]
 
 export const Act2Locations = {
   // Shadowfell
-  SHADOWFELL: ShadowfellLoc,
+  Shadowfell: ShadowfellLoc,
   // Shadow-Cursed Lands
-  SHADOWCURSE: ShadowCursedLandsLoc,
-  GRANDMAUSOLEUM: GrandMausoleum,
-  LASTLIGHT: LastLightInn,
-  MOONRISE: MoonriseTowers,
-  REITHWIN: ReithwinTown,
-  RUINEDBATTLEFIELD: RuinedBattlefield,
+  ShadowCursedLands: ShadowCursedLandsLoc,
+  GrandMausoleum: GrandMausoleum,
+  LastLightInn: LastLightInn,
+  MoonriseTowers: MoonriseTowers,
+  ReithwinTown: ReithwinTown,
+  RuinedBattlefield: RuinedBattlefield,
 }
 
 export type Act2Locations = (typeof Act2Locations)[keyof typeof Act2Locations]

@@ -1,3 +1,5 @@
+export * from './underdark'
+
 export * from './arcane_tower'
 export * from './decrepit_village'
 export * from './dread_hollow'
@@ -6,5 +8,4 @@ export * from './festering_cove'
 export * from './grymforge'
 export * from './selunite_outpost'
 export * from './storehouse'
-export * from './underdark'
 export * from './underdark_loc'

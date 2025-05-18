@@ -1,7 +1,8 @@
+export * from './shadowcursed'
+
 export * from './grand_mausoleum'
 export * from './last_light_inn'
 export * from './moonrise_towers'
 export * from './reithwin_town'
 export * from './ruined_battlefield'
-export * from './shadowcursed'
 export * from './shadowcursed_loc'
