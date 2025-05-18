@@ -1,6 +1,4 @@
-import { Act1 } from './act1'
-import { Act2 } from './act2'
-import { Act3 } from './act3'
+import { Act1, Act2, Act3 } from '.'
 
 export const Act = {
   I: Act1,
