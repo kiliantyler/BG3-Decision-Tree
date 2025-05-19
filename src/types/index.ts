@@ -1,0 +1,6 @@
+export * from './act.d'
+export * from './character.d'
+export * from './decision.d'
+export * from './id.d'
+export * from './location.d'
+export * from './region.d'
