@@ -1,4 +1,4 @@
-import type { Act } from '@/types/act'
+import type { Act } from '@/types'
 import { AstralPlaneAct1, Nautiloid, RosymornMonastery, Underdark, Wilderness } from '../locations'
 
 export const Act1: Act = {

@@ -1,4 +1,4 @@
-import type { Act } from '@/types/act'
+import type { Act } from '@/types'
 import { ShadowCursedLands, Shadowfell } from '../locations'
 
 export const Act2: Act = {

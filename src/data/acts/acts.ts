@@ -6,4 +6,4 @@ export const Act = {
   III: Act3,
 }
 
-export type Act = (typeof Act)[keyof typeof Act]
+export type ActType = (typeof Act)[keyof typeof Act]

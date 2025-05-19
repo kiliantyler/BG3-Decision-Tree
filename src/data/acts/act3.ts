@@ -1,4 +1,4 @@
-import type { Act } from '@/types/act'
+import type { Act } from '@/types'
 import {
   AstralPlaneAct3,
   HouseOfHope,

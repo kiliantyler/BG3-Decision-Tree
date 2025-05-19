@@ -1,4 +1,4 @@
-import { PlayableCharacterType } from '@/types/character'
+import type { Act, Character, ID } from '@/types'
 
 /**
  * Type for an individual option within a decision
@@ -27,15 +27,15 @@ export enum DecisionType {
  */
 export interface Decision {
   id: ID // Unique identifier (e.g., "nautiloid_start")
+  act: Act // Act in which the decision occurs
   type: DecisionType // Usually "decision" (or "outcome" for end states)
-  category: string // Category for sidebar grouping
   description: string // Full description of the situation
   options: DecisionOptions // Object of possible choices
   prerequisites?: Decision[] // Decisions that must be completed first
   unlocks?: Decision[] // Decisions this unlocks
   mutuallyExclusive?: Decision[] // Decisions that become unavailable
   required?: boolean // Is this required for progression?
-  requiredPartyMembers?: PlayableCharacterType[] // Required party members
+  requiredCharacter?: Character[] // Required party members
   wikiLink?: URL // Optional link to a wiki page for more information
 }
 

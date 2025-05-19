@@ -1,5 +1,5 @@
 import { Act } from '@/data/acts'
-import type { Region } from '@/types/region'
+import type { Region } from '@/types'
 import { AstralPlaneAct1Loc } from '.'
 
 export const AstralPlaneAct1: Region = {
