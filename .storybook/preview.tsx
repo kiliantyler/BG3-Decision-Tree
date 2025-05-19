@@ -1,5 +1,5 @@
 import '@/index.css'
-import type { Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react-vite'
 import React from 'react'
 import { ThemeProvider } from '../src/components/theme-provider'
 
