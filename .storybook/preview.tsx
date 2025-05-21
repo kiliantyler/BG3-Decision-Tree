@@ -22,14 +22,17 @@ export const globalTypes = {
     name: 'Theme',
     toolbar: {
       icon: 'paintbrush',
-      dynamicTitle: true,
       items: [
-        { value: 'dark', title: 'Dark', left: '🌙' },
-        { value: 'light', title: 'Light', left: '☀️' },
-        { value: 'system', title: 'System', left: '🖥️' },
+        { value: 'dark', title: 'Dark' },
+        { value: 'light', title: 'Light' },
+        { value: 'system', title: 'System' },
       ],
     },
   },
+}
+
+export const initialGlobals = {
+  theme: 'dark',
 }
 
 const UseThemeProvider: Decorator = (Story, context) => {
