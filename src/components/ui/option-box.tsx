@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const hoverVariants = cva(
-  'select-none truncate min-h-9 max-h-9 rounded-md border px-4 py-2 font-mono text-sm text-primary-foreground transition-all duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background',
+  'select-none truncate min-h-9 max-h-9 rounded-md border px-4 py-2 font-mono text-sm text-secondary-foreground transition-all duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background',
   {
     variants: {
       variant: {

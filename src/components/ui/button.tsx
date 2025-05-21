@@ -20,7 +20,7 @@ const buttonVariants = cva(
         hoverRing:
           'bg-primary select-none truncate rounded-md border px-4 py-2 text-primary-foreground duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background hover:ring-primary/80',
         hoverRingSecondary:
-          'bg-secondary select-none truncate border px-4 py-2 text-primary-foreground duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background hover:ring-primary/80',
+          'bg-secondary select-none truncate border px-4 py-2 text-secondary-foreground duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background hover:ring-primary/80',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
