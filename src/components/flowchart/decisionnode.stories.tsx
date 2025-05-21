@@ -1,5 +1,5 @@
+import { Intro } from '@/data/decisions/act1/nautiloid/intro'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-
 import { DecisionNode } from './decisionnode'
 
 const meta: Meta<typeof DecisionNode> = {
@@ -9,4 +9,8 @@ const meta: Meta<typeof DecisionNode> = {
 export default meta
 type Story = StoryObj<typeof DecisionNode>
 
-export const Primary: Story = {}
+export const Primary: Story = {
+  args: {
+    decision: Intro,
+  },
+}

@@ -10,13 +10,6 @@ export interface DecisionOption {
   mutuallyExclusive?: Decision[] // Decisions that become unavailable
 }
 
-/**
- * Type for the options object containing multiple decision options
- */
-export interface DecisionOptions {
-  [key: string]: DecisionOption
-}
-
 export enum DecisionType {
   DECISION = 'decision',
   OUTCOME = 'outcome',
@@ -30,7 +23,7 @@ export interface Decision {
   act: Act // Act in which the decision occurs
   type: DecisionType // Usually "decision" (or "outcome" for end states)
   description: string // Full description of the situation
-  options: DecisionOptions // Object of possible choices
+  options: DecisionOption[] // Object of possible choices
   prerequisites?: Decision[] // Decisions that must be completed first
   unlocks?: Decision[] // Decisions this unlocks
   mutuallyExclusive?: Decision[] // Decisions that become unavailable

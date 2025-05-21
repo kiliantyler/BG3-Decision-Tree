@@ -4,5 +4,6 @@ export interface Region {
   id: ID
   name: string
   act: Act
-  sublocations?: Location[]
+  sublocations: Location[] // Make this required, initialized as empty array
+  registerLocation: (location: Location) => void // Method to register a location
 }

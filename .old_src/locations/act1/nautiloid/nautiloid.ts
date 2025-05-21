@@ -1,10 +1,9 @@
 import { Act } from '@/data/acts'
 import type { Region } from '@/types'
-import { NautiloidLoc } from '.'
+import { createRegion } from '@/utils/region'
 
-export const Nautiloid: Region = {
+export const Nautiloid: Region = createRegion({
   id: 'nautoloid',
   name: 'Nautoloid',
   act: Act.I,
-  sublocations: [NautiloidLoc],
-}
+})
