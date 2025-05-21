@@ -9,7 +9,7 @@ const meta: Meta<typeof DecisionNode> = {
 export default meta
 type Story = StoryObj<typeof DecisionNode>
 
-export const Primary: Story = {
+export const Default: Story = {
   args: {
     decision: Intro,
   },

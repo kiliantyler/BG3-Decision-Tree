@@ -1,4 +1,4 @@
-import ReactFlow, { Background, Controls } from 'reactflow'
+import ReactFlow, { Background, BackgroundVariant, Panel } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 const proOptions = { hideAttribution: true }
@@ -6,7 +6,6 @@ const proOptions = { hideAttribution: true }
 function FlowChart({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-full">
-      {children}
       <ReactFlow
         nodes={[]}
         edges={[]}
@@ -18,8 +17,9 @@ function FlowChart({ children }: { children: React.ReactNode }) {
         maxZoom={2}
         proOptions={proOptions}
       >
-        <Background gap={12} size={1} />
-        <Controls />
+        <Background size={3} variant={BackgroundVariant.Cross} />
+        <Panel position="top-left">{children}</Panel>
+        {/* <Controls /> */}
       </ReactFlow>
     </div>
   )

@@ -6,10 +6,12 @@ import { SidebarProvider } from './components/ui/sidebar'
 import { SidebarButton } from './components/ui/sidebarbutton'
 
 export function App() {
+  const sidebarState = localStorage.getItem('sidebar') === 'true'
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <ReactFlowProvider>
-        <SidebarProvider className="w-full h-full">
+        <SidebarProvider defaultOpen={sidebarState} className="w-full h-full">
           {/* Reactflow needs full width and height in the surrounding container */}
           <AppSidebar />
           <FlowChart>

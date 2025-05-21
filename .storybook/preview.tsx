@@ -1,8 +1,12 @@
-import type { Preview } from '@storybook/react-vite'
-import { ThemeProvider } from '../src/components/theme-provider'
+import { Decorator, Preview } from '@storybook/react-vite'
+import { useEffect } from 'react'
+import { ThemeProvider, useTheme } from '../src/components/theme-provider'
 import '../src/index.css'
 
 const preview: Preview = {
+  initialGlobals: {
+    theme: 'dark',
+  },
   parameters: {
     controls: {
       matchers: {
@@ -11,13 +15,46 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [
-    Story => (
-      <ThemeProvider defaultTheme="system">
-        <Story />
-      </ThemeProvider>
-    ),
-  ],
 }
+
+export const globalTypes = {
+  theme: {
+    name: 'Theme',
+    toolbar: {
+      icon: 'paintbrush',
+      dynamicTitle: true,
+      items: [
+        { value: 'dark', title: 'Dark', left: '🌙' },
+        { value: 'light', title: 'Light', left: '☀️' },
+        { value: 'system', title: 'System', left: '🖥️' },
+      ],
+    },
+  },
+}
+
+const UseThemeProvider: Decorator = (Story, context) => {
+  const { theme } = context.globals
+
+  return (
+    <ThemeProvider defaultTheme={theme} storageKey="storyboard-ui-theme">
+      <ThemeUpdater theme={theme}>
+        <Story {...context} />
+      </ThemeUpdater>
+    </ThemeProvider>
+  )
+}
+
+// This component ensures theme updates happen inside the ThemeProvider context
+const ThemeUpdater = ({ theme, children }: { theme: string; children: React.ReactNode }) => {
+  const themeContext = useTheme()
+
+  useEffect(() => {
+    themeContext.setTheme(theme as 'dark' | 'light' | 'system')
+  }, [theme, themeContext])
+
+  return <>{children}</>
+}
+
+export const decorators = [UseThemeProvider]
 
 export default preview

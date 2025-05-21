@@ -15,9 +15,9 @@ export function SidebarButton({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="secondary"
+      variant="hoverRingSecondary"
       size="icon"
-      className={cn('size-10', 'muted-foreground', className)}
+      className={cn(className)}
       onClick={event => {
         onClick?.(event)
         toggleSidebar()
