@@ -26,8 +26,14 @@ const DecisionNode: React.FC<DecisionNodeProps> = ({ item, isAvailable }) => {
   const itemStyle: React.CSSProperties = {
     padding: '10px',
     margin: '8px 0',
-    backgroundColor: isAvailable ? (isOptional ? '#e0e0e0' : '#ffb84d') : '#f8f8f8',
-    border: isAvailable ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}` : '1px dashed #999',
+    backgroundColor: isAvailable
+      ? isOptional
+        ? '#e0e0e0'
+        : '#ffb84d'
+      : '#f8f8f8',
+    border: isAvailable
+      ? `1px solid ${isOptional ? '#bebebe' : '#ff9900'}`
+      : '1px dashed #999',
     borderRadius: '4px',
     cursor: isAvailable ? 'grab' : 'not-allowed',
     userSelect: 'none',
@@ -41,14 +47,18 @@ const DecisionNode: React.FC<DecisionNodeProps> = ({ item, isAvailable }) => {
   //   onDragStart(event, item.type || 'decision', item)
   // }
 
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleMouseEnter = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
     if (isAvailable) {
       e.currentTarget.style.transform = 'translateY(-2px)'
       e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)'
     }
   }
 
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleMouseLeave = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
     if (isAvailable) {
       e.currentTarget.style.transform = 'none'
       e.currentTarget.style.boxShadow = 'none'
@@ -75,7 +85,10 @@ const DecisionNode: React.FC<DecisionNodeProps> = ({ item, isAvailable }) => {
           marginBottom: '4px',
         }}
       >
-        <div className="item-title" style={{ fontWeight: 'bold' }}>
+        <div
+          className="item-title"
+          style={{ fontWeight: 'bold' }}
+        >
           {item.label}
         </div>
 
@@ -123,7 +136,10 @@ const DecisionNode: React.FC<DecisionNodeProps> = ({ item, isAvailable }) => {
         </div>
       </div>
 
-      <div className="item-description" style={{ fontSize: '0.8rem', color: '#666' }}>
+      <div
+        className="item-description"
+        style={{ fontSize: '0.8rem', color: '#666' }}
+      >
         {item.description?.substring(0, 60)}...
       </div>
 
@@ -137,7 +153,8 @@ const DecisionNode: React.FC<DecisionNodeProps> = ({ item, isAvailable }) => {
             color: '#999',
           }}
         >
-          <span style={{ fontWeight: 'bold' }}>Requires:</span> {item.prerequisites.join(', ')}
+          <span style={{ fontWeight: 'bold' }}>Requires:</span>{' '}
+          {item.prerequisites.join(', ')}
         </div>
       )}
     </div>

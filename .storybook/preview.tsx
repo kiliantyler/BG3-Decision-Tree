@@ -35,7 +35,15 @@ export const initialGlobals = {
   theme: 'dark',
 }
 
-const UseThemeProvider: Decorator = (Story, context) => {
+const paddingDecorator: Decorator = (Story, context) => {
+  return (
+    <div className="items-center justify-center p-4">
+      <Story {...context} />
+    </div>
+  )
+}
+
+const useThemeProvider: Decorator = (Story, context) => {
   const { theme } = context.globals
 
   return (
@@ -58,6 +66,6 @@ const ThemeUpdater = ({ theme, children }: { theme: string; children: React.Reac
   return <>{children}</>
 }
 
-export const decorators = [UseThemeProvider]
+export const decorators = [useThemeProvider, paddingDecorator]
 
 export default preview

@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SidebarProvider } from '@ui/sidebar'
 import { SidebarButton } from './sidebarbutton'
@@ -12,7 +13,7 @@ type Story = StoryObj<typeof SidebarButton>
 export const Primary: Story = {
   decorators: [
     Story => (
-      <SidebarProvider className="w-full h-100">
+      <SidebarProvider className={cn('h-100', 'w-full')}>
         <Story />
       </SidebarProvider>
     ),

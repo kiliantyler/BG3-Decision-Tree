@@ -15,23 +15,33 @@ import * as React from 'react'
 
 export function DecisionNode({ decision }: { decision: Decision }) {
   const [isOpen, setIsOpen] = React.useState(true)
-  const [chosenOption, setChosenOption] = React.useState<DecisionOption | undefined>(undefined)
+  const [chosenOption, setChosenOption] = React.useState<
+    DecisionOption | undefined
+  >(undefined)
 
   const handleClick = (option: DecisionOption | undefined) => {
     setChosenOption(option)
     setIsOpen(!isOpen)
   }
 
-  const renderedOptions = decision.options.map((option: DecisionOption, index) => (
-    <OptionBox key={index} onClick={() => handleClick(option)}>
-      {option.text}
-    </OptionBox>
-  ))
+  const renderedOptions = decision.options.map(
+    (option: DecisionOption, index) => (
+      <OptionBox
+        key={index}
+        onClick={() => handleClick(option)}
+      >
+        {option.text}
+      </OptionBox>
+    ),
+  )
 
   let openBox = (
-    <div className="w-[350px] flex flex-col space-y-2">
+    <div className={cn('flex', 'w-[350px]', 'flex-col', 'space-y-2')}>
       {chosenOption && (
-        <OptionBox variant={'destructive'} onClick={() => handleClick(undefined)}>
+        <OptionBox
+          variant={'destructive'}
+          onClick={() => handleClick(undefined)}
+        >
           {chosenOption.text}
         </OptionBox>
       )}
@@ -43,7 +53,9 @@ export function DecisionNode({ decision }: { decision: Decision }) {
   }
 
   const contextMenu = chosenOption ? (
-    <ContextMenuItem onClick={() => handleClick(undefined)}>Undo Decision</ContextMenuItem>
+    <ContextMenuItem onClick={() => handleClick(undefined)}>
+      Undo Decision
+    </ContextMenuItem>
   ) : (
     <></>
   )
@@ -54,13 +66,25 @@ export function DecisionNode({ decision }: { decision: Decision }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <Card className={cn('hover:cursor-pointer max-w-sm items-center', borderColor)}>
+        <Card
+          className={cn(
+            'max-w-sm',
+            'items-center',
+            'hover:cursor-pointer',
+            borderColor,
+          )}
+        >
           <CardTitle className="text-center">{decision.description}</CardTitle>
           <CardContent>
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <Collapsible
+              open={isOpen}
+              onOpenChange={setIsOpen}
+            >
               {openBox}
               <CollapsibleContent>
-                <div className="w-[350px] flex flex-col space-y-2">{renderedOptions}</div>
+                <div className={cn('flex w-[350px]', 'flex-col', 'space-y-2')}>
+                  {renderedOptions}
+                </div>
               </CollapsibleContent>
             </Collapsible>
           </CardContent>
@@ -68,7 +92,9 @@ export function DecisionNode({ decision }: { decision: Decision }) {
       </ContextMenuTrigger>
       <ContextMenuContent>
         {contextMenu}
-        <ContextMenuItem className="text-destructive">Delete node</ContextMenuItem>
+        <ContextMenuItem className={cn('text-destructive')}>
+          Delete node
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   )

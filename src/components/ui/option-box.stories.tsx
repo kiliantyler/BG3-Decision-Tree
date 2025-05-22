@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { OptionBox } from './option-box'
 
@@ -5,7 +6,7 @@ const meta: Meta<typeof OptionBox> = {
   component: OptionBox,
   decorators: [
     Story => (
-      <div className="max-w-sm">
+      <div className={cn('max-w-sm')}>
         <Story />
       </div>
     ),

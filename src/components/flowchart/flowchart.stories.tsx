@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SidebarProvider } from '@ui/sidebar'
 import { ReactFlowProvider } from 'reactflow'
@@ -15,7 +16,7 @@ export const Primary: Story = {
   decorators: [
     Story => (
       <ReactFlowProvider>
-        <SidebarProvider className="w-full h-100">
+        <SidebarProvider className={cn('h-100', 'w-full')}>
           <Story>
             <SidebarButton />
           </Story>

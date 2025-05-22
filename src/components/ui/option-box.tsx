@@ -1,9 +1,13 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 import { cn } from '@/lib/utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const hoverVariants = cva(
-  'select-none truncate min-h-9 max-h-9 rounded-md border px-4 py-2 font-mono text-sm text-secondary-foreground transition-all duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background',
+  'bg-secondary select-none truncate min-h-9 max-h-9 rounded-md border px-4 py-2 font-mono text-sm text-secondary-foreground transition-all duration-300 hover:ring-2 hover:ring-offset-1 hover:ring-offset-background',
   {
     variants: {
       variant: {
@@ -14,7 +18,7 @@ const hoverVariants = cva(
     defaultVariants: {
       variant: 'default',
     },
-  }
+  },
 )
 
 function OptionBox({
@@ -24,11 +28,21 @@ function OptionBox({
 }: React.ComponentProps<'div'> & VariantProps<typeof hoverVariants>) {
   return (
     <div>
-      <HoverCard openDelay={100} closeDelay={100}>
+      <HoverCard
+        openDelay={100}
+        closeDelay={100}
+      >
         <HoverCardTrigger>
-          <p className={cn(hoverVariants({ variant }), className)} {...props} />
+          <p
+            className={cn(hoverVariants({ variant }), className)}
+            {...props}
+          />
         </HoverCardTrigger>
-        <HoverCardContent sideOffset={5} side="right" {...props} />
+        <HoverCardContent
+          sideOffset={5}
+          side="right"
+          {...props}
+        />
       </HoverCard>
     </div>
   )

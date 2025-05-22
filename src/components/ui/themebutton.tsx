@@ -3,7 +3,11 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Moon } from 'lucide-react'
 
-export function ThemeButton({ className, onClick, ...props }: React.ComponentProps<typeof Button>) {
+export function ThemeButton({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<typeof Button>) {
   // const { setTheme } = useTheme()
 
   return (
@@ -18,8 +22,8 @@ export function ThemeButton({ className, onClick, ...props }: React.ComponentPro
       }}
       {...props}
     >
-      <Moon className="size-5" />
-      <span className="sr-only">Toggle Sidebar</span>
+      <Moon className={cn('size-5')} />
+      <span className={cn('sr-only')}>Toggle Sidebar</span>
     </Button>
   )
 }

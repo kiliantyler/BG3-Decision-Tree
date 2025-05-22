@@ -1,4 +1,12 @@
-import { Astarion, DarkUrge, Gale, Karlach, Laezel, Shadowheart, Wyll } from './origin'
+import {
+  Astarion,
+  DarkUrge,
+  Gale,
+  Karlach,
+  Laezel,
+  Shadowheart,
+  Wyll,
+} from './origin'
 
 export const OriginCharacter = {
   Astarion: Astarion,

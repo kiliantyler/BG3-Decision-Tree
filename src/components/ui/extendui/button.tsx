@@ -1,15 +1,15 @@
-import { Slot } from '@radix-ui/react-slot';
-import { Tooltip } from '@radix-ui/react-tooltip';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Loader2 } from 'lucide-react';
-import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot'
+import { Tooltip } from '@radix-ui/react-tooltip'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Loader2 } from 'lucide-react'
+import * as React from 'react'
 
 import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+} from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
@@ -50,15 +50,15 @@ const buttonVariants = cva(
       size: 'default',
     },
   },
-);
+)
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-  loading?: boolean;
-  loadingText?: string;
-  tooltipText?: string;
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+  loading?: boolean
+  loadingText?: string
+  tooltipText?: string
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -76,7 +76,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : 'button';
+    const Comp = asChild ? Slot : 'button'
     const content = loading ? (
       <>
         {size == 'icon' ? (
@@ -84,13 +84,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {loadingText}
-            <Loader2 className={cn('ml-2 h-4 w-4 animate-spin')} />
+            <Loader2 className={cn('ml-2', 'h-4', 'w-4', 'animate-spin')} />
           </>
         )}
       </>
     ) : (
       children
-    );
+    )
 
     return tooltipText ? (
       <TooltipProvider>
@@ -117,9 +117,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {content}
       </Comp>
-    );
+    )
   },
-);
-Button.displayName = 'Button';
+)
+Button.displayName = 'Button'
 
-export { Button, buttonVariants };
+export { Button, buttonVariants }
