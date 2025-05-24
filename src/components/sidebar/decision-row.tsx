@@ -1,11 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { useSidebar } from '@/components/ui/sidebar'
 import {
   Tooltip,
@@ -13,9 +5,14 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import type { Decision } from '@/types'
 import { Badge } from '../ui/badge'
 
-export function DecisionRow() {
+export interface DecisionRowProps {
+  decision: Decision
+}
+
+export function DecisionRow({ decision }: DecisionRowProps) {
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed'
 
@@ -25,91 +22,77 @@ export function DecisionRow() {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="select-none">
-            <Card
+            <div
               className={cn(
                 'flex',
-                'h-12',
-                'w-12',
+                'h-10',
+                'w-10',
                 'items-center',
                 'justify-center',
                 'rounded-md',
+                'bg-secondary/50',
+                'hover:bg-secondary',
                 'transition-all',
               )}
             >
-              <CardContent
-                className={cn(
-                  'flex',
-                  'h-full',
-                  'w-full',
-                  'items-center',
-                  'justify-center',
-                  'p-2',
-                )}
-              >
-                <p className={cn('font-medium')}>CT</p>
-              </CardContent>
-            </Card>
+              <p className={cn('font-medium', 'text-sm')}>
+                {decision.id.substring(0, 2).toUpperCase()}
+              </p>
+            </div>
           </div>
         </TooltipTrigger>
         <TooltipContent
           side="right"
-          align="center"
+          align="start"
+          sideOffset={10}
+          className="bg-popover border-border w-60 border p-2 shadow-md"
         >
           <div>
-            <p className={cn('font-medium')}>Card Title</p>
-            <p className={cn('text-xs', 'text-muted-foreground')}>
-              Card Description
-            </p>
+            <p className={cn('font-medium')}>{decision.description}</p>
+            {decision.options.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <p className="text-sm font-medium">Options:</p>
+                <ul className="ml-2 space-y-0.5 text-xs">
+                  {decision.options.map((option, idx) => (
+                    <li
+                      key={idx}
+                      className="text-muted-foreground"
+                    >
+                      • {option.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </TooltipContent>
       </Tooltip>
     )
   }
 
-  // Normal version of the card
-
+  // Normal version - simplified to match the sidebar section style
   return (
-    <div className="px-2">
-      <Card className={cn('transition-all', isCollapsed && 'h-12 w-12')}>
-        <CardHeader className="grid-cols-4">
-          <CardTitle className="col-span-3">Card Title</CardTitle>
+    <div
+      className={cn(
+        'group rounded-md px-2.5 py-1',
+        'hover:bg-secondary/50 border transition-all',
+        decision.required ? 'border-primary' : 'border-border/60 border-dashed',
+      )}
+    >
+      <div className="flex flex-col overflow-hidden">
+        <div className="truncate font-medium">{decision.description}</div>
+        <div className="flex items-center justify-between">
           <Badge
-            variant={'secondary'}
-            className="justify-self-end"
+            variant={decision.required ? 'default' : 'secondary'}
+            className={cn(
+              'mt-0.5 shrink-0 text-xs opacity-70 group-hover:opacity-100',
+              decision.required ? 'bg-primary text-primary-foreground' : '',
+            )}
           >
-            Optional
+            {decision.required ? 'Required' : 'Optional'}
           </Badge>
-          <CardDescription className="col-span-4">
-            Card Description
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    </div>
-  )
-
-  // Expanded version of the card
-  return (
-    <div className="px-2">
-      <Card className={cn('transition-all', isCollapsed && 'h-12 w-12')}>
-        <CardHeader className="grid-cols-4">
-          <CardTitle className="col-span-3">Card Title</CardTitle>
-          <Badge
-            variant={'secondary'}
-            className="justify-self-end"
-          >
-            Optional
-          </Badge>
-          <CardDescription className="col-span-4">
-            Card Description
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Card Content</p>
-        </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

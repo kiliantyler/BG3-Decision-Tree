@@ -4,9 +4,10 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from '@/components/ui/sidebar'
+import { getDecisionsByActAndRegion } from '@/data/decisions'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@ui/scroll-area'
-import { DecisionRow } from './decision-row'
+import { ActSection } from './act-section'
 
 export function AppSidebar() {
   return (
@@ -18,15 +19,24 @@ export function AppSidebar() {
           </span>
         </SidebarHeader>
         <SidebarGroup>
-          <ScrollArea>
-            <DecisionRow />
-            <DecisionRow />
-            <DecisionRow />
+          <ScrollArea className="h-[calc(100vh-70px)] overflow-hidden">
+            <div className="space-y-2 p-2 pr-2">
+              {getDecisionsByActAndRegion().map((actGroup, index) => (
+                <ActSection
+                  key={actGroup.act.id}
+                  act={actGroup.act}
+                  regions={actGroup.regions}
+                  defaultOpen={index === 0} // Only expand the first act by default
+                />
+              ))}
+
+              {getDecisionsByActAndRegion().length === 0 && (
+                <div className="px-4 py-2 text-sm text-muted-foreground">
+                  No decisions found
+                </div>
+              )}
+            </div>
           </ScrollArea>
-          {/* <DecisionNode
-            isAvailable={false}
-            item={{ id: 'example-id', label: 'Example Node', optional: true }}
-          /> */}
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

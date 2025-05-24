@@ -35,5 +35,6 @@
   },
   "include": [
     "src",
+    ".old_src/_old_components/DecisionNode.tsx",
   ]
 }
