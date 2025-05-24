@@ -5,6 +5,7 @@ import {
   SidebarHeader,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
+import { ScrollArea } from '@ui/scroll-area'
 import { DecisionRow } from './decision-row'
 
 export function AppSidebar() {
@@ -17,7 +18,11 @@ export function AppSidebar() {
           </span>
         </SidebarHeader>
         <SidebarGroup>
-          <DecisionRow />
+          <ScrollArea>
+            <DecisionRow />
+            <DecisionRow />
+            <DecisionRow />
+          </ScrollArea>
           {/* <DecisionNode
             isAvailable={false}
             item={{ id: 'example-id', label: 'Example Node', optional: true }}

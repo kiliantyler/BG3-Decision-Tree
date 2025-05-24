@@ -36,11 +36,7 @@
   // Path intellisense
   "path-intellisense.mappings": {
     "@": "${workspaceFolder}/src",
-    "components": "${workspaceFolder}/src/components",
-    "contexts": "${workspaceFolder}/src/contexts",
-    "hooks": "${workspaceFolder}/src/hooks",
-    "data": "${workspaceFolder}/src/data",
-    "styles": "${workspaceFolder}/src/styles"
+    "@ui": "${workspaceFolder}/src/components/ui",
   },
   // File associations
   "files.associations": {
