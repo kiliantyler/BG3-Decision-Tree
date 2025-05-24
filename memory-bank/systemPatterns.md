@@ -17,6 +17,11 @@ graph TD
     FlowChart --> ReactFlow
     ReactFlow --> Background
     ReactFlow --> Panel
+    ReactFlow --> DecisionNode[Custom DecisionNode]
+    DecisionNode --> Card
+    DecisionNode --> Collapsible
+    DecisionNode --> OptionBox
+    DecisionNode --> ContextMenu
     AppSidebar --> DecisionList
     DecisionList --> DecisionRow
 ```
@@ -31,6 +36,25 @@ graph LR
     UserInteraction --> DecisionManager
     DecisionManager --> StateUpdates
     StateUpdates --> UI[UI Components]
+    UserInteraction --> DecisionNode
+    DecisionNode --> LocalState[Local State]
+    LocalState --> RenderUpdate[Re-rendering]
+```
+
+### State Management
+
+```mermaid
+graph TD
+    GlobalState[Global Decision State] --> ReactContext
+    ReactContext --> FlowChartComponent
+    ReactContext --> SidebarComponent
+    LocalState[Local Component State] --> DecisionNodeComponent
+    LocalState --> UIInteractions
+    UserAction[User Action] --> LocalState
+    UserAction --> GlobalState
+    GlobalState --> NodeRelationships[Node Relationships]
+    NodeRelationships --> EdgeVisibility
+    NodeRelationships --> NodeAvailability
 ```
 
 ## Key Technical Decisions
@@ -43,6 +67,8 @@ graph LR
 6. **Radix UI**: Using accessible UI primitives for complex interactions
 7. **Vite**: Fast build tooling and development server
 8. **Storybook**: Component documentation and testing
+9. **Local Component State**: Managing UI state within components
+10. **Context API**: Using React Context for global state management
 
 ## Design Patterns
 
@@ -52,6 +78,8 @@ graph LR
 2. **Provider Pattern**: Context providers for theme, sidebar, and potentially decisions
 3. **Controlled Components**: Managing component state through props and callbacks
 4. **Custom Hooks**: Encapsulating reusable logic (e.g., useMobile)
+5. **Component Composition**: Building complex UI from simpler components
+6. **Render Props**: Using children as a function to customize rendering
 
 ### State Management Patterns
 
@@ -59,6 +87,8 @@ graph LR
 2. **Local Component State**: For UI state specific to individual components
 3. **Props Drilling**: For passing data down the component tree where appropriate
 4. **Event Handlers**: For managing user interactions and state updates
+5. **Immutable Updates**: Using immutable patterns for state updates
+6. **State Lifting**: Moving state up to common ancestors when needed
 
 ### Data Patterns
 
@@ -66,35 +96,75 @@ graph LR
 2. **Data Normalization**: Organizing related data for efficient access and updates
 3. **Immutable Updates**: Using immutable patterns for state updates
 4. **Lazy Loading**: Loading data as needed to improve performance
+5. **Structured Data Organization**: Organizing by acts, regions, and locations
 
 ## Component Relationships
 
 ### FlowChart Component
 
 - **Purpose**: Main visualization component for the decision tree
-- **Dependencies**: ReactFlow, Background, Panel
-- **State**: Manages nodes, edges, and their relationships
-- **Interactions**: Handles node placement, connections, and user interactions
+- **Dependencies**:
+  - ReactFlow: For node-based UI rendering
+  - Background: For visual grid
+  - Panel: For UI controls positioning
+  - SidebarButton: For toggling sidebar
+- **State**:
+  - Currently empty nodes and edges arrays
+  - Empty handlers for node/edge changes and connections
+- **Interactions**:
+  - Will handle node placement, connections, and user interactions
+  - Currently configured with zoom controls (0.1 to 2x)
+  - Attribution hidden via proOptions
 
 ### DecisionNode Component
 
 - **Purpose**: Represents a single decision point in the game
-- **Dependencies**: Card, Collapsible, ContextMenu, OptionBox
-- **State**: Tracks open/closed state and selected option
-- **Interactions**: Allows users to select options and view consequences
+- **Dependencies**:
+  - Card: Container for visual styling
+  - CardTitle: For decision description
+  - CardContent: For content layout
+  - Collapsible: For expanding/collapsing options
+  - ContextMenu: For additional actions
+  - OptionBox: For displaying decision options
+- **State**:
+  - Tracks open/closed state with React.useState
+  - Tracks selected option with React.useState
+- **Interactions**:
+  - Allows users to select options via handleClick function
+  - Provides context menu for undoing decisions and deletion
+  - Changes border color based on selection state
+  - Shows/hides options via collapsible component
 
 ### AppSidebar Component
 
 - **Purpose**: Provides access to available decisions and filters
-- **Dependencies**: SidebarProvider, DecisionRow
-- **State**: Manages sidebar visibility and selected filters
-- **Interactions**: Allows dragging decisions to the canvas and filtering options
+- **Dependencies**:
+  - SidebarProvider: For sidebar visibility state
+  - DecisionRow: For individual decision items
+- **State**:
+  - Manages sidebar visibility (through context)
+  - Will manage filters and selected decisions
+- **Interactions**:
+  - Will allow dragging decisions to the canvas
+  - Will provide filtering options
+  - Current implementation details pending further development
+
+### OptionBox Component
+
+- **Purpose**: Visual representation of decision options
+- **Dependencies**:
+  - Button or similar base component
+- **State**:
+  - Receives variant and onClick props for customization
+- **Interactions**:
+  - Handles click events for option selection
+  - Visual styling based on variant (e.g., destructive for removal)
 
 ## Critical Implementation Paths
 
 ### Decision Tree Rendering
 
-1. Load decision data from structured sources
+1. Load decision data from structured sources (acts/, characters/, decisions/)
 2. Process relationships between decisions (prerequisites, unlocks)
 3. Create initial node structure for ReactFlow
 4. Render nodes and connections
@@ -104,9 +174,24 @@ graph LR
 
 1. User selects a decision node
 2. User chooses an option from available choices
-3. System updates the decision state
+3. System updates the decision state:
+   - Currently local to DecisionNode component
+   - Will be integrated with global state
 4. System determines newly available or unavailable decisions
-5. UI updates to reflect the new state (new nodes appear, some become unavailable)
+5. UI updates to reflect the new state:
+   - Currently changes border color
+   - Future: new nodes appear, some become unavailable
+
+### ReactFlow Integration
+
+1. Setup ReactFlow with configuration options
+2. Define custom node types mapped to DecisionNode
+3. Create data structures for nodes and edges
+4. Implement node positioning and layout algorithms
+5. Implement interaction handlers:
+   - onNodesChange
+   - onEdgesChange
+   - onConnect
 
 ### Data Management
 
@@ -114,6 +199,7 @@ graph LR
 2. Organize decision data by acts and locations
 3. Establish relationships between decisions (prerequisites, unlocks, mutual exclusivity)
 4. Provide efficient access patterns for filtering and searching decisions
+5. Create a central store for decision state
 
 ## Error Handling and Edge Cases
 
@@ -121,11 +207,42 @@ graph LR
 2. **Circular Dependencies**: Detection and prevention of circular prerequisites
 3. **Performance Optimization**: Strategies for handling large decision trees
 4. **User Mistakes**: Support for undoing decisions and reorganizing the flowchart
+5. **Empty State**: Handling first-time usage with empty flowchart
+6. **Invalid Selections**: Preventing selection of mutually exclusive options
 
 ## Future Architecture Considerations
 
-1. **Persistence Layer**: Adding support for saving and loading flowcharts
-2. **Backend Integration**: Potential for server-side storage and sharing
-3. **Mobile Responsiveness**: Adapting the UI for smaller screens
-4. **Offline Support**: Enabling offline usage with local storage
-5. **Extensibility**: Architecture that supports adding new features and data
+1. **Global State Management**:
+
+   - Consider implementing a more robust state management solution
+   - Options include Context API with useReducer, Redux, or Zustand
+   - Need to handle complex state relationships between decisions
+
+2. **Persistence Layer**:
+
+   - Adding support for saving and loading flowcharts
+   - Local storage for client-side persistence
+   - Potential for server-side storage in the future
+
+3. **Performance Optimization**:
+
+   - Virtualization for large decision trees
+   - Efficient re-rendering strategies
+   - Memoization of expensive calculations
+
+4. **Mobile Responsiveness**:
+
+   - Adapting the UI for smaller screens
+   - Specialized touch interactions
+   - Simplified view for limited screen real estate
+
+5. **Extensibility**:
+
+   - Architecture that supports adding new features
+   - Pluggable system for different game data
+   - API abstraction for potential backend integration
+
+6. **Advanced Node Management**:
+   - Auto-layout algorithms for complex flowcharts
+   - Grouping and folding for related decisions
+   - Multi-select and bulk operations

@@ -45,7 +45,9 @@
   // File associations
   "files.associations": {
     "*.jsx": "javascriptreact",
-    "*.js": "javascript"
+    "*.js": "javascript",
+    ".clineignore": "ignore",
+    ".clinerules": "plaintext",
   },
   // Search settings
   "search.exclude": {

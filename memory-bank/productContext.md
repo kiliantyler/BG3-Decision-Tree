@@ -20,6 +20,8 @@ This project exists to address these challenges by providing a visual tool that 
 4. **Content Discovery**: Helps players discover content they might otherwise miss
 5. **Companion Management**: Assists in planning which companions to bring for specific quests
 6. **Quest Tracking**: Provides a clear view of quest dependencies and mutual exclusivity
+7. **Decision Reversibility**: Allows players to experiment with different choices without replaying the game
+8. **Progress Tracking**: Helps players keep track of their current position in complex questlines
 
 ## How It Should Work
 
@@ -36,22 +38,78 @@ This project exists to address these challenges by providing a visual tool that 
 ### Core Functionality
 
 1. **Dynamic Flowchart**: The flowchart updates in real-time as users make decisions
+   - ReactFlow provides the technical foundation for this interactivity
+   - Custom node types allow for specialized decision representations
+   - Edge connections visualize relationships between decisions
 2. **Decision Nodes**: Each node represents a key decision point with multiple options
+   - Collapsible interface shows/hides available options
+   - Visual feedback indicates selected options
+   - Context menu provides additional actions
 3. **Consequence Visualization**: Visual indicators show the impact of each choice
+   - Border colors differentiate selected vs. unselected nodes
+   - Future: different node styles for required vs. optional decisions
 4. **Prerequisite Linking**: Nodes automatically connect to their prerequisites
+   - Edges will represent relationships between decisions
+   - Future: different edge styles for different types of relationships
 5. **Filtering System**: Users can filter by act, location, or decision type
+   - Sidebar will provide filtering options
+   - Future: search functionality for finding specific decisions
 6. **Search Capability**: Users can search for specific decisions or characters
 7. **Optional vs. Required**: Clear distinction between required story decisions and optional content
+
+### Information Architecture
+
+1. **Act Structure**: Content organized by game acts (Act 1, 2, 3)
+2. **Location Hierarchy**: Decisions grouped by locations within each act
+3. **Decision Types**:
+   - Main Quest: Critical path decisions
+   - Side Quest: Optional content
+   - Companion: Decisions affecting companions
+   - Special: Unique or rare decisions
+4. **Relationship Types**:
+   - Prerequisites: Decisions required before others become available
+   - Unlocks: New content made available by decisions
+   - Blocks: Content made unavailable by decisions
+   - Affects: Decisions that influence but don't determine other content
+
+### Interaction Model
+
+1. **Selection**: Click on decision nodes to interact with them
+2. **Expansion**: Collapsible nodes expand to show options
+3. **Navigation**: Pan and zoom to explore the flowchart
+4. **Drag and Drop**: Add decisions from sidebar to flowchart
+5. **Context Actions**: Right-click for additional options
+6. **Visual Feedback**: Color changes and animations to indicate state
 
 ## User Experience Goals
 
 1. **Intuitive Interface**: Users should understand how to use the tool with minimal instruction
+   - Clear visual design
+   - Consistent interaction patterns
+   - Helpful tooltips and guidance
 2. **Visual Clarity**: The flowchart should be easy to read and understand
+   - Clear node layout
+   - Distinct visual elements
+   - Appropriate spacing and organization
 3. **Responsive Interaction**: The application should respond quickly to user actions
+   - Immediate feedback for selections
+   - Smooth animations for state changes
+   - Efficient rendering even with large flowcharts
 4. **Flexibility**: Users should be able to easily modify their decisions and see updated paths
+   - Undo/redo capabilities
+   - Easy decision changes
+   - Clear consequences of changes
 5. **Accessibility**: The tool should be usable by players with different levels of gaming experience
+   - Clear labeling
+   - Keyboard navigation
+   - Screen reader support
 6. **Spoiler Management**: Users should be able to control the level of detail shown to avoid unwanted spoilers
+   - Progressive disclosure of information
+   - Options to hide certain details
 7. **Efficiency**: Users should be able to quickly find and make decisions without unnecessary complexity
+   - Streamlined workflows
+   - Effective search and filtering
+   - Logical organization
 
 ## Target Audience
 
@@ -68,3 +126,25 @@ This project exists to address these challenges by providing a visual tool that 
 3. **Feature Utilization**: Usage of filtering, search, and organization features
 4. **User Satisfaction**: Feedback on how well the tool helps with game planning
 5. **Community Adoption**: Sharing and discussion of the tool in BG3 communities
+6. **Decision Coverage**: Percentage of game decisions represented in the tool
+7. **Technical Performance**: Rendering and interaction speeds with large flowcharts
+
+## Current Development Focus
+
+The current development focuses on building the core flowchart functionality:
+
+1. **Decision Node Implementation**: Creating interactive decision nodes with option selection
+2. **Flowchart Foundation**: Establishing the ReactFlow integration for visualization
+3. **Data Structure**: Defining the TypeScript interfaces for game data
+4. **UI Components**: Building reusable components for the interface
+5. **State Management**: Developing the approach for tracking decision states
+
+## Future Enhancements
+
+1. **Local Storage**: Saving flowcharts between sessions
+2. **Import/Export**: Sharing flowcharts with others
+3. **Detailed Consequences**: More in-depth information about decision outcomes
+4. **Character Stats**: Filtering decisions based on character builds
+5. **Mobile Optimization**: Better experience on smaller screens
+6. **Community Features**: Voting on best paths, commenting on decisions
+7. **Companion Focus**: Views centered around maximizing specific companion relationships
