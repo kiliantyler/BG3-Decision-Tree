@@ -31,10 +31,14 @@
       "@ui/*": [
         "./src/components/ui/*"
       ],
+      "@mock/*": [
+        "./mock/*"
+      ]
     }
   },
   "include": [
     "src",
     ".old_src/_old_components/DecisionNode.tsx",
+    "mock"
   ]
 }

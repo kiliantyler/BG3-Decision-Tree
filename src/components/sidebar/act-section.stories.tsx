@@ -1,6 +1,8 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Act } from '@/data/acts'
 import { DecisionType } from '@/types'
+// Import mock decision data for stories
+import { getDecisionsByActAndRegion } from '@mock/decisions'
 import type { Meta, StoryObj } from '@storybook/react'
 import { ActSection } from './act-section'
 
@@ -83,35 +85,32 @@ const mockRegions = [
   },
 ]
 
+// Use mock data for stories
+const mockActGroups = getDecisionsByActAndRegion()
+const act1Group = mockActGroups.find(group => group.act.id === 'act1')
+const act2Group = mockActGroups.find(group => group.act.id === 'act2')
+const act3Group = mockActGroups.find(group => group.act.id === 'act3')
+
 export const Default: Story = {
   args: {
-    act: {
-      id: 'act1',
-      name: 'Act 1',
-    },
-    regions: mockRegions,
+    act: act1Group?.act || { id: 'act1', name: 'Act 1' },
+    regions: act1Group?.regions || mockRegions,
     defaultOpen: true,
   },
 }
 
 export const Collapsed: Story = {
   args: {
-    act: {
-      id: 'act1',
-      name: 'Act 1',
-    },
-    regions: mockRegions,
+    act: act1Group?.act || { id: 'act1', name: 'Act 1' },
+    regions: act1Group?.regions || mockRegions,
     defaultOpen: false,
   },
 }
 
 export const ActTwo: Story = {
   args: {
-    act: {
-      id: 'act2',
-      name: 'Act 2',
-    },
-    regions: [
+    act: act2Group?.act || { id: 'act2', name: 'Act 2' },
+    regions: act2Group?.regions || [
       {
         name: 'Shadowfell',
         decisions: [
@@ -136,11 +135,8 @@ export const ActTwo: Story = {
 
 export const ActThree: Story = {
   args: {
-    act: {
-      id: 'act3',
-      name: 'Act 3',
-    },
-    regions: [
+    act: act3Group?.act || { id: 'act3', name: 'Act 3' },
+    regions: act3Group?.regions || [
       {
         name: 'Upper City',
         decisions: [

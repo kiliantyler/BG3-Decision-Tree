@@ -1,6 +1,8 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Act } from '@/data/acts'
 import { DecisionType } from '@/types'
+// Import mock decision data
+import { allDecisions } from '@mock/decisions'
 import type { Meta, StoryObj } from '@storybook/react'
 import { DecisionRow } from './decision-row'
 
@@ -25,36 +27,46 @@ const meta: Meta<typeof DecisionRow> = {
 export default meta
 type Story = StoryObj<typeof DecisionRow>
 
+// Get required and optional decisions from mock data
+const requiredMockDecisions = allDecisions.filter((d: any) => d.required)
+const optionalMockDecisions = allDecisions.filter((d: any) => !d.required)
+
 export const Required: Story = {
   args: {
-    decision: {
-      id: 'required-decision' as any,
-      act: Act.I,
-      description: 'Accept or reject the tadpole',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Accept the tadpole' },
-        { text: 'Reject the tadpole' },
-      ],
-      required: true,
-    },
+    decision:
+      requiredMockDecisions.length > 0
+        ? requiredMockDecisions[0]
+        : {
+            id: 'required-decision' as any,
+            act: Act.I,
+            description: 'Accept or reject the tadpole',
+            type: DecisionType.DECISION,
+            options: [
+              { text: 'Accept the tadpole' },
+              { text: 'Reject the tadpole' },
+            ],
+            required: true,
+          },
   },
 }
 
 export const Optional: Story = {
   args: {
-    decision: {
-      id: 'optional-decision' as any,
-      act: Act.I,
-      description: 'Choose who to save from the pods',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Save Shadowheart' },
-        { text: "Save Lae'zel" },
-        { text: 'Save no one' },
-      ],
-      required: false,
-    },
+    decision:
+      optionalMockDecisions.length > 0
+        ? optionalMockDecisions[0]
+        : {
+            id: 'optional-decision' as any,
+            act: Act.I,
+            description: 'Choose who to save from the pods',
+            type: DecisionType.DECISION,
+            options: [
+              { text: 'Save Shadowheart' },
+              { text: "Save Lae'zel" },
+              { text: 'Save no one' },
+            ],
+            required: false,
+          },
   },
 }
 

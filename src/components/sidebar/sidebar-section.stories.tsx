@@ -1,6 +1,8 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Act } from '@/data/acts'
 import { DecisionType } from '@/types'
+// Import mock decision data for stories
+import { allDecisions } from '@mock/decisions'
 import type { Meta, StoryObj } from '@storybook/react'
 import { SidebarSection } from './sidebar-section'
 
@@ -25,7 +27,8 @@ const meta: Meta<typeof SidebarSection> = {
 export default meta
 type Story = StoryObj<typeof SidebarSection>
 
-const mockDecisions = [
+// Fallback mock decisions in case the import fails
+const fallbackMockDecisions = [
   {
     id: 'decision1' as any,
     act: Act.I,
@@ -60,13 +63,22 @@ const mockDecisions = [
   },
 ]
 
+// Get Nautiloid decisions from the mock data
+const nautiloidDecisions = allDecisions.filter(
+  (d: any) => d.region === 'Nautiloid',
+)
+const optionalDecisions = allDecisions.filter((d: any) => !d.required)
+const requiredDecisions = allDecisions.filter((d: any) => d.required)
+
 export const Default: Story = {
   args: {
     title: 'Nautiloid',
-    subtitle: '3 decisions',
-    decisions: mockDecisions as any,
+    subtitle: `${nautiloidDecisions.length || 3} decisions`,
+    decisions: nautiloidDecisions.length
+      ? nautiloidDecisions
+      : (fallbackMockDecisions as any),
     badge: {
-      text: '1 Required',
+      text: `${nautiloidDecisions.filter((d: any) => d.required).length || 1} Required`,
       variant: 'outline',
     },
     defaultOpen: true,
@@ -76,10 +88,12 @@ export const Default: Story = {
 export const Collapsed: Story = {
   args: {
     title: 'Nautiloid',
-    subtitle: '3 decisions',
-    decisions: mockDecisions as any,
+    subtitle: `${nautiloidDecisions.length || 3} decisions`,
+    decisions: nautiloidDecisions.length
+      ? nautiloidDecisions
+      : (fallbackMockDecisions as any),
     badge: {
-      text: '1 Required',
+      text: `${nautiloidDecisions.filter((d: any) => d.required).length || 1} Required`,
       variant: 'outline',
     },
     defaultOpen: false,
@@ -89,8 +103,10 @@ export const Collapsed: Story = {
 export const NoRequiredDecisions: Story = {
   args: {
     title: 'Optional Area',
-    subtitle: '2 decisions',
-    decisions: mockDecisions.filter(d => !d.required) as any,
+    subtitle: `${optionalDecisions.slice(0, 5).length} decisions`,
+    decisions:
+      (optionalDecisions.slice(0, 5) as any) ||
+      (fallbackMockDecisions.filter(d => !d.required) as any),
     badge: {
       text: '0 Required',
       variant: 'outline',
@@ -102,12 +118,14 @@ export const NoRequiredDecisions: Story = {
 export const AllRequiredDecisions: Story = {
   args: {
     title: 'Critical Path',
-    subtitle: '2 decisions',
-    decisions: mockDecisions
-      .map(d => ({ ...d, required: true }))
-      .slice(0, 2) as any,
+    subtitle: `${requiredDecisions.slice(0, 3).length || 2} decisions`,
+    decisions:
+      (requiredDecisions.slice(0, 3) as any) ||
+      (fallbackMockDecisions
+        .map(d => ({ ...d, required: true }))
+        .slice(0, 2) as any),
     badge: {
-      text: '2 Required',
+      text: `${requiredDecisions.slice(0, 3).length || 2} Required`,
       variant: 'outline',
     },
     defaultOpen: true,
@@ -118,7 +136,7 @@ export const LongTitle: Story = {
   args: {
     title: 'Extremely Long Location Name That Should Be Truncated',
     subtitle: '3 decisions',
-    decisions: mockDecisions as any,
+    decisions: fallbackMockDecisions as any,
     badge: {
       text: '1 Required',
       variant: 'outline',

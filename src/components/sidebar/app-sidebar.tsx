@@ -4,8 +4,8 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from '@/components/ui/sidebar'
-import { getDecisionsByActAndRegion } from '@/data/decisions'
 import { cn } from '@/lib/utils'
+import { getDecisionsByActAndRegion } from '@mock/decisions'
 import { ScrollArea } from '@ui/scroll-area'
 import { ActSection } from './act-section'
 
@@ -31,7 +31,7 @@ export function AppSidebar() {
               ))}
 
               {getDecisionsByActAndRegion().length === 0 && (
-                <div className="px-4 py-2 text-sm text-muted-foreground">
+                <div className="text-muted-foreground px-4 py-2 text-sm">
                   No decisions found
                 </div>
               )}
