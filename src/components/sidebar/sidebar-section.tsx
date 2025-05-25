@@ -46,7 +46,7 @@ export function SidebarSection({
           <div
             className={cn(
               'flex h-10 w-10 items-center justify-center',
-              'bg-secondary/20 hover:bg-secondary/30 rounded-md',
+              'rounded-md bg-secondary/20 hover:bg-secondary/30',
               'mb-2 cursor-pointer transition-colors',
             )}
           >
@@ -57,12 +57,12 @@ export function SidebarSection({
           side="right"
           align="start"
           sideOffset={20}
-          className="bg-popover w-72 border border-gray-200 p-3 shadow-md dark:border-gray-700"
+          className="w-72 border border-gray-200 bg-popover p-3 shadow-md dark:border-gray-700"
         >
           <div className="mb-2">
             <p className="font-medium">{title}</p>
             {subtitle && (
-              <p className="text-muted-foreground text-xs">{subtitle}</p>
+              <p className="text-xs text-muted-foreground">{subtitle}</p>
             )}
             {badge && <p className="text-xs">{badge.text}</p>}
           </div>
@@ -73,7 +73,7 @@ export function SidebarSection({
                 key={decision.id}
                 className={cn(
                   'rounded-sm px-2 py-1 text-sm',
-                  'bg-background border',
+                  'border bg-background',
                   decision.required
                     ? 'border-primary/70'
                     : 'border-dashed border-gray-200/40 dark:border-gray-700/40',
@@ -98,7 +98,7 @@ export function SidebarSection({
             ))}
 
             {decisions.length === 0 && (
-              <p className="text-muted-foreground text-sm italic">
+              <p className="text-sm text-muted-foreground italic">
                 No decisions available
               </p>
             )}
@@ -115,8 +115,8 @@ export function SidebarSection({
         onOpenChange={setIsOpen}
       >
         <CollapsibleTrigger className="w-full">
-          <div className="bg-secondary/20 hover:bg-secondary/30 flex items-center justify-between rounded-md px-3 py-2">
-            <div className="flex flex-col items-start text-left">
+          <div className="flex items-center justify-between rounded-md bg-secondary/20 px-3 py-2 hover:bg-secondary/30">
+            <div className="flex flex-col items-start text-left select-none">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{title}</span>
                 {badge && (
@@ -129,14 +129,14 @@ export function SidebarSection({
                 )}
               </div>
               {subtitle && (
-                <span className="text-muted-foreground text-xs">
+                <span className="text-xs text-muted-foreground">
                   {subtitle}
                 </span>
               )}
             </div>
             <ChevronDown
               className={cn(
-                'text-muted-foreground h-4 w-4 transition-transform',
+                'h-4 w-4 text-muted-foreground transition-transform',
                 isOpen && 'rotate-180',
               )}
             />
@@ -151,7 +151,7 @@ export function SidebarSection({
               />
             ))}
             {decisions.length === 0 && (
-              <div className="text-muted-foreground px-2 py-1 text-xs">
+              <div className="px-2 py-1 text-xs text-muted-foreground">
                 No decisions available
               </div>
             )}

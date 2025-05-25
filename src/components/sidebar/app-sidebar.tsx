@@ -19,8 +19,8 @@ export function AppSidebar() {
           </span>
         </SidebarHeader>
         <SidebarGroup>
-          <ScrollArea className="h-[calc(100vh-70px)] overflow-hidden">
-            <div className="space-y-2 p-2 pr-2">
+          <ScrollArea className="h-[calc(100vh-70px)] overflow-hidden select-none">
+            <div className="space-y-2 p-2 pr-2 select-none">
               {getDecisionsByActAndRegion().map((actGroup, index) => (
                 <ActSection
                   key={actGroup.act.id}
@@ -31,7 +31,7 @@ export function AppSidebar() {
               ))}
 
               {getDecisionsByActAndRegion().length === 0 && (
-                <div className="text-muted-foreground px-4 py-2 text-sm">
+                <div className="px-4 py-2 text-sm text-muted-foreground">
                   No decisions found
                 </div>
               )}

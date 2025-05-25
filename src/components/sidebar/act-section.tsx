@@ -57,7 +57,7 @@ export function ActSection({
               <div
                 className={cn(
                   'flex h-10 w-10 items-center justify-center',
-                  'bg-primary/10 hover:bg-primary/20 rounded-md',
+                  'rounded-md bg-primary/10 hover:bg-primary/20',
                   'cursor-pointer transition-colors',
                 )}
               >
@@ -77,11 +77,11 @@ export function ActSection({
               side="right"
               align="start"
               sideOffset={20}
-              className="bg-popover w-72 border border-gray-200 p-3 shadow-md dark:border-gray-700"
+              className="w-72 border border-gray-200 bg-popover p-3 shadow-md dark:border-gray-700"
             >
               <div className="mb-2">
                 <p className="font-semibold">{act.name}</p>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   {totalDecisions} decisions ({requiredCount} required)
                 </p>
               </div>
@@ -93,13 +93,13 @@ export function ActSection({
                     className="mb-2"
                   >
                     <p className="text-sm font-medium">{region.name}</p>
-                    <div className="ml-2 mt-1 space-y-1">
+                    <div className="mt-1 ml-2 space-y-1">
                       {region.decisions.slice(0, 3).map(decision => (
                         <div
                           key={decision.id}
                           className={cn(
                             'rounded-sm px-2 py-1 text-sm',
-                            'bg-background border',
+                            'border bg-background',
                             decision.required
                               ? 'border-primary/70'
                               : 'border-dashed border-gray-200/40 dark:border-gray-700/40',
@@ -111,7 +111,7 @@ export function ActSection({
                         </div>
                       ))}
                       {region.decisions.length > 3 && (
-                        <p className="text-muted-foreground ml-2 text-xs">
+                        <p className="ml-2 text-xs text-muted-foreground">
                           +{region.decisions.length - 3} more decisions
                         </p>
                       )}
@@ -154,18 +154,18 @@ export function ActSection({
         onOpenChange={setIsOpen}
       >
         <CollapsibleTrigger className="w-full">
-          <div className="bg-primary/10 hover:bg-primary/20 flex items-center justify-between rounded-md px-3 py-2">
-            <div className="flex flex-col items-start text-left">
+          <div className="flex items-center justify-between rounded-md bg-primary/10 px-3 py-2 hover:bg-primary/20">
+            <div className="flex flex-col items-start text-left select-none">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-semibold">{act.name}</span>
               </div>
-              <span className="text-muted-foreground text-xs">
+              <span className="text-xs text-muted-foreground">
                 {totalDecisions} decisions ({requiredCount} required)
               </span>
             </div>
             <ChevronDown
               className={cn(
-                'text-muted-foreground h-5 w-5 transition-transform',
+                'h-5 w-5 text-muted-foreground transition-transform',
                 isOpen && 'rotate-180',
               )}
             />
@@ -191,7 +191,7 @@ export function ActSection({
               />
             ))}
             {regions.length === 0 && (
-              <div className="text-muted-foreground px-2 py-1 text-sm">
+              <div className="px-2 py-1 text-sm text-muted-foreground">
                 No regions found
               </div>
             )}
