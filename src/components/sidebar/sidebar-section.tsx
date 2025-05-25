@@ -29,6 +29,9 @@ interface SidebarSectionProps {
   showOptional?: boolean
   showUnavailable?: boolean
   searchTerm?: string
+  // External control for open/close state
+  isOpenExternal?: boolean
+  onOpenChangeExternal?: (open: boolean) => void
 }
 
 export function SidebarSection({
@@ -41,8 +44,26 @@ export function SidebarSection({
   showOptional = true,
   showUnavailable = true,
   searchTerm = '',
+  // External control props
+  isOpenExternal,
+  onOpenChangeExternal,
 }: SidebarSectionProps) {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  // Internal state for when external control is not provided
+  const [isOpenInternal, setIsOpenInternal] = React.useState(defaultOpen)
+
+  // Use external state if provided, otherwise use internal state
+  const isOpen = isOpenExternal !== undefined ? isOpenExternal : isOpenInternal
+
+  // Handle open/close changes
+  const handleOpenChange = (open: boolean) => {
+    // Call external handler if provided
+    if (onOpenChangeExternal) {
+      onOpenChangeExternal(open)
+    } else {
+      // Otherwise use internal state
+      setIsOpenInternal(open)
+    }
+  }
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed'
 
@@ -143,7 +164,7 @@ export function SidebarSection({
     <div className="mb-2">
       <Collapsible
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={handleOpenChange}
       >
         <CollapsibleTrigger className="w-full">
           <div className="flex items-center justify-between rounded-md bg-secondary/20 px-3 py-2 hover:bg-secondary/30">

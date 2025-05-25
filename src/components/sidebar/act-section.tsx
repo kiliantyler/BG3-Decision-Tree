@@ -28,6 +28,11 @@ interface ActSectionProps {
   showOptional?: boolean
   showUnavailable?: boolean
   searchTerm?: string
+  // External control for open/close state
+  isOpenExternal?: boolean
+  onOpenChangeExternal?: (open: boolean) => void
+  // Nested section states for regions
+  sectionStates?: Record<string, boolean>
 }
 
 export function ActSection({
@@ -38,8 +43,28 @@ export function ActSection({
   showOptional = true,
   showUnavailable = true,
   searchTerm = '',
+  // External control props
+  isOpenExternal,
+  onOpenChangeExternal,
+  // Section states for nested regions
+  sectionStates,
 }: ActSectionProps) {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  // Internal state for when external control is not provided
+  const [isOpenInternal, setIsOpenInternal] = React.useState(defaultOpen)
+
+  // Use external state if provided, otherwise use internal state
+  const isOpen = isOpenExternal !== undefined ? isOpenExternal : isOpenInternal
+
+  // Handle open/close changes
+  const handleOpenChange = (open: boolean) => {
+    // Call external handler if provided
+    if (onOpenChangeExternal) {
+      onOpenChangeExternal(open)
+    } else {
+      // Otherwise use internal state
+      setIsOpenInternal(open)
+    }
+  }
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed'
 
@@ -200,7 +225,7 @@ export function ActSection({
     <div className="mb-3">
       <Collapsible
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={handleOpenChange}
       >
         <CollapsibleTrigger className="w-full">
           <div className="flex items-center justify-between rounded-md bg-primary/10 px-3 py-2 hover:bg-primary/20">
@@ -242,6 +267,24 @@ export function ActSection({
                   variant: 'outline',
                 }}
                 defaultOpen={false}
+                // Use regionKey to manage region section state separately
+                isOpenExternal={
+                  sectionStates &&
+                  `region-${act.id}-${region.name}` in sectionStates
+                    ? sectionStates[`region-${act.id}-${region.name}`]
+                    : false
+                }
+                onOpenChangeExternal={open => {
+                  if (onOpenChangeExternal) {
+                    // Instead of calling onOpenChangeExternal directly which would update
+                    // the parent's state, we're using a custom event to update only the region state
+                    const regionKey = `region-${act.id}-${region.name}`
+                    const customEvent = new CustomEvent('regionStateChange', {
+                      detail: { regionKey, open },
+                    })
+                    window.dispatchEvent(customEvent)
+                  }
+                }}
               />
             ))}
             {regions.length === 0 && (

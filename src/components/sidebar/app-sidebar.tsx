@@ -12,7 +12,7 @@ import {
   RescueAdventurer,
 } from '@mock/decisions/act1/wilderness/unavailable_example'
 import { ScrollArea } from '@ui/scroll-area'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ActSection } from './act-section'
 import { LegendArea } from './legend-area'
 
@@ -35,28 +35,67 @@ export function AppSidebar() {
     {},
   )
 
-  const collapseAllSections = () => {
-    // We'll track section states for the ActSections
-    const actSections = getDecisionsByActAndRegion().reduce(
+  // Initialize section states on component mount
+  useEffect(() => {
+    // Set initial state for all sections
+    const initialSectionStates = getDecisionsByActAndRegion().reduce(
       (acc, actGroup) => {
-        acc[actGroup.act.id] = false
+        // Set the act section to be open if it's the first one
+        acc[`act-${actGroup.act.id}`] = actGroup.act.id === 'act1'
+
+        // Set all region sections within this act to be closed by default
+        actGroup.regions.forEach(region => {
+          acc[`region-${actGroup.act.id}-${region.name}`] = false
+        })
+
         return acc
       },
       {} as Record<string, boolean>,
     )
-    setSectionStates(actSections)
+
+    setSectionStates(initialSectionStates)
+
+    // Add event listener for region state changes
+    const handleRegionStateChange = (event: Event) => {
+      const customEvent = event as CustomEvent
+      const { regionKey, open } = customEvent.detail
+
+      setSectionStates(prev => ({
+        ...prev,
+        [regionKey]: open,
+      }))
+    }
+
+    window.addEventListener('regionStateChange', handleRegionStateChange)
+
+    // Cleanup event listener when component unmounts
+    return () => {
+      window.removeEventListener('regionStateChange', handleRegionStateChange)
+    }
+  }, []) // Empty dependency array means this runs once on mount
+
+  const collapseAllSections = () => {
+    // Create a copy of current state
+    const newSectionStates = { ...sectionStates }
+
+    // Set all sections to collapsed state
+    Object.keys(newSectionStates).forEach(key => {
+      newSectionStates[key] = false
+    })
+
+    setSectionStates(newSectionStates)
   }
 
   const expandAllSections = () => {
-    // Set all sections to expanded
-    const actSections = getDecisionsByActAndRegion().reduce(
-      (acc, actGroup) => {
-        acc[actGroup.act.id] = true
-        return acc
-      },
-      {} as Record<string, boolean>,
-    )
-    setSectionStates(actSections)
+    // Create a copy of current state
+    const newSectionStates = { ...sectionStates }
+
+    // Set all sections to expanded state
+    Object.keys(newSectionStates).forEach(key => {
+      newSectionStates[key] = true
+    })
+
+    setSectionStates(newSectionStates)
   }
   return (
     <Sidebar collapsible="icon">
@@ -91,6 +130,16 @@ export function AppSidebar() {
                   showOptional={showOptional}
                   showUnavailable={showUnavailable}
                   searchTerm={searchTerm}
+                  // Pass the external control props for expand/collapse functionality
+                  isOpenExternal={sectionStates[`act-${actGroup.act.id}`]}
+                  onOpenChangeExternal={open => {
+                    setSectionStates(prev => ({
+                      ...prev,
+                      [`act-${actGroup.act.id}`]: open,
+                    }))
+                  }}
+                  // Pass section states for nested regions
+                  sectionStates={sectionStates}
                 />
               ))}
 
