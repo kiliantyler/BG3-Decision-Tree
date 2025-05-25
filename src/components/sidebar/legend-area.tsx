@@ -30,17 +30,6 @@ export function LegendArea({
 }: LegendAreaProps) {
   return (
     <div className="mb-4 rounded-md bg-muted/40 p-3 select-none">
-      {/* Search bar */}
-      <div className="relative mb-3">
-        <SearchIcon className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          placeholder="Search decisions..."
-          className="h-8 pl-8 text-xs"
-        />
-      </div>
-
       {/* Legend rows */}
       <div className="mb-3 space-y-1.5">
         <LegendRow
@@ -70,26 +59,40 @@ export function LegendArea({
         />
       </div>
 
-      {/* Collapse/expand buttons */}
-      <div className="flex justify-end gap-2 border-t border-border/30 pt-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={collapseAllSections}
-          title="Collapse All Sections"
-        >
-          <MinusSquare className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={expandAllSections}
-          title="Expand All Sections"
-        >
-          <PlusSquare className="h-4 w-4" />
-        </Button>
+      {/* Bottom row with search and expand/collapse buttons */}
+      <div className="flex items-center justify-between gap-2 border-t border-border/30 pt-2">
+        {/* Search bar */}
+        <div className="relative flex-1">
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Search decisions..."
+            className="h-7 w-full pl-8 text-xs"
+          />
+        </div>
+
+        {/* Collapse/expand buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 shrink-0"
+            onClick={collapseAllSections}
+            title="Collapse All Sections"
+          >
+            <MinusSquare className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 shrink-0"
+            onClick={expandAllSections}
+            title="Expand All Sections"
+          >
+            <PlusSquare className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   )
