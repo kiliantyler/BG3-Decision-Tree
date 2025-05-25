@@ -45,7 +45,7 @@ export function DecisionRow({ decision }: DecisionRowProps) {
           side="right"
           align="start"
           sideOffset={10}
-          className="bg-popover border-border w-60 border p-2 shadow-md"
+          className="bg-popover w-60 border border-gray-200 p-2 shadow-md dark:border-gray-700"
         >
           <div>
             <p className={cn('font-medium')}>{decision.description}</p>
@@ -76,7 +76,9 @@ export function DecisionRow({ decision }: DecisionRowProps) {
       className={cn(
         'group rounded-md px-2.5 py-1',
         'hover:bg-secondary/50 border transition-all',
-        decision.required ? 'border-primary' : 'border-border/60 border-dashed',
+        decision.required
+          ? 'border-primary'
+          : 'border-dashed border-gray-200/60 dark:border-gray-700/60',
       )}
     >
       <div className="flex flex-col overflow-hidden">

@@ -1,6 +1,7 @@
+import { OriginCharacter } from '@/data/characters'
 import { cn } from '@/lib/utils'
 import { useCallback } from 'react'
-import type { Connection, Edge, NodeTypes } from 'reactflow'
+import type { Connection, Edge, Node, NodeTypes } from 'reactflow'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,11 +12,13 @@ import ReactFlow, {
   useNodesState,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
+import { CharacterSelectionNode } from './characterselectionnode'
 import { DecisionNode } from './decisionnode'
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
   decisionNode: DecisionNode,
+  characterSelection: CharacterSelectionNode,
 }
 
 const proOptions = { hideAttribution: true }
@@ -26,13 +29,31 @@ interface FlowChartProps {
   initialEdges?: Edge[]
 }
 
+// Default character selection node to show when no nodes are provided
+const defaultCharacterSelectionNode: Node = {
+  id: 'character-selection-root',
+  type: 'characterSelection',
+  position: { x: 0, y: 0 },
+  data: {
+    title: 'Choose Your Origin Character',
+    characters: Object.values(OriginCharacter),
+    onSelect: (characterId: string) => {
+      console.log(`Selected character: ${characterId}`)
+    },
+  },
+}
+
 function FlowChart({
   children,
   initialNodes = [],
   initialEdges = [],
 }: FlowChartProps) {
+  // If no nodes provided, start with character selection node
+  const startingNodes =
+    initialNodes.length > 0 ? initialNodes : [defaultCharacterSelectionNode]
+
   // Setup nodes state
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [nodes, setNodes, onNodesChange] = useNodesState(startingNodes)
   // Setup edges state
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
 

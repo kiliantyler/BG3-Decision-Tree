@@ -25,8 +25,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state'
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+const SIDEBAR_STORAGE_KEY = 'sidebar_state'
 const SIDEBAR_WIDTH = '26rem'
 const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '4rem'
@@ -69,9 +68,22 @@ function SidebarProvider({
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
 
+  // Load saved state from localStorage or use defaultOpen (true)
+  const getSavedSidebarState = React.useCallback(() => {
+    if (typeof window === 'undefined') return defaultOpen
+
+    try {
+      const savedState = localStorage.getItem(SIDEBAR_STORAGE_KEY)
+      return savedState === null ? defaultOpen : savedState === 'true'
+    } catch (e) {
+      console.warn('Failed to get sidebar state from localStorage:', e)
+      return defaultOpen
+    }
+  }, [defaultOpen])
+
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
+  const [_open, _setOpen] = React.useState(() => getSavedSidebarState())
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -82,8 +94,12 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      // Store the sidebar state in localStorage
+      try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, String(openState))
+      } catch (e) {
+        console.warn('Failed to save sidebar state to localStorage:', e)
+      }
     },
     [setOpenProp, open],
   )

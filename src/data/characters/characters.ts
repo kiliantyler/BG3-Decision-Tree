@@ -5,10 +5,12 @@ import {
   Karlach,
   Laezel,
   Shadowheart,
+  Tav,
   Wyll,
 } from './origin'
 
 export const OriginCharacter = {
+  Tav: Tav,
   Astarion: Astarion,
   Gale: Gale,
   Shadowheart: Shadowheart,

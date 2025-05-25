@@ -77,7 +77,7 @@ export function ActSection({
               side="right"
               align="start"
               sideOffset={20}
-              className="bg-popover border-border w-72 border p-3 shadow-md"
+              className="bg-popover w-72 border border-gray-200 p-3 shadow-md dark:border-gray-700"
             >
               <div className="mb-2">
                 <p className="font-semibold">{act.name}</p>
@@ -86,7 +86,7 @@ export function ActSection({
                 </p>
               </div>
 
-              <div className="border-border/40 mt-1 space-y-1.5 border-t pt-2">
+              <div className="mt-1 space-y-1.5 border-t border-gray-200/40 pt-2 dark:border-gray-700/40">
                 {regions.map(region => (
                   <div
                     key={region.name}
@@ -102,7 +102,7 @@ export function ActSection({
                             'bg-background border',
                             decision.required
                               ? 'border-primary/70'
-                              : 'border-border/40 border-dashed',
+                              : 'border-dashed border-gray-200/40 dark:border-gray-700/40',
                           )}
                         >
                           <p className="truncate text-sm font-medium">

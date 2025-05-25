@@ -57,7 +57,7 @@ export function SidebarSection({
           side="right"
           align="start"
           sideOffset={20}
-          className="bg-popover border-border w-72 border p-3 shadow-md"
+          className="bg-popover w-72 border border-gray-200 p-3 shadow-md dark:border-gray-700"
         >
           <div className="mb-2">
             <p className="font-medium">{title}</p>
@@ -67,7 +67,7 @@ export function SidebarSection({
             {badge && <p className="text-xs">{badge.text}</p>}
           </div>
 
-          <div className="border-border/40 mt-1 space-y-1 border-t pt-2">
+          <div className="mt-1 space-y-1 border-t border-gray-200/40 pt-2 dark:border-gray-700/40">
             {decisions.map(decision => (
               <div
                 key={decision.id}
@@ -76,7 +76,7 @@ export function SidebarSection({
                   'bg-background border',
                   decision.required
                     ? 'border-primary/70'
-                    : 'border-border/40 border-dashed',
+                    : 'border-dashed border-gray-200/40 dark:border-gray-700/40',
                 )}
               >
                 <p className="truncate text-sm font-medium">

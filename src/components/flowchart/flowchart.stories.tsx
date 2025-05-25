@@ -1,19 +1,19 @@
-import { Intro } from '@/data/decisions/act1/nautiloid/intro'
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { Edge } from 'reactflow'
+import { OriginCharacter } from '@/data/characters'
+import { CharacterType } from '@/types'
+import type { Meta, StoryObj } from '@storybook/react'
+import 'reactflow/dist/style.css'
 import { FlowChart } from './flowchart'
 
 const meta: Meta<typeof FlowChart> = {
+  title: 'Components/FlowChart/FlowChart',
   component: FlowChart,
   parameters: {
-    layout: 'centered',
-    backgrounds: {
-      default: 'dark',
-    },
+    layout: 'padded',
   },
+  tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="h-[500px] w-[900px]">
+      <div style={{ width: '100%', height: '700px' }}>
         <Story />
       </div>
     ),
@@ -23,74 +23,141 @@ const meta: Meta<typeof FlowChart> = {
 export default meta
 type Story = StoryObj<typeof FlowChart>
 
-const initialNodes = [
+// Convert Origin characters to Character objects for the node
+const originCharacters = Object.entries(OriginCharacter).map(
+  ([key, value]) => ({
+    id: value.id,
+    name: value.name,
+    type: CharacterType.PLAYABLE,
+    description:
+      value.description ||
+      `Play as ${value.name}, an origin character with a unique story.`,
+  }),
+)
+
+// Basic nodes with just a character selection node
+const characterSelectionNodes = [
   {
-    id: 'node-1',
-    type: 'decisionNode',
-    position: { x: 100, y: 50 },
+    id: 'character-selection',
+    type: 'characterSelection',
+    position: { x: 0, y: 0 },
     data: {
-      decision: Intro,
-      onComplete: (id: string, option: any, wasAlreadyCompleted: boolean) => {
-        console.log('Decision completed:', id, option, wasAlreadyCompleted)
+      title: 'Choose Your Origin Character',
+      characters: originCharacters,
+      onSelect: (characterId: string) => {
+        console.log(`Selected character: ${characterId}`)
       },
-      onRemove: (id: string) => {
-        console.log('Remove node:', id)
+    },
+  },
+]
+
+// Nodes with character selection and some decision nodes
+const flowWithDecisionsNodes = [
+  {
+    id: 'character-selection',
+    type: 'characterSelection',
+    position: { x: 0, y: 0 },
+    data: {
+      title: 'Choose Your Origin Character',
+      characters: originCharacters,
+      selectedCharacter: originCharacters[0], // Astarion selected
+      onSelect: (characterId: string) => {
+        console.log(`Selected character: ${characterId}`)
       },
     },
   },
   {
-    id: 'node-2',
+    id: 'decision-1',
     type: 'decisionNode',
-    position: { x: 500, y: 250 },
+    position: { x: 0, y: 300 },
     data: {
       decision: {
-        ...Intro,
-        id: 'secondary_decision',
-        description: 'Secondary Decision',
+        id: 'nautiloid_start',
+        description: 'Accept or reject the tadpole?',
+        type: 'decision',
         required: true,
+        options: [
+          { text: 'Accept the tadpole' },
+          { text: 'Reject the tadpole' },
+        ],
       },
-      onComplete: (id: string, option: any, wasAlreadyCompleted: boolean) => {
-        console.log('Decision completed:', id, option, wasAlreadyCompleted)
+    },
+  },
+  {
+    id: 'decision-2',
+    type: 'decisionNode',
+    position: { x: -250, y: 550 },
+    data: {
+      decision: {
+        id: 'nautiloid_pods',
+        description: 'Who do you save from the pods?',
+        type: 'decision',
+        options: [
+          { text: 'Save Shadowheart' },
+          { text: "Save Lae'zel" },
+          { text: 'Save no one' },
+        ],
       },
-      onRemove: (id: string) => {
-        console.log('Remove node:', id)
+    },
+  },
+  {
+    id: 'decision-3',
+    type: 'decisionNode',
+    position: { x: 250, y: 550 },
+    data: {
+      decision: {
+        id: 'nautiloid_controls',
+        description: 'Activate ship controls?',
+        type: 'decision',
+        options: [
+          { text: 'Use controls to activate defense systems' },
+          { text: 'Ignore the controls' },
+        ],
       },
     },
   },
 ]
 
-const initialEdges: Edge[] = [
+// Edges connecting the nodes
+const flowWithDecisionsEdges = [
   {
-    id: 'edge-1-2',
-    source: 'node-1',
-    target: 'node-2',
-    animated: true,
-    style: { stroke: '#555', strokeWidth: 2 },
+    id: 'edge-1',
+    source: 'character-selection',
+    target: 'decision-1',
+    type: 'default',
+  },
+  {
+    id: 'edge-2',
+    source: 'decision-1',
+    target: 'decision-2',
+    type: 'default',
+  },
+  {
+    id: 'edge-3',
+    source: 'decision-1',
+    target: 'decision-3',
+    type: 'default',
   },
 ]
 
-export const Empty: Story = {
-  args: {},
-}
-
-export const WithNodes: Story = {
+export const DefaultWithCharacterSelection: Story = {
   args: {
-    initialNodes,
-    initialEdges,
+    // No initialNodes - will show default character selection node
+    initialNodes: [],
+    initialEdges: [],
   },
 }
 
-export const WithPanelContent: Story = {
+export const CharacterSelectionOnly: Story = {
   args: {
-    initialNodes,
-    initialEdges,
-    children: (
-      <div className="rounded bg-card p-4 shadow">
-        <h3 className="mb-2 font-bold">Flowchart Controls</h3>
-        <button className="rounded bg-primary px-3 py-1 text-sm text-primary-foreground">
-          Add Node
-        </button>
-      </div>
-    ),
+    initialNodes: characterSelectionNodes,
+    initialEdges: [],
+  },
+}
+
+export const WithDecisions: Story = {
+  args: {
+    initialNodes: flowWithDecisionsNodes,
+    initialEdges: flowWithDecisionsEdges,
   },
 }
