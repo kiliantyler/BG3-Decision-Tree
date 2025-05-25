@@ -1,9 +1,17 @@
+import { SidebarProvider } from '@/components/ui/sidebar'
 import type { Meta, StoryObj } from '@storybook/react'
 import { AppSidebar } from './app-sidebar'
 
-const meta: Meta<typeof AppSidebar> = {
+// Wrap AppSidebar in SidebarProvider to fix "useSidebar must be used within a SidebarProvider" error
+const AppSidebarWithProvider = () => (
+  <SidebarProvider>
+    <AppSidebar />
+  </SidebarProvider>
+)
+
+const meta: Meta<typeof AppSidebarWithProvider> = {
   title: 'Sidebar/AppSidebar',
-  component: AppSidebar,
+  component: AppSidebarWithProvider,
   parameters: {
     layout: 'fullscreen',
     backgrounds: {
@@ -14,7 +22,7 @@ const meta: Meta<typeof AppSidebar> = {
 }
 
 export default meta
-type Story = StoryObj<typeof AppSidebar>
+type Story = StoryObj<typeof AppSidebarWithProvider>
 
 export const Default: Story = {}
 

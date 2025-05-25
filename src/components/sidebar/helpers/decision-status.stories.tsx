@@ -19,13 +19,33 @@ const DecisionStatusDemo = () => {
     options: [{ text: 'Option 1' }, { text: 'Option 2' }],
   }
 
-  const prerequisiteDecision: Decision = {
-    id: 'prereq_decision',
+  // Create a new decision that is not in the completed list
+  const uncompleted: Decision = {
+    id: 'uncompleted_prerequisite',
     act: { id: 'act1', name: 'Act 1', regions: [] },
     type: DecisionType.DECISION,
-    description: 'Decision with prerequisites',
+    description: 'This decision has not been completed yet',
+    options: [{ text: 'Option A' }, { text: 'Option B' }],
+  }
+
+  // This decision has a prerequisite that is in the completed list
+  const prerequisiteMetDecision: Decision = {
+    id: 'prereq_met_decision',
+    act: { id: 'act1', name: 'Act 1', regions: [] },
+    type: DecisionType.DECISION,
+    description: 'Decision with prerequisites that are satisfied',
     options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    prerequisites: [completedDecisions[0]],
+    prerequisites: [completedDecisions[0]], // GoblinCamp is completed
+  }
+
+  // This decision has a prerequisite that is NOT in the completed list
+  const prerequisiteNotMetDecision: Decision = {
+    id: 'prereq_not_met_decision',
+    act: { id: 'act1', name: 'Act 1', regions: [] },
+    type: DecisionType.DECISION,
+    description: 'Decision with prerequisites that are NOT satisfied',
+    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
+    prerequisites: [uncompleted], // This is not in the completed list
   }
 
   const mutuallyExclusiveDecision: Decision = {
@@ -34,7 +54,7 @@ const DecisionStatusDemo = () => {
     type: DecisionType.DECISION,
     description: 'Decision that conflicts with a completed decision',
     options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    mutuallyExclusive: [completedDecisions[1]],
+    mutuallyExclusive: [completedDecisions[1]], // OwlbearCub is completed
   }
 
   return (
@@ -78,23 +98,56 @@ const DecisionStatusDemo = () => {
 
         <div className="rounded border p-3">
           <p>
-            <strong>Decision with Prerequisites:</strong>{' '}
-            {prerequisiteDecision.description}
+            <strong>Decision with Satisfied Prerequisites:</strong>{' '}
+            {prerequisiteMetDecision.description}
           </p>
           <p className="text-sm">
-            Has prerequisite: {prerequisiteDecision.prerequisites?.[0]?.id}
+            Has prerequisite: {prerequisiteMetDecision.prerequisites?.[0]?.id}{' '}
+            (Completed: ✓)
           </p>
           <p className="text-sm">
             Is Unavailable:{' '}
             <span
               className={
-                isDecisionUnavailable(prerequisiteDecision, completedDecisions)
+                isDecisionUnavailable(
+                  prerequisiteMetDecision,
+                  completedDecisions,
+                )
                   ? 'text-red-500'
                   : 'text-green-500'
               }
             >
               {isDecisionUnavailable(
-                prerequisiteDecision,
+                prerequisiteMetDecision,
+                completedDecisions,
+              ).toString()}
+            </span>
+          </p>
+        </div>
+
+        <div className="rounded border bg-amber-50 p-3 dark:bg-amber-950/30">
+          <p>
+            <strong>Decision with Unsatisfied Prerequisites:</strong>{' '}
+            {prerequisiteNotMetDecision.description}
+          </p>
+          <p className="text-sm">
+            Has prerequisite:{' '}
+            {prerequisiteNotMetDecision.prerequisites?.[0]?.id} (Completed: ✗)
+          </p>
+          <p className="text-sm">
+            Is Unavailable:{' '}
+            <span
+              className={
+                isDecisionUnavailable(
+                  prerequisiteNotMetDecision,
+                  completedDecisions,
+                )
+                  ? 'text-red-500'
+                  : 'text-green-500'
+              }
+            >
+              {isDecisionUnavailable(
+                prerequisiteNotMetDecision,
                 completedDecisions,
               ).toString()}
             </span>
@@ -108,7 +161,8 @@ const DecisionStatusDemo = () => {
           </p>
           <p className="text-sm">
             Mutually exclusive with:{' '}
-            {mutuallyExclusiveDecision.mutuallyExclusive?.[0]?.id}
+            {mutuallyExclusiveDecision.mutuallyExclusive?.[0]?.id} (Completed:
+            ✓)
           </p>
           <p className="text-sm">
             Is Unavailable:{' '}

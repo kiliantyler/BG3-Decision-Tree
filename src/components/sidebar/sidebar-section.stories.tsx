@@ -1,6 +1,16 @@
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { DecisionType } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import { SidebarSection } from './sidebar-section'
+
+// Wrap SidebarSection in SidebarProvider to fix "useSidebar must be used within a SidebarProvider" error
+const SidebarSectionWithProvider = (
+  props: React.ComponentProps<typeof SidebarSection>,
+) => (
+  <SidebarProvider>
+    <SidebarSection {...props} />
+  </SidebarProvider>
+)
 
 // Create mock decisions for the storybook
 // We need to use 'as Decision' to bypass TypeScript's strict ID type checking in storybook
@@ -40,9 +50,9 @@ const mockDecisions = [
   },
 ] as any // Type assertion to avoid ID format issues in storybook
 
-const meta: Meta<typeof SidebarSection> = {
+const meta: Meta<typeof SidebarSectionWithProvider> = {
   title: 'Sidebar/SidebarSection',
-  component: SidebarSection,
+  component: SidebarSectionWithProvider,
   parameters: {
     layout: 'padded',
   },
@@ -77,7 +87,7 @@ const meta: Meta<typeof SidebarSection> = {
 }
 
 export default meta
-type Story = StoryObj<typeof SidebarSection>
+type Story = StoryObj<typeof SidebarSectionWithProvider>
 
 export const Default: Story = {}
 

@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import type { Decision } from '@/types'
+import * as React from 'react'
 import { Badge } from '../ui/badge'
 import {
   getCompletedDecisionsForDemo,
@@ -26,8 +27,19 @@ export function DecisionRow({ decision }: DecisionRowProps) {
   // Use the helper function to determine if the decision is unavailable
   const isUnavailable = isDecisionUnavailable(decision, completedDecisions)
 
-  // Add debug logging to see if isUnavailable is being set correctly
-  console.log(`Decision: ${decision.id}, isUnavailable: ${isUnavailable}`)
+  // For debugging issues with unavailable detection
+  React.useEffect(() => {
+    if (decision.prerequisites?.length || decision.mutuallyExclusive?.length) {
+      console.debug(
+        `Decision ${decision.id} - hasPrereq: ${!!decision.prerequisites?.length} - hasMutEx: ${!!decision.mutuallyExclusive?.length} - isUnavailable: ${isUnavailable}`,
+      )
+    }
+  }, [decision, isUnavailable])
+
+  // Use debug logging only in development mode
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Decision: ${decision.id}, isUnavailable: ${isUnavailable}`)
+  }
 
   // Collapsed version of the card
   if (isCollapsed && !isMobile) {

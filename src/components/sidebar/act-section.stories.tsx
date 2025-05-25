@@ -1,5 +1,15 @@
+import { SidebarProvider } from '@/components/ui/sidebar'
 import type { Meta, StoryObj } from '@storybook/react'
 import { ActSection } from './act-section'
+
+// Wrap ActSection in SidebarProvider to fix "useSidebar must be used within a SidebarProvider" error
+const ActSectionWithProvider = (
+  props: React.ComponentProps<typeof ActSection>,
+) => (
+  <SidebarProvider>
+    <ActSection {...props} />
+  </SidebarProvider>
+)
 
 // Define mock data for the component with proper TypeScript type handling
 const mockAct = {
@@ -76,9 +86,9 @@ const mockSectionStates = {
   'region-act1-Wilderness': true,
 }
 
-const meta: Meta<typeof ActSection> = {
+const meta: Meta<typeof ActSectionWithProvider> = {
   title: 'Sidebar/ActSection',
-  component: ActSection,
+  component: ActSectionWithProvider,
   parameters: {
     layout: 'padded',
   },
@@ -112,7 +122,7 @@ const meta: Meta<typeof ActSection> = {
 }
 
 export default meta
-type Story = StoryObj<typeof ActSection>
+type Story = StoryObj<typeof ActSectionWithProvider>
 
 export const Default: Story = {}
 
