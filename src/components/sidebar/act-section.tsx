@@ -24,12 +24,20 @@ interface ActSectionProps {
     decisions: any[]
   }[]
   defaultOpen?: boolean
+  showRequired?: boolean
+  showOptional?: boolean
+  showUnavailable?: boolean
+  searchTerm?: string
 }
 
 export function ActSection({
   act,
   regions,
   defaultOpen = true,
+  showRequired = true,
+  showOptional = true,
+  showUnavailable = true,
+  searchTerm = '',
 }: ActSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
   const { state, isMobile } = useSidebar()
@@ -147,6 +155,47 @@ export function ActSection({
     )
   }
 
+  // Filter the decisions based on the filter settings and search term
+  const filteredRegions = regions
+    .map(region => {
+      const filteredDecisions = region.decisions.filter(decision => {
+        // Filter by decision visibility
+        if (decision.required && !showRequired) return false
+        if (!decision.required && !showOptional) return false
+        if (decision.unavailable && !showUnavailable) return false
+
+        // Filter by search term
+        if (searchTerm && searchTerm.length > 0) {
+          const searchLower = searchTerm.toLowerCase()
+          return decision.description.toLowerCase().includes(searchLower)
+        }
+
+        return true
+      })
+
+      return {
+        ...region,
+        decisions: filteredDecisions,
+      }
+    })
+    .filter(region => region.decisions.length > 0) // Only show regions with decisions
+
+  // Count filtered decisions
+  const filteredTotalDecisions = filteredRegions.reduce(
+    (total, region) => total + region.decisions.length,
+    0,
+  )
+
+  const filteredRequiredCount = filteredRegions.reduce(
+    (total, region) => total + region.decisions.filter(d => d.required).length,
+    0,
+  )
+
+  // If no decisions match the filters, hide the section
+  if (filteredRegions.length === 0) {
+    return null
+  }
+
   return (
     <div className="mb-3">
       <Collapsible
@@ -160,7 +209,8 @@ export function ActSection({
                 <span className="text-lg font-semibold">{act.name}</span>
               </div>
               <span className="text-xs text-muted-foreground">
-                {totalDecisions} decisions ({requiredCount} required)
+                {filteredTotalDecisions} decisions ({filteredRequiredCount}{' '}
+                required)
               </span>
             </div>
             <ChevronDown
@@ -173,13 +223,17 @@ export function ActSection({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="mt-2 space-y-2">
-            {regions.map(region => (
+            {filteredRegions.map(region => (
               <SidebarSection
                 key={`${act.id}-${region.name}`}
                 title={region.name}
                 subtitle={`${region.decisions.length} decision${
                   region.decisions.length === 1 ? '' : 's'
                 }`}
+                showRequired={showRequired}
+                showOptional={showOptional}
+                showUnavailable={showUnavailable}
+                searchTerm={searchTerm}
                 decisions={region.decisions}
                 badge={{
                   text: `${

@@ -10,7 +10,11 @@ import {
   JoinTadpoles,
   SaveCompanion,
 } from './act1/nautiloid/decisions'
-import { Intro } from './act1/nautiloid/intro'
+// import {
+//   doorDecision,
+//   introDecision as Intro,
+//   podDecision,
+// } from './act1/nautiloid/intro'
 import {
   AncientCells,
   MonasteryEntrance,
@@ -28,6 +32,11 @@ import {
   GoblinCamp,
   OwlbearCub,
 } from './act1/wilderness/decisions'
+import {
+  AncientRuins,
+  HiddenCamp,
+  RescueAdventurer,
+} from './act1/wilderness/unavailable_example'
 
 // Act 2 decisions
 import {
@@ -90,16 +99,20 @@ function addRegionInfo(decision: any, region: string) {
 export const allDecisions = [
   // Act 1 decisions
   // Nautiloid region
-  addRegionInfo(Intro, 'Nautiloid'),
+  // addRegionInfo(Intro, 'Nautiloid'),
+  // addRegionInfo(doorDecision, 'Nautiloid'),
+  // addRegionInfo(podDecision, 'Nautiloid'),
   addRegionInfo(JoinTadpoles, 'Nautiloid'),
   addRegionInfo(SaveCompanion, 'Nautiloid'),
-  addRegionInfo(DefenseMechanism, 'Nautiloid'),
-
   // Wilderness region
   addRegionInfo(DruidGroveConflict, 'Wilderness'),
   addRegionInfo(GoblinCamp, 'Wilderness'),
   addRegionInfo(OwlbearCub, 'Wilderness'),
   addRegionInfo(BlightedVillage, 'Wilderness'),
+  // Examples of decisions with prerequisites or mutual exclusivity
+  addRegionInfo(HiddenCamp, 'Wilderness'),
+  addRegionInfo(RescueAdventurer, 'Wilderness'),
+  addRegionInfo(AncientRuins, 'Wilderness'),
 
   // Underdark region
   addRegionInfo(MyconidColony, 'Underdark'),
@@ -214,6 +227,7 @@ export function getDecisionsByActAndRegion() {
 // Export all individual decisions for direct imports
 export {
   AncientCells,
+  AncientRuins, // Added unavailable example
   AstralCrystal,
   AstralKeys,
   BlightedVillage,
@@ -235,11 +249,11 @@ export {
   GoblinCamp,
   GrandBall,
   HauntedVillage,
+  HiddenCamp, // Added unavailable example
   HighJustice,
   ImperialDecree,
   InfernalContract,
-  // Act 1
-  Intro,
+  // Intro,
   JoinTadpoles,
   LostSpirit,
   Marketplace,
@@ -251,16 +265,15 @@ export {
   Planeshift,
   PsychicEcho,
   RefugeeCrisis,
+  RescueAdventurer, // Added unavailable example
   SacredScrolls,
   SaveCompanion,
   ShadowCult,
-  // Act 2
   ShadowLord,
   ShadowNexus,
   SlumsRebellion,
   SmugglersTunnels,
   SussurCave,
-  // Act 3
   ThievesGuild,
   TollDispute,
   UndergroundColiseum,

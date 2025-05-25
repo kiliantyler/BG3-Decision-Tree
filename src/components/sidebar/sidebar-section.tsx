@@ -25,6 +25,10 @@ interface SidebarSectionProps {
     variant?: 'default' | 'outline' | 'secondary'
   }
   defaultOpen?: boolean
+  showRequired?: boolean
+  showOptional?: boolean
+  showUnavailable?: boolean
+  searchTerm?: string
 }
 
 export function SidebarSection({
@@ -33,6 +37,10 @@ export function SidebarSection({
   decisions,
   badge,
   defaultOpen = true,
+  showRequired = true,
+  showOptional = true,
+  showUnavailable = true,
+  searchTerm = '',
 }: SidebarSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
   const { state, isMobile } = useSidebar()
@@ -108,6 +116,29 @@ export function SidebarSection({
     )
   }
 
+  // Filter decisions based on the filter settings and search term
+  const filteredDecisions = decisions.filter(decision => {
+    // Filter by decision visibility
+    if (decision.required && !showRequired) return false
+    if (!decision.required && !showOptional) return false
+    // Note: For unavailable decisions, we'll consider a decision without 'required' as potentially unavailable
+    // This is a simplified approach since there's no explicit 'unavailable' flag in the Decision type
+    if (!decision.required && !showUnavailable) return false
+
+    // Filter by search term
+    if (searchTerm && searchTerm.length > 0) {
+      const searchLower = searchTerm.toLowerCase()
+      return decision.description.toLowerCase().includes(searchLower)
+    }
+
+    return true
+  })
+
+  // If no decisions match the filters, hide the section
+  if (filteredDecisions.length === 0) {
+    return null
+  }
+
   return (
     <div className="mb-2">
       <Collapsible
@@ -144,7 +175,7 @@ export function SidebarSection({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="space-y-1 py-1">
-            {decisions.map(decision => (
+            {filteredDecisions.map(decision => (
               <DecisionRow
                 key={decision.id}
                 decision={decision}
