@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 /**
  * ID type that is forced to be lowercase with no spaces or special characters.

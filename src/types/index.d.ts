@@ -1,6 +1,0 @@
-export * from './act'
-export * from './character'
-export * from './decision'
-export * from './id'
-export * from './location'
-export * from './region'
