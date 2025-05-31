@@ -6,22 +6,10 @@ import {
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { getDecisionsByActAndRegion } from '@mock/decisions'
-import {
-  AncientRuins,
-  HiddenCamp,
-  RescueAdventurer,
-} from '@mock/decisions/act1/wilderness/unavailable_example'
 import { ScrollArea } from '@ui/scroll-area'
 import { useEffect, useState } from 'react'
 import { ActSection } from './act-section'
 import { LegendArea } from './legend-area'
-
-// Debug helper to ensure our example decisions are accessible
-console.log('Example decisions:', {
-  HiddenCamp,
-  RescueAdventurer,
-  AncientRuins,
-})
 
 export function AppSidebar() {
   // Filter state

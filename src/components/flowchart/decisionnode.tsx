@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 import type { Decision, DecisionOption } from '@/types'
 import { Badge } from '@ui/badge'

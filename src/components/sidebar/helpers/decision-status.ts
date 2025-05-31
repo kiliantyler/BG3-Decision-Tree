@@ -10,14 +10,6 @@ export function isDecisionUnavailable(
   decision: Decision,
   completedDecisions: Decision[] = [],
 ): boolean {
-  // Add debug logging
-  console.log(`Checking availability for decision: ${decision.id}`)
-  console.log(`Decision prerequisites:`, decision.prerequisites)
-  console.log(`Decision mutuallyExclusive:`, decision.mutuallyExclusive)
-  console.log(
-    `Completed decisions:`,
-    completedDecisions.map(d => d.id),
-  )
   // Check if decision has prerequisites that haven't been completed
   if (decision.prerequisites && decision.prerequisites.length > 0) {
     const prereqsMet = decision.prerequisites.every(prerequisite =>

@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 import type { Character } from '@/types'
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar'
