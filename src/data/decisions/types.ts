@@ -3,6 +3,32 @@
  * These are separated from implementation files to avoid circular dependencies
  */
 
+/**
+ * Type structure for hierarchical organization that maintains flat access:
+ * Act1.Nautiloid.MainDeck.SaveShadowheart.OpenPod
+ */
+
+// Location - contains decisions
+export interface Location {
+  name: string
+  description?: string
+  [key: string]: Decision<any> | string | undefined // For both metadata and decisions
+}
+
+// Region - contains locations
+export interface Region {
+  name: string
+  description?: string
+  [key: string]: Location | string | undefined // For both metadata and locations
+}
+
+// Act - contains regions
+export interface ActType {
+  name: string
+  description?: string
+  [key: string]: Region | string | undefined // For both metadata and regions
+}
+
 // Define dependency types
 export type DecisionDependency = {
   decision: object // Direct reference to decision object
@@ -20,6 +46,9 @@ export type OptionType = {
 export type DecisionBase = {
   name: string
   description: string
+  actId?: string // Reference to parent act
+  regionId?: string // Reference to parent region
+  locationId?: string // Reference to parent location
   dependencies?: readonly DecisionDependency[] // Optional dependencies for entire decision (supports readonly arrays)
 }
 
