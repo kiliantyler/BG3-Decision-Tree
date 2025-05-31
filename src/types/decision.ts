@@ -1,4 +1,4 @@
-import type { Act, Character, ID } from '@/types'
+import type { Character, ID } from '@/types'
 import type { ReactNode } from 'react'
 
 /**
@@ -10,18 +10,11 @@ export interface DecisionOption {
   mutuallyExclusive?: Decision[] // Decisions that become unavailable
 }
 
-export enum DecisionType {
-  DECISION = 'decision',
-  OUTCOME = 'outcome',
-}
-
 /**
  * Main Decision type representing a game decision point
  */
 export interface Decision {
   id: ID // Unique identifier (e.g., "nautiloid_start")
-  act: Act // Act in which the decision occurs
-  type: DecisionType // Usually "decision" (or "outcome" for end states)
   description: string // Full description of the situation
   options: DecisionOption[] // Object of possible choices
   prerequisites?: Decision[] // Decisions that must be completed first
@@ -70,3 +63,18 @@ export interface DecisionContextValue {
 }
 
 export type DecisionTemplate = Decision
+
+/**
+ * Type for decisions with named option access
+ * Allows accessing options both as an array and as named properties
+ */
+export type DecisionWithNamedOptions<
+  T extends readonly { id: string; name: string }[],
+> = {
+  id: string
+  name: string
+  description: string
+  options: T
+} & {
+  [K in T[number]['id']]: Extract<T[number], { id: K }>
+}
