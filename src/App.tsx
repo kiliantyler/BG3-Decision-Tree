@@ -7,7 +7,18 @@ import { SidebarButton } from './components/ui/sidebarbutton'
 import { cn } from './lib/utils'
 
 export function App() {
-  const sidebarState = localStorage.getItem('sidebar') === 'true'
+  // Safely access localStorage with fallback for environments where it's not available
+  const getSafeLocalStorage = (key: string, defaultValue: boolean): boolean => {
+    try {
+      return localStorage.getItem(key) === 'true'
+    } catch (error) {
+      // Handle cases where localStorage is unavailable (private browsing, permissions)
+      console.warn(`Unable to access localStorage: ${error}`)
+      return defaultValue
+    }
+  }
+
+  const sidebarState = getSafeLocalStorage('sidebar', true)
 
   return (
     <ThemeProvider

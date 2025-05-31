@@ -90,7 +90,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarHeader className={cn('items-center')}>
           <span className="center truncate font-semibold">
-            BG3 Descision Tree
+            BG3 Decision Tree
           </span>
         </SidebarHeader>
         <SidebarGroup>
