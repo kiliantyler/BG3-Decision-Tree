@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 /**
  * ID type that is forced to be lowercase with no spaces or special characters.
  * Only allows lowercase letters (a-z), numbers (0-9), and hyphens/underscores.
@@ -38,3 +40,29 @@ type AllowedChar = LowercaseChar | Digit | '-' | '_'
 
 // ID type that only allows lowercase letters, numbers, hyphens, and underscores
 export type ID = `${AllowedChar}${string}`
+
+/**
+ * React component helper types
+ */
+
+// Props for components that receive an ID
+export interface WithIdProps {
+  id: ID
+  className?: string
+  children?: ReactNode
+}
+
+// Type for components that require a unique ID selector
+export type IdSelector<T> = (id: ID) => T
+
+// Type for components with selection handling based on IDs
+export interface SelectableProps {
+  selectedId?: ID
+  onSelectId?: (id: ID) => void
+}
+
+// Type for components with multiple selection handling
+export interface MultiSelectProps {
+  selectedIds: ID[]
+  onSelectIds?: (ids: ID[]) => void
+}
