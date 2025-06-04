@@ -1,80 +1,56 @@
-import type { Character, ID } from '@/types'
-import type { ReactNode } from 'react'
-
-/**
- * Type for an individual option within a decision
- */
-export interface DecisionOption {
-  text: string
-  required_party_members?: Character[] // Required party members for this option
-  mutuallyExclusive?: Decision[] // Decisions that become unavailable
+// Define dependency types
+export type DecisionDependency = {
+  decision: object // Direct reference to decision object
+  option: object // Direct reference to option object
+  type: 'excludes' | 'requires' // Whether this option excludes or requires another decision
 }
 
-/**
- * Main Decision type representing a game decision point
- */
-export interface Decision {
-  id: ID // Unique identifier (e.g., "nautiloid_start")
-  description: string // Full description of the situation
-  options: DecisionOption[] // Object of possible choices
-  prerequisites?: Decision[] // Decisions that must be completed first
-  unlocks?: Decision[] // Decisions this unlocks
-  mutuallyExclusive?: Decision[] // Decisions that become unavailable
-  required?: boolean // Is this required for progression?
-  requiredCharacter?: Character[] // Required party members
-  wikiLink?: URL // Optional link to a wiki page for more information
+// Option type definition with optional dependencies
+export type OptionType = {
+  name: string
+  dependencies?: readonly DecisionDependency[] // Optional dependencies for this specific option (supports readonly arrays)
 }
 
-export interface DecisionNodeProps {
-  decision: Decision
-  isSelected?: boolean
-  isCompleted?: boolean
-  isDisabled?: boolean
-  className?: string
-  onSelect?: (decision: Decision) => void
-  children?: ReactNode
-}
-
-export interface DecisionOptionProps {
-  option: DecisionOption
-  index: number
-  isAvailable: boolean
-  isSelected?: boolean
-  onSelect?: (option: DecisionOption) => void
-  className?: string
-}
-
-export interface DecisionFlowProps {
-  decisions: Decision[]
-  currentDecision?: Decision
-  completedDecisions?: ID[]
-  onDecisionSelect?: (decision: Decision) => void
-  onOptionSelect?: (decision: Decision, option: DecisionOption) => void
-  className?: string
-}
-
-export interface DecisionContextValue {
-  decisions: Decision[]
-  currentDecision: Decision | null
-  completedDecisions: ID[]
-  selectDecision: (decision: Decision) => void
-  completeDecision: (decisionId: ID, optionIndex: number) => void
-  getAvailableDecisions: () => Decision[]
-}
-
-export type DecisionTemplate = Decision
-
-/**
- * Type for decisions with named option access
- * Allows accessing options both as an array and as named properties
- */
-export type DecisionWithNamedOptions<
-  T extends readonly { id: string; name: string }[],
-> = {
-  id: string
+// Base type for decision objects
+export type DecisionBase = {
   name: string
   description: string
-  options: T
-} & {
-  [K in T[number]['id']]: Extract<T[number], { id: K }>
+  dependencies?: readonly DecisionDependency[] // Optional dependencies for entire decision (supports readonly arrays)
+}
+
+// Define the return type for createDecision
+export type Decision<T extends Record<string, OptionType>> = DecisionBase &
+  T & {
+    id: string
+    options: (OptionType & { id: string })[]
+  }
+
+/**
+ * Creates a decision object with named option access and dynamic options array
+ * @param decision Base decision properties including optional dependencies
+ * @param options Object containing option entries
+ * @param id Optional explicit ID
+ * @returns Decision object with options accessible both as properties and as array
+ */
+export function createDecision<T extends Record<string, OptionType>>(
+  decision: DecisionBase,
+  options: T,
+  id?: string, // Optional ID parameter (defaults to name if not provided)
+): Decision<T> {
+  // Extract option entries and create options array
+  const optionsArray = Object.entries(options).map(([key, value]) => ({
+    ...(value as OptionType),
+    id: key, // Use the property name as the ID
+  }))
+
+  // Create the result object by combining everything
+  const decisionId = id || decision.name.replace(/\s+/g, '')
+
+  // Return the combined object
+  return {
+    ...decision,
+    ...options,
+    id: decisionId,
+    options: optionsArray,
+  } as Decision<T>
 }

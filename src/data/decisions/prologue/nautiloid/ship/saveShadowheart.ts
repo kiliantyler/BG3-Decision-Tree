@@ -1,4 +1,4 @@
-import { createDecision } from '../../types'
+import { createDecision } from '@types'
 import { ChooseCharacter } from './chooseCharacter'
 
 // Define the option entries with option objects - this is the single source of truth

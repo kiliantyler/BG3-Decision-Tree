@@ -1,21 +1,10 @@
-import type { ReactNode } from 'react'
-import type { Region } from '.'
-import type { ID } from './id'
+import type { Region } from './region'
 
-export interface Act {
-  id: ID
+// Act - contains regions
+export interface ActType {
   name: string
-  regions: Region[]
-}
+  description: string
+  wikiUrl: string
 
-export interface ActProps {
-  act: Act
-  className?: string
-  children?: ReactNode
-  onSelect?: (actId: ID) => void
-}
-
-export interface ActContextValue {
-  currentAct: Act | null
-  setCurrentAct: (act: Act) => void
+  [key: string]: Region | string | undefined // For both metadata and regions
 }

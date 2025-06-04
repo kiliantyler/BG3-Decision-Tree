@@ -17,9 +17,9 @@
       "@ui/*": [
         "./src/components/ui/*"
       ],
-      "@mock/*": [
-        "./mock/*"
-      ]
+      "@types": [
+        "./src/types"
+      ],
     }
   }
 }

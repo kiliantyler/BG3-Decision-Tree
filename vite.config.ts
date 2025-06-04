@@ -6,10 +6,4 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), tsconfigPaths()],
-  build: {
-    rollupOptions: {
-      // Exclude mock directory from build
-      external: ['mock/**'],
-    },
-  },
 })

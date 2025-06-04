@@ -1,37 +1,10 @@
-import type { ReactNode } from 'react'
-import type { Act, ID, Location } from '.'
+import type { Location } from './location'
 
+// Region - contains locations
 export interface Region {
-  id: ID
   name: string
-  act: Act
-  sublocations: Location[] // Make this required, initialized as empty array
-  registerLocation: (location: Location) => void // Method to register a location
-}
+  description: string
+  wikiUrl: string
 
-export interface RegionProps {
-  region: Region
-  isExpanded?: boolean
-  isSelected?: boolean
-  className?: string
-  children?: ReactNode
-  onSelect?: (region: Region) => void
-  onToggleExpand?: (region: Region) => void
-}
-
-export interface RegionListProps {
-  regions: Region[]
-  currentRegion?: Region
-  expandedRegions?: ID[]
-  onRegionSelect?: (region: Region) => void
-  className?: string
-}
-
-export interface RegionContextValue {
-  regions: Region[]
-  currentRegion: Region | null
-  expandedRegions: ID[]
-  selectRegion: (region: Region) => void
-  toggleRegionExpanded: (regionId: ID) => void
-  getRegionLocations: (regionId: ID) => Location[]
+  [key: string]: Location | string
 }

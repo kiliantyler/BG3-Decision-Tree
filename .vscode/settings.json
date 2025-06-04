@@ -37,6 +37,7 @@
   "path-intellisense.mappings": {
     "@": "${workspaceFolder}/src",
     "@ui": "${workspaceFolder}/src/components/ui",
+    "@types": "${workspaceFolder}/src/types",
   },
   // File associations
   "files.associations": {

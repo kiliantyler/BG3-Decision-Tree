@@ -1,35 +1,10 @@
-import type { ReactNode } from 'react'
-import type { Act, ID, Region } from '.'
+import type { Decision } from './decision'
 
+// Location - contains decisions
 export interface Location {
-  id: ID
   name: string
-  act: Act
-  region?: Region // Make region optional during initialization
-  registerWithRegion: (region: Region) => void // Method to register with a region
-}
+  description: string
+  wikiUrl: string
 
-export interface LocationProps {
-  location: Location
-  isSelected?: boolean
-  isVisited?: boolean
-  className?: string
-  children?: ReactNode
-  onClick?: (location: Location) => void
-}
-
-export interface LocationListProps {
-  locations: Location[]
-  currentLocation?: Location
-  visitedLocations?: ID[]
-  onLocationSelect?: (location: Location) => void
-  className?: string
-}
-
-export interface LocationContextValue {
-  locations: Location[]
-  currentLocation: Location | null
-  visitedLocations: ID[]
-  selectLocation: (location: Location) => void
-  markLocationAsVisited: (locationId: ID) => void
+  [key: string]: Decision<any> | string | undefined // For both metadata and decisions
 }
