@@ -3,38 +3,49 @@ import type { Decision } from '@/types'
 /**
  * Determine if a decision is currently unavailable
  * A decision is unavailable if:
- * 1. It has prerequisites that haven't been completed yet
- * 2. Another decision that makes this one mutually exclusive has been completed
+ * 1. It has dependencies with type 'requires' that haven't been completed
+ * 2. It has dependencies with type 'excludes' that have been completed
+ * 3. A completed decision has an 'excludes' dependency on it
  */
 export function isDecisionUnavailable(
-  decision: Decision,
-  completedDecisions: Decision[] = [],
+  decision: Decision<any>,
+  completedDecisions: Decision<any>[] = [],
 ): boolean {
-  // Check if decision has prerequisites that haven't been completed
-  if (decision.prerequisites && decision.prerequisites.length > 0) {
-    const prereqsMet = decision.prerequisites.every(prerequisite =>
-      completedDecisions.some(completed => completed.id === prerequisite.id),
+  // Check if decision has dependencies that make it unavailable
+  if (decision.dependencies && decision.dependencies.length > 0) {
+    // Check for 'requires' dependencies that haven't been completed
+    const requiresDeps = decision.dependencies.filter(
+      (dep: import('@/types').DecisionDependency) => dep.type === 'requires',
     )
-    if (!prereqsMet) return true
-  }
-
-  // Check if any decisions that make this one mutually exclusive have been completed
-  for (const completedDecision of completedDecisions) {
-    // Check if this decision is in the completedDecision's mutuallyExclusive list
-    if (
-      completedDecision.mutuallyExclusive?.some(
-        mutuallyExclusiveDecision =>
-          mutuallyExclusiveDecision.id === decision.id,
+    if (requiresDeps.length > 0) {
+      const requiresMet = requiresDeps.every((dep: any) =>
+        completedDecisions.some(
+          completed => completed.id === (dep.decision as any).id,
+        ),
       )
-    ) {
-      return true
+      if (!requiresMet) return true
     }
 
-    // Check if the completed decision is in this decision's mutuallyExclusive list
+    // Check for 'excludes' dependencies that have been completed
+    const excludesDeps = decision.dependencies.filter(
+      (dep: import('@/types').DecisionDependency) => dep.type === 'excludes',
+    )
+    if (excludesDeps.length > 0) {
+      const isExcluded = excludesDeps.some((dep: any) =>
+        completedDecisions.some(
+          completed => completed.id === (dep.decision as any).id,
+        ),
+      )
+      if (isExcluded) return true
+    }
+  }
+
+  // Check if any completed decision has an 'excludes' dependency on this decision
+  for (const completedDecision of completedDecisions) {
     if (
-      decision.mutuallyExclusive?.some(
-        mutuallyExclusiveDecision =>
-          mutuallyExclusiveDecision.id === completedDecision.id,
+      completedDecision.dependencies?.some(
+        (dep: any) =>
+          dep.type === 'excludes' && (dep.decision as any).id === decision.id,
       )
     ) {
       return true
@@ -42,24 +53,4 @@ export function isDecisionUnavailable(
   }
 
   return false
-}
-
-/**
- * For mock/demo purposes, simulate some completed decisions based on the decision ID
- * In a real app, this would come from the game state
- */
-// Import actual decisions from our mock data
-import { GoblinCamp, OwlbearCub } from '@mock/decisions'
-
-/**
- * For demo purposes, returns a list of decisions that are considered "completed"
- * In a real app, this would come from the game state or user progress
- */
-export function getCompletedDecisionsForDemo(): Decision[] {
-  // Return the actual decision objects from our mock data
-  // This ensures they match the Decision type exactly
-  return [
-    GoblinCamp, // Completing this should enable decisions that require it
-    OwlbearCub, // This will make mutually exclusive decisions unavailable
-  ]
 }

@@ -1,4 +1,5 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
+import type { Decision } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import { ActSection } from './act-section'
 
@@ -11,76 +12,79 @@ const ActSectionWithProvider = (
   </SidebarProvider>
 )
 
-// Define mock data for the component with proper TypeScript type handling
-const mockAct = {
+// Define story data for the component with proper TypeScript types
+const storyAct = {
   id: 'act1',
   name: 'Act 1',
 }
 
-const mockRegions = [
+// Create decision using proper Decision type
+const createStoryDecision = (
+  id: string,
+  description: string,
+  isRequired: boolean,
+  options: { name: string }[] = [{ name: 'Option 1' }, { name: 'Option 2' }],
+  dependencies?: any[],
+): Decision<any> => ({
+  id,
+  name: description,
+  description,
+  options,
+  dependencies,
+})
+
+const storyRegions = [
   {
     name: 'Nautiloid',
     decisions: [
-      {
-        id: 'story_nautiloid_decision1',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        description: 'First decision in Nautiloid',
-        type: 'decision',
-        options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-        required: true,
-      },
-      {
-        id: 'story_nautiloid_decision2',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        description: 'Second decision in Nautiloid',
-        type: 'decision',
-        options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-        required: false,
-      },
+      createStoryDecision(
+        'story_nautiloid_decision1',
+        'First decision in Nautiloid',
+        true,
+      ),
+      createStoryDecision(
+        'story_nautiloid_decision2',
+        'Second decision in Nautiloid',
+        false,
+      ),
     ],
   },
   {
     name: 'Wilderness',
     decisions: [
-      {
-        id: 'story_wilderness_required',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        description: 'Required wilderness decision',
-        type: 'decision',
-        options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-        required: true,
-      },
-      {
-        id: 'story_wilderness_optional',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        description: 'Optional wilderness decision',
-        type: 'decision',
-        options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-        required: false,
-      },
-      {
-        id: 'story_wilderness_unavailable',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        description: 'Unavailable wilderness decision',
-        type: 'decision',
-        options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-        required: false,
-        prerequisites: [
+      createStoryDecision(
+        'story_wilderness_required',
+        'Required wilderness decision',
+        true,
+      ),
+      createStoryDecision(
+        'story_wilderness_optional',
+        'Optional wilderness decision',
+        false,
+      ),
+      createStoryDecision(
+        'story_wilderness_unavailable',
+        'Unavailable wilderness decision',
+        false,
+        [{ name: 'Option 1' }, { name: 'Option 2' }],
+        [
           {
-            id: 'story_prerequisite_decision',
-            act: mockAct,
-            type: 'decision',
-            description: 'Prerequisite',
-            options: [],
+            decision: createStoryDecision(
+              'story_prerequisite_decision',
+              'Prerequisite',
+              false,
+            ),
+            option: { name: 'Option 1', id: 'option1' },
+            type: 'requires',
           },
         ],
-      },
+      ),
     ],
   },
-] as any // Type assertion to avoid ID format issues in storybook
+]
 
 // Mock functions for the section state controls
-const mockSectionStates = {
+const storySectionStates = {
   'act-act1': true,
   'region-act1-Nautiloid': false,
   'region-act1-Wilderness': true,
@@ -93,14 +97,14 @@ const meta: Meta<typeof ActSectionWithProvider> = {
     layout: 'padded',
   },
   args: {
-    act: mockAct,
-    regions: mockRegions,
+    act: storyAct,
+    regions: storyRegions,
     defaultOpen: true,
     showRequired: true,
     showOptional: true,
     showUnavailable: true,
     searchTerm: '',
-    sectionStates: mockSectionStates,
+    sectionStates: storySectionStates,
     isOpenExternal: true,
     onOpenChangeExternal: () => {},
   },
@@ -173,14 +177,11 @@ export const Act2Example: Story = {
       {
         name: 'Shadowfell',
         decisions: [
-          {
-            id: 'story_shadowfell_decision',
-            act: { id: 'act2', name: 'Act 2', regions: [] },
-            description: 'Shadowfell decision',
-            type: 'decision',
-            options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-            required: true,
-          },
+          createStoryDecision(
+            'story_shadowfell_decision',
+            'Shadowfell decision',
+            true,
+          ),
         ],
       },
     ],
@@ -188,5 +189,5 @@ export const Act2Example: Story = {
       'act-act2': true,
       'region-act2-Shadowfell': false,
     },
-  } as any, // Type assertion needed for the mock decisions
+  },
 }

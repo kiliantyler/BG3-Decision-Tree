@@ -8,38 +8,31 @@ import { cn } from '@/lib/utils'
 import type { Decision } from '@/types'
 import * as React from 'react'
 import { Badge } from '../ui/badge'
-import {
-  getCompletedDecisionsForDemo,
-  isDecisionUnavailable,
-} from './helpers/decision-status'
+import { isDecisionUnavailable } from './helpers/decision-status'
 
 export interface DecisionRowProps {
-  decision: Decision
+  decision: Decision<any>
 }
 
 export function DecisionRow({ decision }: DecisionRowProps) {
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed'
 
-  // Get completed decisions for demo purposes
-  const completedDecisions = getCompletedDecisionsForDemo()
+  // Use empty array for completed decisions in the main app
+  // In a real app, this would come from a global state or context
+  const completedDecisions: Decision<any>[] = []
 
   // Use the helper function to determine if the decision is unavailable
   const isUnavailable = isDecisionUnavailable(decision, completedDecisions)
 
-  // For debugging issues with unavailable detection
+  // For debugging issues with dependencies
   React.useEffect(() => {
-    if (decision.prerequisites?.length || decision.mutuallyExclusive?.length) {
+    if (decision.dependencies?.length) {
       console.debug(
-        `Decision ${decision.id} - hasPrereq: ${!!decision.prerequisites?.length} - hasMutEx: ${!!decision.mutuallyExclusive?.length} - isUnavailable: ${isUnavailable}`,
+        `Decision ${decision.id} - hasDeps: ${!!decision.dependencies?.length} - isUnavailable: ${isUnavailable}`,
       )
     }
   }, [decision, isUnavailable])
-
-  // Use debug logging only in development mode
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`Decision: ${decision.id}, isUnavailable: ${isUnavailable}`)
-  }
 
   // Collapsed version of the card
   if (isCollapsed && !isMobile) {
@@ -101,14 +94,16 @@ export function DecisionRow({ decision }: DecisionRowProps) {
               <div className="mt-2 space-y-1">
                 <p className="text-sm font-medium">Options:</p>
                 <ul className="ml-2 space-y-0.5 text-xs">
-                  {decision.options.map((option, idx) => (
-                    <li
-                      key={idx}
-                      className="text-muted-foreground"
-                    >
-                      • {option.text}
-                    </li>
-                  ))}
+                  {decision.options.map(
+                    (option: { name: string }, idx: number) => (
+                      <li
+                        key={idx}
+                        className="text-muted-foreground"
+                      >
+                        • {option.name}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}

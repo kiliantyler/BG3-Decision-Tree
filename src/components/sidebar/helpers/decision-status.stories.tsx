@@ -1,60 +1,118 @@
-import type { Decision } from '@/types'
-import { DecisionType } from '@/types'
+import type { Decision, DecisionDependency } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
-import {
-  getCompletedDecisionsForDemo,
-  isDecisionUnavailable,
-} from './decision-status'
+import { isDecisionUnavailable } from './decision-status'
+
+// Create sample completed decisions for this story file
+const createStoryCompletedDecisions = (): Decision<any>[] => {
+  // Create sample completed decisions
+  const goblinCampDecision: Decision<any> = {
+    id: 'wilderness_goblincamp_goblinleader',
+    name: 'Goblin Leader Decision',
+    description: 'What to do with the goblin leader',
+    options: [
+      { name: 'Kill the goblin leader' },
+      { name: 'Spare the goblin leader' },
+    ],
+    dependencies: [],
+  }
+
+  const owlbearCubDecision: Decision<any> = {
+    id: 'wilderness_forest_owlbearcub',
+    name: 'Owlbear Cub Decision',
+    description: 'What to do with the owlbear cub',
+    options: [
+      { name: 'Take the owlbear cub' },
+      { name: 'Leave the owlbear cub' },
+    ],
+    dependencies: [],
+  }
+
+  return [
+    goblinCampDecision,
+    owlbearCubDecision,
+  ]
+}
 
 // Create a demo component to showcase the functions
 const DecisionStatusDemo = () => {
-  const completedDecisions = getCompletedDecisionsForDemo()
-
-  // Example decisions with different statuses
-  const availableDecision: Decision = {
-    id: 'available_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    type: DecisionType.DECISION,
-    description: 'A regular decision with no prerequisites',
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-  }
+  const completedDecisions = createStoryCompletedDecisions()
 
   // Create a new decision that is not in the completed list
-  const uncompleted: Decision = {
+  const uncompleted: Decision<any> = {
     id: 'uncompleted_prerequisite',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    type: DecisionType.DECISION,
+    name: 'Not Completed Decision',
     description: 'This decision has not been completed yet',
-    options: [{ text: 'Option A' }, { text: 'Option B' }],
+    options: [
+      { name: 'Option A' },
+      { name: 'Option B' },
+    ],
+    dependencies: [],
   }
 
-  // This decision has a prerequisite that is in the completed list
-  const prerequisiteMetDecision: Decision = {
-    id: 'prereq_met_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    type: DecisionType.DECISION,
-    description: 'Decision with prerequisites that are satisfied',
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    prerequisites: [completedDecisions[0]], // GoblinCamp is completed
+  // Example decisions with different statuses
+  const availableDecision: Decision<any> = {
+    id: 'available_decision',
+    name: 'Available Decision',
+    description: 'A regular decision with no dependencies',
+    options: [
+      { name: 'Option 1' },
+      { name: 'Option 2' },
+    ],
+    dependencies: [],
   }
 
-  // This decision has a prerequisite that is NOT in the completed list
-  const prerequisiteNotMetDecision: Decision = {
-    id: 'prereq_not_met_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    type: DecisionType.DECISION,
-    description: 'Decision with prerequisites that are NOT satisfied',
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    prerequisites: [uncompleted], // This is not in the completed list
+  // This decision has a dependency that requires a decision in the completed list
+  const requiresMetDecision: Decision<any> = {
+    id: 'requires_met_decision',
+    name: 'Requires Met Decision',
+    description: 'Decision with requires dependency that is satisfied',
+    options: [
+      { name: 'Option 1' },
+      { name: 'Option 2' },
+    ],
+    dependencies: [
+      {
+        decision: completedDecisions[0], // GoblinCamp is completed
+        option: { name: 'Option 1' },
+        type: 'requires',
+      } as DecisionDependency,
+    ],
   }
 
-  const mutuallyExclusiveDecision: Decision = {
-    id: 'mutually_exclusive_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    type: DecisionType.DECISION,
+  // This decision has a dependency that requires a decision NOT in the completed list
+  const requiresNotMetDecision: Decision<any> = {
+    id: 'requires_not_met_decision',
+    name: 'Requires Not Met Decision',
+    description: 'Decision with requires dependency that is NOT satisfied',
+    options: [
+      { name: 'Option 1' },
+      { name: 'Option 2' },
+    ],
+    dependencies: [
+      {
+        decision: uncompleted, // This is not in the completed list
+        option: { name: 'Option A' },
+        type: 'requires',
+      } as DecisionDependency,
+    ],
+  }
+
+  // This decision has a dependency that excludes a decision in the completed list
+  const excludesDecision: Decision<any> = {
+    id: 'excludes_decision',
+    name: 'Excludes Decision',
     description: 'Decision that conflicts with a completed decision',
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    mutuallyExclusive: [completedDecisions[1]], // OwlbearCub is completed
+    options: [
+      { name: 'Option 1' },
+      { name: 'Option 2' },
+    ],
+    dependencies: [
+      {
+        decision: completedDecisions[1], // OwlbearCub is completed
+        option: { name: 'Take the owlbear cub' },
+        type: 'excludes',
+      } as DecisionDependency,
+    ],
   }
 
   return (
@@ -98,27 +156,25 @@ const DecisionStatusDemo = () => {
 
         <div className="rounded border p-3">
           <p>
-            <strong>Decision with Satisfied Prerequisites:</strong>{' '}
-            {prerequisiteMetDecision.description}
+            <strong>Decision with Satisfied 'Requires' Dependency:</strong>{' '}
+            {requiresMetDecision.description}
           </p>
           <p className="text-sm">
-            Has prerequisite: {prerequisiteMetDecision.prerequisites?.[0]?.id}{' '}
+            Requires:{' '}
+            {(requiresMetDecision.dependencies[0].decision as Decision<any>).id}{' '}
             (Completed: ✓)
           </p>
           <p className="text-sm">
             Is Unavailable:{' '}
             <span
               className={
-                isDecisionUnavailable(
-                  prerequisiteMetDecision,
-                  completedDecisions,
-                )
+                isDecisionUnavailable(requiresMetDecision, completedDecisions)
                   ? 'text-red-500'
                   : 'text-green-500'
               }
             >
               {isDecisionUnavailable(
-                prerequisiteMetDecision,
+                requiresMetDecision,
                 completedDecisions,
               ).toString()}
             </span>
@@ -127,19 +183,23 @@ const DecisionStatusDemo = () => {
 
         <div className="rounded border bg-amber-50 p-3 dark:bg-amber-950/30">
           <p>
-            <strong>Decision with Unsatisfied Prerequisites:</strong>{' '}
-            {prerequisiteNotMetDecision.description}
+            <strong>Decision with Unsatisfied 'Requires' Dependency:</strong>{' '}
+            {requiresNotMetDecision.description}
           </p>
           <p className="text-sm">
-            Has prerequisite:{' '}
-            {prerequisiteNotMetDecision.prerequisites?.[0]?.id} (Completed: ✗)
+            Requires:{' '}
+            {
+              (requiresNotMetDecision.dependencies[0].decision as Decision<any>)
+                .id
+            }{' '}
+            (Completed: ✗)
           </p>
           <p className="text-sm">
             Is Unavailable:{' '}
             <span
               className={
                 isDecisionUnavailable(
-                  prerequisiteNotMetDecision,
+                  requiresNotMetDecision,
                   completedDecisions,
                 )
                   ? 'text-red-500'
@@ -147,7 +207,7 @@ const DecisionStatusDemo = () => {
               }
             >
               {isDecisionUnavailable(
-                prerequisiteNotMetDecision,
+                requiresNotMetDecision,
                 completedDecisions,
               ).toString()}
             </span>
@@ -156,28 +216,25 @@ const DecisionStatusDemo = () => {
 
         <div className="rounded border p-3">
           <p>
-            <strong>Mutually Exclusive Decision:</strong>{' '}
-            {mutuallyExclusiveDecision.description}
+            <strong>Decision with 'Excludes' Dependency:</strong>{' '}
+            {excludesDecision.description}
           </p>
           <p className="text-sm">
-            Mutually exclusive with:{' '}
-            {mutuallyExclusiveDecision.mutuallyExclusive?.[0]?.id} (Completed:
-            ✓)
+            Excludes:{' '}
+            {(excludesDecision.dependencies[0].decision as Decision<any>).id}{' '}
+            (Completed: ✓)
           </p>
           <p className="text-sm">
             Is Unavailable:{' '}
             <span
               className={
-                isDecisionUnavailable(
-                  mutuallyExclusiveDecision,
-                  completedDecisions,
-                )
+                isDecisionUnavailable(excludesDecision, completedDecisions)
                   ? 'text-red-500'
                   : 'text-green-500'
               }
             >
               {isDecisionUnavailable(
-                mutuallyExclusiveDecision,
+                excludesDecision,
                 completedDecisions,
               ).toString()}
             </span>

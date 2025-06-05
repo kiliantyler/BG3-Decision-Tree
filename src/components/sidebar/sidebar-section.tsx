@@ -19,7 +19,7 @@ import { DecisionRow } from './decision-row'
 interface SidebarSectionProps {
   title: string
   subtitle?: string
-  decisions: Decision[]
+  decisions: Decision<any>[]
   badge?: {
     text: string
     variant?: 'default' | 'outline' | 'secondary'

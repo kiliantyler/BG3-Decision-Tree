@@ -21,7 +21,7 @@ interface ActSectionProps {
   }
   regions: {
     name: string
-    decisions: any[]
+    decisions: import('@/types').Decision<any>[]
   }[]
   defaultOpen?: boolean
   showRequired?: boolean

@@ -1,6 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import type { Meta, StoryObj } from '@storybook/react'
 import { AppSidebar } from './app-sidebar'
+// Import AppSidebar component
 
 // Wrap AppSidebar in SidebarProvider to fix "useSidebar must be used within a SidebarProvider" error
 const AppSidebarWithProvider = () => (
@@ -18,7 +19,7 @@ const meta: Meta<typeof AppSidebarWithProvider> = {
       default: 'light',
     },
   },
-  // No args needed since AppSidebar loads its own data from mock sources
+  // No args needed since AppSidebar loads its own data internally
 }
 
 export default meta

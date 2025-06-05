@@ -1,4 +1,5 @@
 import { OriginCharacter } from '@/data/characters'
+import type { Decision } from '@/types'
 import { CharacterType } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import 'reactflow/dist/style.css'
@@ -73,14 +74,13 @@ const flowWithDecisionsNodes = [
     data: {
       decision: {
         id: 'nautiloid_start',
+        name: 'Accept or reject the tadpole?',
         description: 'Accept or reject the tadpole?',
-        type: 'decision',
-        required: true,
         options: [
-          { text: 'Accept the tadpole' },
-          { text: 'Reject the tadpole' },
+          { name: 'Accept the tadpole' },
+          { name: 'Reject the tadpole' },
         ],
-      },
+      } as Decision<any>,
     },
   },
   {
@@ -90,14 +90,14 @@ const flowWithDecisionsNodes = [
     data: {
       decision: {
         id: 'nautiloid_pods',
+        name: 'Who do you save from the pods?',
         description: 'Who do you save from the pods?',
-        type: 'decision',
         options: [
-          { text: 'Save Shadowheart' },
-          { text: "Save Lae'zel" },
-          { text: 'Save no one' },
+          { name: 'Save Shadowheart' },
+          { name: "Save Lae'zel" },
+          { name: 'Save no one' },
         ],
-      },
+      } as Decision<any>,
     },
   },
   {
@@ -107,13 +107,13 @@ const flowWithDecisionsNodes = [
     data: {
       decision: {
         id: 'nautiloid_controls',
+        name: 'Activate ship controls?',
         description: 'Activate ship controls?',
-        type: 'decision',
         options: [
-          { text: 'Use controls to activate defense systems' },
-          { text: 'Ignore the controls' },
+          { name: 'Use controls to activate defense systems' },
+          { name: 'Ignore the controls' },
         ],
-      },
+      } as Decision<any>,
     },
   },
 ]

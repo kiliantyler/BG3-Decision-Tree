@@ -1,5 +1,5 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
-import { DecisionType } from '@/types'
+import type { Decision } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import { SidebarSection } from './sidebar-section'
 
@@ -12,43 +12,42 @@ const SidebarSectionWithProvider = (
   </SidebarProvider>
 )
 
-// Create mock decisions for the storybook
-// We need to use 'as Decision' to bypass TypeScript's strict ID type checking in storybook
-const mockDecisions = [
-  {
-    id: 'story_required_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    description: 'Required decision',
-    type: DecisionType.DECISION,
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    required: true,
-  },
-  {
-    id: 'story_optional_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    description: 'Optional decision',
-    type: DecisionType.DECISION,
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    required: false,
-  },
-  {
-    id: 'story_unavailable_decision',
-    act: { id: 'act1', name: 'Act 1', regions: [] },
-    description: 'Unavailable decision with prerequisite',
-    type: DecisionType.DECISION,
-    options: [{ text: 'Option 1' }, { text: 'Option 2' }],
-    required: false,
-    prerequisites: [
+// Create story decisions using the proper Decision type
+const createStoryDecision = (
+  id: string,
+  description: string,
+  required: boolean = false,
+  options: { name: string }[] = [{ name: 'Option 1' }, { name: 'Option 2' }],
+  dependencies?: any[],
+): Decision<any> => ({
+  id,
+  name: description,
+  description,
+  options,
+  dependencies,
+})
+
+// Create sample decisions for the storybook
+const storyDecisions = [
+  createStoryDecision('story_required_decision', 'Required decision', true),
+  createStoryDecision('story_optional_decision', 'Optional decision', false),
+  createStoryDecision(
+    'story_unavailable_decision',
+    'Unavailable decision with prerequisite',
+    false,
+    [{ name: 'Option 1' }, { name: 'Option 2' }],
+    [
       {
-        id: 'story_prerequisite_decision',
-        act: { id: 'act1', name: 'Act 1', regions: [] },
-        type: DecisionType.DECISION,
-        description: 'Prerequisite',
-        options: [],
+        decision: createStoryDecision(
+          'story_prerequisite_decision',
+          'Prerequisite',
+        ),
+        option: { name: 'Option 1' },
+        type: 'requires',
       },
     ],
-  },
-] as any // Type assertion to avoid ID format issues in storybook
+  ),
+]
 
 const meta: Meta<typeof SidebarSectionWithProvider> = {
   title: 'Sidebar/SidebarSection',
@@ -59,7 +58,7 @@ const meta: Meta<typeof SidebarSectionWithProvider> = {
   args: {
     title: 'Region Name',
     subtitle: '3 decisions (1 required)',
-    decisions: mockDecisions,
+    decisions: storyDecisions,
     badge: {
       text: '1 Required',
       variant: 'outline',

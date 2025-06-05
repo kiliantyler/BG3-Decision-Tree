@@ -1,5 +1,4 @@
-import { Act } from '@/data/acts'
-import { DecisionType } from '@/types'
+import type { Decision } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import type { NodeTypes } from 'reactflow'
 import ReactFlow, { Background, Controls } from 'reactflow'
@@ -36,16 +35,14 @@ const baseDecision = {
   position: { x: 100, y: 100 },
   data: {
     decision: {
-      id: 'decision1' as any,
-      act: Act.I,
+      id: 'decision1',
+      name: 'Accept or reject the tadpole',
       description: 'Accept or reject the tadpole',
-      type: DecisionType.DECISION,
       options: [
-        { text: 'Accept the tadpole' },
-        { text: 'Reject the tadpole' },
+        { name: 'Accept the tadpole' },
+        { name: 'Reject the tadpole' },
       ],
-      required: true,
-    },
+    } as Decision<any>,
   },
 }
 
@@ -76,11 +73,14 @@ export const OptionalDecision: Story = {
           id: 'node2',
           data: {
             decision: {
-              ...baseDecision.data.decision,
-              id: 'decision2' as any,
-              required: false,
+              id: 'decision2',
+              name: 'Optional side quest',
               description: 'Optional side quest',
-            },
+              options: [
+                { name: 'Option 1' },
+                { name: 'Option 2' },
+              ],
+            } as Decision<any>,
           },
         },
       ]}
@@ -97,11 +97,15 @@ export const LongDescription: Story = {
           id: 'node3',
           data: {
             decision: {
-              ...baseDecision.data.decision,
-              id: 'decision3' as any,
+              id: 'decision3',
+              name: 'Long Description',
               description:
                 'This is an extremely long decision description that should wrap or be truncated in the node component',
-            },
+              options: [
+                { name: 'Option 1' },
+                { name: 'Option 2' },
+              ],
+            } as Decision<any>,
           },
         },
       ]}
@@ -118,17 +122,17 @@ export const ManyOptions: Story = {
           id: 'node4',
           data: {
             decision: {
-              ...baseDecision.data.decision,
-              id: 'decision4' as any,
+              id: 'decision4',
+              name: 'Decision with many options',
               description: 'Decision with many options',
               options: [
-                { text: 'Option 1' },
-                { text: 'Option 2' },
-                { text: 'Option 3' },
-                { text: 'Option 4' },
-                { text: 'Option 5' },
+                { name: 'Option 1' },
+                { name: 'Option 2' },
+                { name: 'Option 3' },
+                { name: 'Option 4' },
+                { name: 'Option 5' },
               ],
-            },
+            } as Decision<any>,
           },
         },
       ]}
@@ -147,11 +151,14 @@ export const MultipleNodes: Story = {
           position: { x: 300, y: 100 },
           data: {
             decision: {
-              ...baseDecision.data.decision,
-              id: 'decision5' as any,
-              required: false,
+              id: 'decision5',
+              name: 'Second decision node',
               description: 'Second decision node',
-            },
+              options: [
+                { name: 'Option 1' },
+                { name: 'Option 2' },
+              ],
+            } as Decision<any>,
           },
         },
         {
@@ -160,11 +167,14 @@ export const MultipleNodes: Story = {
           position: { x: 200, y: 250 },
           data: {
             decision: {
-              ...baseDecision.data.decision,
-              id: 'decision6' as any,
-              act: Act.II,
+              id: 'decision6',
+              name: 'Act II Decision',
               description: 'Act II Decision',
-            },
+              options: [
+                { name: 'Option 1' },
+                { name: 'Option 2' },
+              ],
+            } as Decision<any>,
           },
         },
       ]}

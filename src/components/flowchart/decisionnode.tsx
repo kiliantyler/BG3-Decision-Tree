@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import type { Decision, DecisionOption } from '@/types'
+import type { Decision } from '@/types'
 import { Badge } from '@ui/badge'
 import { Card, CardContent, CardTitle } from '@ui/card'
 import {
@@ -18,8 +18,15 @@ import * as React from 'react'
 import type { NodeProps } from 'reactflow'
 import { Handle, Position } from 'reactflow'
 
+// Define a local DecisionOption type to use in the component
+interface DecisionOption {
+  text?: string
+  name: string
+  id?: string
+}
+
 export interface DecisionNodeData {
-  decision: Decision
+  decision: Decision<any>
   onComplete?: (
     id: string,
     option: DecisionOption,
@@ -76,12 +83,12 @@ export function DecisionNode({
 
   // Render options list
   const renderedOptions = decision.options.map(
-    (option: DecisionOption, index) => (
+    (option: { name: string; text?: string }, index: number) => (
       <OptionBox
         key={index}
-        onClick={() => handleOptionSelect(option)}
+        onClick={() => handleOptionSelect(option as DecisionOption)}
       >
-        {option.text}
+        {option.text || option.name}
       </OptionBox>
     ),
   )
@@ -100,7 +107,7 @@ export function DecisionNode({
         onClick={handleSelectedOptionClick}
         className="option-box border border-dashed border-green-500 dark:border-green-700"
       >
-        {chosenOption.text}
+        {chosenOption.text || chosenOption.name}
       </OptionBox>
     </div>
   )
@@ -232,25 +239,44 @@ export function DecisionNode({
                 )}
               </Collapsible>
 
-              {/* Metadata section (prerequisites, unlocks) */}
-              {(decision.prerequisites && decision.prerequisites.length > 0) ||
-              (decision.unlocks && decision.unlocks.length > 0) ? (
+              {/* Metadata section (dependencies) */}
+              {decision.dependencies && decision.dependencies.length > 0 ? (
                 <div className="mt-3 border-t border-dashed border-muted pt-3 text-xs text-muted-foreground">
-                  {decision.prerequisites &&
-                    decision.prerequisites.length > 0 && (
+                  {/* Show requires dependencies */}
+                  {decision.dependencies &&
+                    decision.dependencies.filter(
+                      (dep: any) => dep.type === 'requires',
+                    ).length > 0 && (
                       <div className="mb-1">
                         <strong>Requires:</strong>{' '}
-                        {decision.prerequisites
-                          .map(p => p.description)
+                        {decision.dependencies
+                          .filter((dep: any) => dep.type === 'requires')
+                          .map(
+                            (dep: any) =>
+                              (dep.decision as any).name ||
+                              (dep.decision as any).description,
+                          )
                           .join(', ')}
                       </div>
                     )}
-                  {decision.unlocks && decision.unlocks.length > 0 && (
-                    <div>
-                      <strong>Unlocks:</strong>{' '}
-                      {decision.unlocks.map(u => u.description).join(', ')}
-                    </div>
-                  )}
+
+                  {/* Show excludes dependencies */}
+                  {decision.dependencies &&
+                    decision.dependencies.filter(
+                      (dep: any) => dep.type === 'excludes',
+                    ).length > 0 && (
+                      <div>
+                        <strong>Excludes:</strong>{' '}
+                        {decision.dependencies
+                          .filter((dep: any) => dep.type === 'excludes')
+                          .map(
+                            (dep: any) =>
+                              (dep.decision as any).name ||
+                              (dep.decision as any).description,
+                          )
+                          .join(', ')}
+                      </div>
+                    )}
                 </div>
               ) : null}
 

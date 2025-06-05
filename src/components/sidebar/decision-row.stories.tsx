@@ -1,14 +1,63 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
-import { Act } from '@/data/acts'
-import { DecisionType } from '@/types'
-// Import mock decision data
-import { allDecisions } from '@mock/decisions'
+import type { Decision } from '@/types'
 import type { Meta, StoryObj } from '@storybook/react'
 import { DecisionRow } from './decision-row'
+import { isDecisionUnavailable } from './helpers/decision-status'
 
-const meta: Meta<typeof DecisionRow> = {
+// Create sample completed decisions for storybook demos
+const getCompletedDecisionsForStories = (): Decision<any>[] => {
+  // Create sample completed decisions for demo purposes
+  const goblinCampDecision: Decision<any> = {
+    id: 'wilderness_goblincamp_goblinleader',
+    name: 'Goblin Leader Decision',
+    description: 'What to do with the goblin leader',
+    options: [
+      { name: 'Kill the goblin leader' },
+      { name: 'Spare the goblin leader' },
+    ],
+    dependencies: [],
+  }
+
+  const owlbearCubDecision: Decision<any> = {
+    id: 'wilderness_forest_owlbearcub',
+    name: 'Owlbear Cub Decision',
+    description: 'What to do with the owlbear cub',
+    options: [
+      { name: 'Take the owlbear cub' },
+      { name: 'Leave the owlbear cub' },
+    ],
+    dependencies: [],
+  }
+
+  return [
+    goblinCampDecision,
+    owlbearCubDecision,
+  ]
+}
+
+// Wrap DecisionRow for story purposes to provide completed decisions
+const DecisionRowWithCompletedDecisions = (
+  props: React.ComponentProps<typeof DecisionRow>,
+) => {
+  // Mock the isDecisionUnavailable function by using our story-specific completed decisions
+  const originalIsDecisionUnavailable = isDecisionUnavailable
+  const modifiedIsDecisionUnavailable = (decision: Decision<any>) => {
+    return originalIsDecisionUnavailable(
+      decision,
+      getCompletedDecisionsForStories(),
+    )
+  }
+
+  // Replace the isDecisionUnavailable implementation for stories
+  ;(DecisionRow as any).prototype.isDecisionUnavailable =
+    modifiedIsDecisionUnavailable
+
+  return <DecisionRow {...props} />
+}
+
+const meta: Meta<typeof DecisionRowWithCompletedDecisions> = {
   title: 'Components/Sidebar/DecisionRow',
-  component: DecisionRow,
+  component: DecisionRowWithCompletedDecisions,
   parameters: {
     layout: 'centered',
   },
@@ -27,113 +76,95 @@ const meta: Meta<typeof DecisionRow> = {
 export default meta
 type Story = StoryObj<typeof DecisionRow>
 
-// Get required and optional decisions from mock data
-const requiredMockDecisions = allDecisions.filter((d: any) => d.required)
-const optionalMockDecisions = allDecisions.filter((d: any) => !d.required)
+// Create sample decisions for stories
+const createSampleDecision = (
+  id: string,
+  description: string,
+  required: boolean = false,
+  options: { name: string }[] = [{ name: 'Option 1' }, { name: 'Option 2' }],
+): Decision<any> => ({
+  id,
+  name: description,
+  description,
+  options,
+  dependencies: [],
+})
 
 export const Required: Story = {
   args: {
-    decision:
-      requiredMockDecisions.length > 0
-        ? requiredMockDecisions[0]
-        : {
-            id: 'required-decision' as any,
-            act: Act.I,
-            description: 'Accept or reject the tadpole',
-            type: DecisionType.DECISION,
-            options: [
-              { text: 'Accept the tadpole' },
-              { text: 'Reject the tadpole' },
-            ],
-            required: true,
-          },
+    decision: createSampleDecision(
+      'required-decision',
+      'Accept or reject the tadpole',
+      true,
+      [
+        { name: 'Accept the tadpole' },
+        { name: 'Reject the tadpole' },
+      ],
+    ),
   },
 }
 
 export const Optional: Story = {
   args: {
-    decision:
-      optionalMockDecisions.length > 0
-        ? optionalMockDecisions[0]
-        : {
-            id: 'optional-decision' as any,
-            act: Act.I,
-            description: 'Choose who to save from the pods',
-            type: DecisionType.DECISION,
-            options: [
-              { text: 'Save Shadowheart' },
-              { text: "Save Lae'zel" },
-              { text: 'Save no one' },
-            ],
-            required: false,
-          },
+    decision: createSampleDecision(
+      'optional-decision',
+      'Choose who to save from the pods',
+      false,
+      [
+        { name: 'Save Shadowheart' },
+        { name: "Save Lae'zel" },
+        { name: 'Save no one' },
+      ],
+    ),
   },
 }
 
 export const LongDescription: Story = {
   args: {
-    decision: {
-      id: 'long-description' as any,
-      act: Act.I,
-      description:
-        'This is an extremely long decision description that should be truncated when displayed in the decision row component',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Option 1' },
-        { text: 'Option 2' },
-      ],
-      required: true,
-    },
+    decision: createSampleDecision(
+      'long-description',
+      'This is an extremely long decision description that should be truncated when displayed in the decision row component',
+      true,
+    ),
   },
 }
 
 export const ActTwo: Story = {
   args: {
-    decision: {
-      id: 'act2-decision' as any,
-      act: Act.II,
-      description: 'Shadow Realm Decision',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Enter the darkness' },
-        { text: 'Find another path' },
+    decision: createSampleDecision(
+      'act2-decision',
+      'Shadow Realm Decision',
+      true,
+      [
+        { name: 'Enter the darkness' },
+        { name: 'Find another path' },
       ],
-      required: true,
-    },
+    ),
   },
 }
 
 export const ActThree: Story = {
   args: {
-    decision: {
-      id: 'act3-decision' as any,
-      act: Act.III,
-      description: 'City Decision',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Upper City Path' },
-        { text: 'Lower City Path' },
-      ],
-      required: false,
-    },
+    decision: createSampleDecision('act3-decision', 'City Decision', false, [
+      { name: 'Upper City Path' },
+      { name: 'Lower City Path' },
+    ]),
   },
 }
 
 export const ManyOptions: Story = {
   args: {
-    decision: {
-      id: 'many-options' as any,
-      act: Act.I,
-      description: 'Decision with many options',
-      type: DecisionType.DECISION,
-      options: [
-        { text: 'Option 1' },
-        { text: 'Option 2' },
-        { text: 'Option 3' },
-        { text: 'Option 4' },
-        { text: 'Option 5' },
+    decision: createSampleDecision(
+      'many-options',
+      'Decision with many options',
+      true,
+      [
+        { name: 'Option 1' },
+        { name: 'Option 2' },
+        { name: 'Option 3' },
+        { name: 'Option 4' },
+        { name: 'Option 5' },
       ],
-      required: true,
-    },
+    ),
   },
 }

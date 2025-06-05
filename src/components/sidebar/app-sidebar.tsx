@@ -4,12 +4,142 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from '@/components/ui/sidebar'
+import * as acts from '@/data/decisions'
 import { cn } from '@/lib/utils'
-import { getDecisionsByActAndRegion } from '@mock/decisions'
+import type { ActType, Decision, Region } from '@/types'
 import { ScrollArea } from '@ui/scroll-area'
 import { useEffect, useState } from 'react'
 import { ActSection } from './act-section'
 import { LegendArea } from './legend-area'
+
+// Helper function to get all decisions from an act
+const getDecisionsFromAct = (act: ActType): Decision<any>[] => {
+  const decisions: Decision<any>[] = []
+
+  // Iterate through act properties to find regions
+  Object.entries(act).forEach(([key, value]) => {
+    // Skip metadata properties
+    if (key === 'name' || key === 'description' || key === 'wikiUrl') {
+      return
+    }
+
+    const region = value as Region
+    if (region && typeof region === 'object' && region.name) {
+      // Iterate through region properties to find locations with decisions
+      Object.entries(region).forEach(([locKey, locValue]) => {
+        // Skip metadata properties
+        if (
+          locKey === 'name' ||
+          locKey === 'description' ||
+          locKey === 'wikiUrl'
+        ) {
+          return
+        }
+
+        // Check if it's a location with decisions
+        if (locValue && typeof locValue === 'object') {
+          // Extract decisions from location
+          Object.values(locValue).forEach(item => {
+            if (item && typeof item === 'object' && 'options' in item) {
+              decisions.push(item as Decision<any>)
+            }
+          })
+        }
+      })
+    }
+  })
+
+  return decisions
+}
+
+// Helper function to get decisions organized by act and region
+const getDecisionsByActAndRegion = () => {
+  const actGroups = []
+
+  // Process Act 1
+  if (acts.Act1) {
+    const act1Decisions = getDecisionsFromAct(acts.Act1)
+    const act1Regions: { name: string; decisions: Decision<any>[] }[] = []
+
+    // Group decisions by region
+    Object.entries(acts.Act1).forEach(([key, value]) => {
+      if (key === 'name' || key === 'description' || key === 'wikiUrl') {
+        return
+      }
+
+      const region = value as Region
+      if (region && typeof region === 'object' && region.name) {
+        const regionDecisions = act1Decisions.filter(d => {
+          // Logic to determine if decision belongs to this region
+          // This is a placeholder - you'll need to implement proper filtering
+          return true
+        })
+
+        act1Regions.push({
+          name: region.name,
+          decisions: regionDecisions,
+        })
+      }
+    })
+
+    actGroups.push({
+      act: { id: 'act1', name: acts.Act1.name },
+      regions: act1Regions,
+    })
+  }
+
+  // Process Act 2 (similar to Act 1)
+  if (acts.Act2) {
+    const act2Regions: { name: string; decisions: Decision<any>[] }[] = []
+
+    // Similar region processing as Act 1
+    Object.entries(acts.Act2).forEach(([key, value]) => {
+      if (key === 'name' || key === 'description' || key === 'wikiUrl') {
+        return
+      }
+
+      const region = value as Region
+      if (region && typeof region === 'object' && region.name) {
+        act2Regions.push({
+          name: region.name,
+          decisions: [], // Placeholder - need to filter proper decisions
+        })
+      }
+    })
+
+    actGroups.push({
+      act: { id: 'act2', name: acts.Act2.name },
+      regions: act2Regions,
+    })
+  }
+
+  // Process Act 3 (similar to Act 1 and 2)
+  if (acts.Act3) {
+    const act3Regions: { name: string; decisions: Decision<any>[] }[] = []
+
+    // Similar region processing
+    Object.entries(acts.Act3).forEach(([key, value]) => {
+      if (key === 'name' || key === 'description' || key === 'wikiUrl') {
+        return
+      }
+
+      const region = value as Region
+      if (region && typeof region === 'object' && region.name) {
+        act3Regions.push({
+          name: region.name,
+          decisions: [], // Placeholder - need to filter proper decisions
+        })
+      }
+    })
+
+    actGroups.push({
+      act: { id: 'act3', name: acts.Act3.name },
+      regions: act3Regions,
+    })
+  }
+
+  return actGroups
+}
 
 export function AppSidebar() {
   // Filter state
